@@ -1,0 +1,8 @@
+PLAN:
+- Real time stock data from NASDAQ - done via script
+- Send it via ethernet - work out how vivado ethernet IP works
+- Parse the data
+- Order book stuff maybe?
+- Trading algorithm
+- Reformat data
+- Send it back
