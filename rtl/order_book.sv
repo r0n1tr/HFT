@@ -1,4 +1,5 @@
 // TODO: add logic for whether buy or sell
+// TODO: need to add logic for when the outputs are valid - should be done when order is added (cache not updated) or after the cache is updated.
 module order_book 
 #(  parameter NUM_STOCKS = 4,
     parameter BOOK_DEPTH = 250, // number of orders we want to store per stock
@@ -16,7 +17,8 @@ module order_book
     output logic     [31:0] o_curr_price,
     output logic     [31:0] o_best_bid,
     output logic     [31:0] o_best_ask,
-    output logic     o_book_is_busy // can only read from the book (from trading logic) when book is not busy
+    output logic     o_book_is_busy, // can only read from the book (from trading logic) when book is not busy
+    output logic     o_data_valid
 )
     // order book array. Each trade takes up 3 32 bit wide registers.
     logic [REG_WIDTH - 1 : 0] order_book_memory [BOOK_DEPTH*NUM_STOCKS*3 - 1 : 0]; // order book has BOOK_DEPTH*NUM_STOCKS*3 - 1 number of 32 bit wide registers to hold orders
