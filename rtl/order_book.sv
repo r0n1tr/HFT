@@ -7,6 +7,13 @@ module order_book
     parameter CACHE_DEPTH = 1
 )
 (
+    // Testing signals:
+    input logic       tb_order_book_side,
+    input logic       [$clog2(BOOK_DEPTH*NUM_STOCKS) - 1 : 0] tb_order_book_address,
+    output logic      [31:0] tb_order_book_reg_1,
+    output logic      [31:0] tb_order_book_reg_2,
+    output logic      [31:0] tb_order_book_reg_3,   
+
     input logic      i_clk,
     input logic      i_reset_n, //LOGIC HIGH
     input logic      i_trade_type, // whether it is buy or sell // logic high = buy, logic low = sell.
