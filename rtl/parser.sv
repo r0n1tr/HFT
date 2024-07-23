@@ -20,7 +20,7 @@ module parser
         o_order_id <= ;
         o_price <= ;
         o_quantity <= ;
-        o_order_type <= ;
+        o_order_type <= ;   
     end
 
 endmodule
