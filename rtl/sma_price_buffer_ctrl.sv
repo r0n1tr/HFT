@@ -12,9 +12,7 @@ module sma_price_buffer_ctrl
     input logic                             i_write_en,
     input logic [1:0]                       i_stock_id,
     input logic                             i_mem_is_busy, // TODO, make use of this
-    output logic [ADDR_WIDTH - 1 : 0]       o_wr_addr,
-    output logic                            o_is_buffer_full,
-    output logic                            o_index,
+    output logic [ADDR_WIDTH - 1 : 0]       o_wr_addr
 )
 
     logic [$clog2(BUFFER_SIZE) - 1 : 0] index_array [$clog2(NUM_STOCKS) - 1 : 0]; 
@@ -47,7 +45,5 @@ module sma_price_buffer_ctrl
     end
 
     assign o_wr_addr = wr_addr_array[i_stock_id];
-    assign o_is_buffer_full = is_buffer_full_array[i_stock_id];
-    assign o_index = index_array[i_stock_id];
 
 endmodule

@@ -1,6 +1,7 @@
 module moving_stats
 #(
-    parameter DATA_WIDTH = 32
+    parameter DATA_WIDTH = 32,
+    parameter WINDOW_SIZE = 64, // TODO: hard code this
 )
 (
     input logic                             i_clk,
@@ -10,6 +11,7 @@ module moving_stats
     output logic [DATA_WIDTH - 1 : 0]       o_mean,
     output logic [DATA_WIDTH - 1 : 0]       o_stddev,
     output logic                            o_data_valid,
+    output logic [DATA_WIDTH - 1 : 0]       o_square_root_remainder
 )
 
     // TODO: 
@@ -29,21 +31,36 @@ module moving_stats
     E(X^2) - E(X)^2
     */
 
-    logic signed [DATA_WIDTH - 1 : 0]       mean_reg, 
-    logic signed [DATA_WIDTH - 1 : 0]       mean_squared_reg;
+    logic signed [DATA_WIDTH - 1 : 0]       total_sum, 
+    logic signed [DATA_WIDTH - 1 : 0]       total_squared_sum;
     logic                                   input_valid;
     logic                                   square_root_data_out;
     logic                                   square_root_data_valid;
+    logic                                   square_root_remainder; 
+    logic                                   sqaure_root_busy;
 
     always_ff @(posedge i_clk) begin
-        mean_reg <= mean_reg + (i_incoming_data - i_outgoing_data)/2;
-        mean_squared_reg <= mean_squared_reg + (i_incoming_data**2 - i_outgoing_data**2)/2;     
-        input_valid <= 1;
+        total_sum <= total_sum + i_incoming_data - i_outgoing_data;
+        total_squared_sum <= total_squared_sum + i_incoming_data**2 - i_outgoing_data**2;
+        if(!square_root_busy) input_valid <= 1;
     end
 
-    assign o_mean <= mean_reg;
+    square_root squareRoot (
+        .i_clk(i_clk),
+        .i_start(input_valid),
+        .o_busy(square_root_busy),
+        .o_valid(square_root_data_valid),
+        .i_rad(total_sum/WINDOW_SIZE - total_squared_sum/WINDOW_SIZE),
+        .o_root(square_root_data_out),
+        .o_rem(square_root_remainder)
+    )
+
+    assign o_mean <= total_sum/WINDOW_SIZE;
     assign o_stddev <= square_root_data_out;
     assign o_data_valid <= square_root_data_valid;
+    assign o_square_root_remainder <= square_root_remainder;
+
+
 
 
 endmodule

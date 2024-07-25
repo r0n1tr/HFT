@@ -11,19 +11,25 @@ module sma_price_buffer_mem
     input logic                                     i_write_en,
     input logic [ADDR_WIDTH - 1 : 0]                i_write_addr,
     input logic [DATA_WIDTH - 1 : 0]                i_write_data,
-    output logic                                    o_is_busy,
+    output logic                                    o_is_busy, // might not be necessary
     output logic [DATA_WIDTH - 1 : 0]               o_outgoing_price,
     output logic [DATA_WIDTH - 1 : 0]               o_incoming_price,
 
 )
 
     logic [DATA_WIDTH - 1 : 0] sma_buffer [NUM_STOCKS * BUFFER_SIZE];
+    logic [DATA_WIDTH - 1 : 0] outgoing_reg;
 
     always_ff @(posedge i_clk) begin // TODO: fix this so that it behaves more like a shift register
-        if (i_write_en) sma_buffer[i_write_addr] <= i_write_data;
+        if (i_write_en) begin
+            outgoing_reg <= sma_buffer[i_write_addr];
+            sma_buffer[i_write_addr] <= i_write_data;
+        end
     end
 
+    assign o_is_busy = i_write_en;
     assign o_incoming_price = i_write_data;
+    assign o_outgoing_price = outgoing_reg;
     
     
 endmodule
