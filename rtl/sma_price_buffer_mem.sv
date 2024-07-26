@@ -13,9 +13,8 @@ module sma_price_buffer_mem
     input logic [DATA_WIDTH - 1 : 0]                i_write_data,
     output logic                                    o_is_busy, // might not be necessary
     output logic [DATA_WIDTH - 1 : 0]               o_outgoing_price,
-    output logic [DATA_WIDTH - 1 : 0]               o_incoming_price,
-
-)
+    output logic [DATA_WIDTH - 1 : 0]               o_incoming_price
+);
 
     logic [DATA_WIDTH - 1 : 0] sma_buffer [NUM_STOCKS * BUFFER_SIZE];
     logic [DATA_WIDTH - 1 : 0] outgoing_reg;

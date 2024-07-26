@@ -13,10 +13,10 @@ module risk_management
     output logic                            o_data_valid
 );
 
-    enum {
+    typedef enum logic{
         BUY = 0,
         SELL = 1
-    }
+    } trade_t;
 
     always_ff @(posedge i_clk) begin 
         o_data_valid <= 0;

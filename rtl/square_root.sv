@@ -44,14 +44,14 @@ module square_root
     input logic [WIDTH-1:0]         i_rad,              // radicand
     output logic [WIDTH-1:0]        o_root,             // root
     output logic [WIDTH-1:0]        o_rem               // remainder
-)
+);
 
     logic [WIDTH-1:0] x, x_next;    // radicand copy
     logic [WIDTH-1:0] q, q_next;    // intermediate root (quotient)
     logic [WIDTH+1:0] ac, ac_next;  // accumulator (2 bits wider)
     logic [WIDTH+1:0] test_res;     // sign test result (2 bits wider)
 
-    localparam ITER = (WIDTH+FBITS) >> 1;  // iterations are half radicand+fbits width
+    localparam ITER = (WIDTH+FRACT_BITS) >> 1;  // iterations are half radicand+fbits width
     logic [$clog2(ITER)-1:0] i;            // iteration counter
 
     always_comb begin
@@ -66,13 +66,13 @@ module square_root
     end    
 
         always_ff @(posedge i_clk) begin
-        if (start) begin
+        if (i_start) begin
             o_busy <= 1;
             o_valid <= 0;
             i <= 0;
             q <= 0;
-            {ac, x} <= {{WIDTH{1'b0}}, rad, 2'b0};
-        end else if (busy) begin
+            {ac, x} <= {{WIDTH{1'b0}}, i_rad, 2'b0};
+        end else if (o_busy) begin
             if (i == ITER-1) begin  // we're done
                 o_busy <= 0;
                 o_valid <= 1;

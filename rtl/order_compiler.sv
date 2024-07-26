@@ -17,7 +17,7 @@ module order_compiler
     input logic [1:0]                       i_stock_id,
     output logic [DATA_WIDTH - 1 : 0]       o_order_reg_1,
     output logic [DATA_WIDTH - 1 : 0]       o_order_reg_2,
-    output logic                            o_data_valid,
+    output logic                            o_data_valid
 );
 
     logic [15:0]                            quantity;
@@ -30,7 +30,7 @@ module order_compiler
 
     typedef enum logic { 
         BUY = 0,
-        SELL = 1,
+        SELL = 1
      } trade_t;                           
 
     always_ff @(posedge i_clk) begin 
@@ -43,7 +43,7 @@ module order_compiler
             hold <= 0;
         end 
         else begin
-            hold <= 1
+            hold <= 1;
         end
         price <= buy_or_sell ? i_best_ask : i_best_bid;
         quantity <= i_fixed_risk_limit / (i_stddev * i_base_quantity);
@@ -62,8 +62,8 @@ module order_compiler
         .i_quantity(quantity),
         .i_position(i_position),
         .i_fixed_risk_limit(i_fixed_risk_limit),
-        .o_hold(risk_hold)
+        .o_hold(risk_hold),
         .o_data_valid(risk_data_valid)
-    )
+    );
 
 endmodule
