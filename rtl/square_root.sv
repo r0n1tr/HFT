@@ -33,8 +33,8 @@ Output: Q=1010 (decimal 11), R=0 (remainder taken from final A)
 // just experimenting with this one, not sure if its all that good though - 16 clock cycles for 32 bit fixed point numbers
 module square_root
 #(
-    parameter WIDTH = 16,
-    parameter FRACT_BITS = 16
+    parameter WIDTH = 8,
+    parameter FRACT_BITS = 0
 )
 (
     input logic                     i_clk,
