@@ -42,24 +42,21 @@ module parser
     } trade_t;
 
     typedef enum logic [1:0] { 
-        AAPL = 0;
-        AMZN = 1;
-        MSFT = 2;
-        GOOGL = 3;
+        AAPL = 0,
+        AMZN = 1,
+        GOOGL = 2,
+        MSFT = 3
     } stock_t;
 
-    logic i_stock_id [63:0] = {i_reg_4[15:0], i_reg_5, i_reg_6[31:16]};
+    logic [63:0] i_stock_id;
 
-    logic stock_id;
+    always_comb begin
+        i_stock_id = {i_reg_4[15:0], i_reg_5, i_reg_6[31:16]};
+    end
+
+    logic [1:0] stock_id;
 
     always_ff @(posedge i_clk) begin
-
-        case(i_stock_id)
-            64'h4141504c20202020 : stock_id <= AAPL;
-            64'h414d5a4e20202020 : stock_id <= AMZN;
-            64'h474f4f474c202020 : stock_id <= GOOGL;
-            64'h4d53465420202020 : stock_id <= MSFT;
-        endcase
 
         case(i_reg_1[31:24])
             8'h41: begin
@@ -67,7 +64,7 @@ module parser
                 o_stock_symbol <= stock_id;
                 o_order_id <= {i_reg_2[23:0], i_reg_3[31:24]};
                 o_price <= {i_reg_6[15:0], i_reg_7[31:16]};
-                o_quantity <= {i_reg_3[15:0], i_reg_4[31:16]};
+                o_quantity <= i_reg_4[31:16];
                 o_trade_type <= i_reg_3[16] ? BUY : SELL;
             end
             8'h58: begin
@@ -83,9 +80,26 @@ module parser
                 o_stock_symbol <= 0;
                 o_order_id <= {i_reg_2[23:0], i_reg_3[31:24]};
                 o_price <= 0;
-                o_quantity <= ;
+                o_quantity <= {i_reg_3[15:0], i_reg_4[31:24]};
                 o_trade_type <= 0;
             end
+            default: begin 
+                o_order_type <= 0;
+                o_stock_symbol <= 0;
+                o_order_id <= 0;
+                o_price <= 0;
+                o_quantity <= 0;
+                o_trade_type <= 0;
+            end
+        endcase
+    end
+
+    always_comb begin
+        case(i_stock_id)
+            64'h4141504c20202020 : stock_id <= AAPL;
+            64'h414d5a4e20202020 : stock_id <= AMZN;
+            64'h474f4f474c202020 : stock_id <= GOOGL;
+            64'h4d53465420202020 : stock_id <= MSFT;
         endcase
     end
 
