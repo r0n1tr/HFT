@@ -80,7 +80,7 @@ module parser
                 o_stock_symbol <= 0;
                 o_order_id <= {i_reg_2[23:0], i_reg_3[31:24]};
                 o_price <= 0;
-                o_quantity <= {i_reg_3[15:0], i_reg_4[31:24]};
+                o_quantity <= {i_reg_3[7:0], i_reg_4[31:24]};
                 o_trade_type <= 0;
             end
             default: begin 
@@ -96,10 +96,10 @@ module parser
 
     always_comb begin
         case(i_stock_id)
-            64'h4141504c20202020 : stock_id <= AAPL;
-            64'h414d5a4e20202020 : stock_id <= AMZN;
-            64'h474f4f474c202020 : stock_id <= GOOGL;
-            64'h4d53465420202020 : stock_id <= MSFT;
+            64'h4141504c20202020 : stock_id = AAPL;
+            64'h414d5a4e20202020 : stock_id = AMZN;
+            64'h474f4f474c202020 : stock_id = GOOGL;
+            64'h4d53465420202020 : stock_id = MSFT;
         endcase
     end
 
