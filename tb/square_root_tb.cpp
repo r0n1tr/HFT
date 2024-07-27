@@ -3,14 +3,16 @@
 #include "verilated_vcd_c.h"
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
 
 int main(int argc, char **argv, char **env)
 {
     int i; // number of clock cycles to simulate
     int clk; // module clock signal
-    double o_root = 0;
-    double o_rem = 0.0;
+    float o_root = 0.0;
+    float o_rem = 0.0;
     bool valid;
+    double constant = 1.52e-5;
 
     Verilated::commandArgs(argc, argv);
 
@@ -26,7 +28,7 @@ int main(int argc, char **argv, char **env)
     // simualtion inputs
     top->i_clk = 1;
 
-    for (i = 0; i < 300; i++)
+    for (i = 0; i < 40; i++)
     {
         for(clk = 0; clk < 2; clk++)
         {
@@ -44,17 +46,29 @@ int main(int argc, char **argv, char **env)
         }
         
 
-        top->i_rad = 2;
+        top->i_rad = 2.0;
         valid = top->o_valid;
 
-        if(valid){
+        // if(valid){
         
+        //     o_root = top->o_root;
+        //     o_rem = top->o_rem;
+        //     std::cout << std::fixed << std::setprecision(10); // Set precision to 10 decimal places
+        //     std::cout << "root: " << o_root << std::endl;
+        //     std::cout << "rem: " << o_rem << std::endl;
+        // }
+        if (valid) {
             o_root = top->o_root;
             o_rem = top->o_rem;
-            std::cout << "root: " << o_root << std::endl;
-            std::cout << "rem: " << o_rem << std::endl;
-
+            std::cout << std::fixed << std::setprecision(10); // Set precision to 10 decimal places
+            std::cout << "\t" << std::setw(8) << (2 * i + clk) << ": "
+                      << "sqrt(" << top->i_rad << ") = " << top->o_LHS << "." << top->o_RHS << " "
+                      << std::bitset<32>(static_cast<unsigned long>(o_root)) << " ("
+                    //   << o_root << ") "
+                    //   << "(rem = " << std::bitset<16>(static_cast<unsigned long long>(o_rem)) << ") "
+                      << "(V = " << valid << ")" << std::endl;
         }
+
    
     }
 

@@ -33,14 +33,16 @@ Output: Q=1010 (decimal 11), R=0 (remainder taken from final A)
 // just experimenting with this one, not sure if its all that good though - 16 clock cycles for 32 bit fixed point numbers
 module square_root
 #(
-    parameter WIDTH = 8,
-    parameter FRACT_BITS = 0
+    parameter WIDTH = 32,
+    parameter FRACT_BITS = 32
 )
 (
     input logic                     i_clk,
     input logic                     i_start,            // start signal
     output logic                    o_busy,             // calculation in progress
     output logic                    o_valid,            // root and rem are valid
+    output logic [WIDTH-1:0]        o_LHS,
+    output logic [FRACT_BITS-1:0]   o_RHS,
     input logic [WIDTH-1:0]         i_rad,              // radicand
     output logic [WIDTH-1:0]        o_root,             // root
     output logic [WIDTH-1:0]        o_rem               // remainder
@@ -51,7 +53,7 @@ module square_root
     logic [WIDTH+1:0] ac, ac_next;  // accumulator (2 bits wider)
     logic [WIDTH+1:0] test_res;     // sign test result (2 bits wider)
 
-    localparam ITER = (WIDTH+FRACT_BITS) >> 1;  // iterations are half radicand+fbits width
+    localparam ITER = (WIDTH + FRACT_BITS) >> 1;  // iterations are half radicand+fbits width
     logic [$clog2(ITER)-1:0] i;            // iteration counter
 
     always_comb begin
@@ -77,6 +79,8 @@ module square_root
                 o_busy <= 0;
                 o_valid <= 1;
                 o_root <= q_next;
+                o_LHS <= q_next[WIDTH-1:FRACT_BITS/2];
+                o_RHS <= q_next[(FRACT_BITS/2)-1:0]; 
                 o_rem <= ac_next[WIDTH+1:2];  // undo final shift
             end else begin  // next iteration
                 i <= i + 1;
