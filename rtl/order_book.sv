@@ -1,4 +1,5 @@
 // TODO: need to add logic for when the outputs are valid - should be done when order is added (cache not updated) or after the cache is updated.
+// trade_type: 1 = buy, 0 = sell
 module order_book 
 #(  parameter NUM_STOCKS = 4,
     parameter BOOK_DEPTH = 10, // number of orders we want to store per stock
@@ -7,11 +8,36 @@ module order_book
 )
 (
     // Testing signals:
-    input logic       tb_order_book_side,
-    input logic       [$clog2(BOOK_DEPTH*NUM_STOCKS*3) - 1 : 0] tb_order_book_address,
-    output logic      [31:0] tb_order_book_reg_1,
-    output logic      [31:0] tb_order_book_reg_2,
-    output logic      [31:0] tb_order_book_reg_3,   
+    output logic      [31:0] tb_reg_1,
+    output logic      [31:0] tb_reg_2,
+    output logic      [31:0] tb_reg_3,   
+    output logic      [31:0] tb_reg_4,
+    output logic      [31:0] tb_reg_5,
+    output logic      [31:0] tb_reg_6,
+    output logic      [31:0] tb_reg_7,
+    output logic      [31:0] tb_reg_8,
+    output logic      [31:0] tb_reg_9,
+    output logic      [31:0] tb_reg_10,
+    output logic      [31:0] tb_reg_11,
+    output logic      [31:0] tb_reg_12,
+    output logic      [31:0] tb_reg_13,
+    output logic      [31:0] tb_reg_14,
+    output logic      [31:0] tb_reg_15,
+    output logic      [31:0] tb_reg_16,
+    output logic      [31:0] tb_reg_17,
+    output logic      [31:0] tb_reg_18,
+    output logic      [31:0] tb_reg_19,
+    output logic      [31:0] tb_reg_20,
+    output logic      [31:0] tb_reg_21,
+    output logic      [31:0] tb_reg_22,
+    output logic      [31:0] tb_reg_23,
+    output logic      [31:0] tb_reg_24,
+    output logic      [31:0] tb_reg_25,
+    output logic      [31:0] tb_reg_26,
+    output logic      [31:0] tb_reg_27,
+    output logic      [31:0] tb_reg_28,
+    output logic      [31:0] tb_reg_29,
+    output logic      [31:0] tb_reg_30,
 
     input logic             i_clk,
     input logic             i_reset_n, //LOGIC HIGH
@@ -80,15 +106,69 @@ module order_book
 
     // TESTING LOGIC:
     always_comb begin
-        if(tb_order_book_side) begin
-            tb_order_book_reg_1 = order_book_memory_bid[tb_order_book_address];
-            tb_order_book_reg_2 = order_book_memory_bid[tb_order_book_address];
-            tb_order_book_reg_3 = order_book_memory_bid[tb_order_book_address];
+        if(i_order_type) begin
+            tb_reg_1 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 0];
+            tb_reg_2 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 1];
+            tb_reg_3 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 2];
+            tb_reg_4 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 3];
+            tb_reg_5 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 4];
+            tb_reg_6 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 5];
+            tb_reg_7 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 6];
+            tb_reg_8 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 7];
+            tb_reg_9 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 8];
+            tb_reg_10 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 9];
+            tb_reg_11 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 10];
+            tb_reg_12 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 11];
+            tb_reg_13 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 12];
+            tb_reg_14 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 13];
+            tb_reg_15 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 14];
+            tb_reg_16 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 15];
+            tb_reg_17 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 16];
+            tb_reg_18 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 17];
+            tb_reg_19 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 18];
+            tb_reg_20 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 19];
+            tb_reg_21 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 20];
+            tb_reg_22 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 21];
+            tb_reg_23 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 22];
+            tb_reg_24 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 23];
+            tb_reg_25 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 24];
+            tb_reg_26 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 25];
+            tb_reg_27 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 26];
+            tb_reg_28 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 27];
+            tb_reg_29 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 28];
+            tb_reg_30 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 29];
         end
         else begin
-            tb_order_book_reg_1 = order_book_memory_ask[tb_order_book_address];
-            tb_order_book_reg_2 = order_book_memory_ask[tb_order_book_address];
-            tb_order_book_reg_3 = order_book_memory_ask[tb_order_book_address];
+            tb_reg_1 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 0];
+            tb_reg_2 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 1];
+            tb_reg_3 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 2];
+            tb_reg_4 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 3];
+            tb_reg_5 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 4];
+            tb_reg_6 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 5];
+            tb_reg_7 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 6];
+            tb_reg_8 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 7];
+            tb_reg_9 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 8];
+            tb_reg_10 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 9];
+            tb_reg_11 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 10];
+            tb_reg_12 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 11];
+            tb_reg_13 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 12];
+            tb_reg_14 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 13];
+            tb_reg_15 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 14];
+            tb_reg_16 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 15];
+            tb_reg_17 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 16];
+            tb_reg_18 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 17];
+            tb_reg_19 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 18];
+            tb_reg_20 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 19];
+            tb_reg_21 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 20];
+            tb_reg_22 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 21];
+            tb_reg_23 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 22];
+            tb_reg_24 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 23];
+            tb_reg_25 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 24];
+            tb_reg_26 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 25];
+            tb_reg_27 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 26];
+            tb_reg_28 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 27];
+            tb_reg_29 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 28];
+            tb_reg_30 = order_book_memory_ask[i_stock_id * BOOK_DEPTH + 29];
         end
     end
 
