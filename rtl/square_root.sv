@@ -2,13 +2,13 @@ module square_root #(
     parameter WIDTH=32,  // width of radicand
     parameter FBITS=16   // fractional bits (for fixed point)
     ) (
-    input wire logic clk,
-    input wire logic start,             // start signal
-    output     logic busy,              // calculation in progress
-    output     logic valid,             // root and rem are valid
-    input wire logic [WIDTH-1:0] rad,   // radicand
-    output     logic [WIDTH-1:0] root,  // root
-    output     logic [WIDTH-1:0] rem    // remainder
+    input wire logic i_clk,
+    input wire logic i_start,             // start signal
+    output     logic o_busy,              // calculation in progress
+    output     logic o_valid,             // root and rem are valid
+    input wire logic [WIDTH-1:0] i_rad,   // radicand
+    output     logic [WIDTH-1:0] o_root,  // root
+    output     logic [WIDTH-1:0] o_rem    // remainder
     );
 
     logic [WIDTH-1:0] x, x_next;    // radicand copy
@@ -30,21 +30,21 @@ module square_root #(
         end
     end
 
-    always_ff @(posedge clk) begin
-        if (start) begin
-            busy <= 1;
-            valid <= 0;
+    always_ff @(posedge i_clk) begin
+        if (i_start) begin
+            o_busy <= 1;
+            o_valid <= 0;
             i <= 0;
             q <= 0;
-            {ac, x} <= {{WIDTH{1'b0}}, rad, 2'b0};
-        end else if (busy) begin
+            {ac, x} <= {{WIDTH{1'b0}}, i_rad, 2'b0};
+        end else if (o_busy) begin
             /* verilator lint_off WIDTH */
             if (i == ITER-1) begin  // we're done
             /* verilator lint_on WIDTH */
-                busy <= 0;
-                valid <= 1;
-                root <= q_next;
-                rem <= ac_next[WIDTH+1:2];  // undo final shift
+                o_busy <= 0;
+                o_valid <= 1;
+                o_root <= q_next;
+                o_rem <= ac_next[WIDTH+1:2];  // undo final shift
             end else begin  // next iteration
                 i <= i + 1;
                 x <= x_next;

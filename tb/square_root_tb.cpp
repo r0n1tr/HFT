@@ -69,14 +69,14 @@ int main(int argc, char **argv, char **env)
     int fractionalBits = 16; // Number of fractional bits
 
     // simualtion inputs
-    top->clk = 1;
+    top->i_clk = 1;
 
     for (i = 0; i < 300; i++)
     {
         for(clk = 0; clk < 2; clk++)
         {
             tfp->dump (2*i+clk);
-            top->clk = !top->clk;
+            top->i_clk = !top->i_clk;
             top->eval();           
         }
 
@@ -84,22 +84,22 @@ int main(int argc, char **argv, char **env)
             {
             case(5):
                 std::cout << "Loading inputs..." << std::endl;
-                top->start = 1;
+                top->i_start = 1;
                 // top->rad = 0x00004000;
-                top->rad = 0x00020000;
+                top->i_rad = 0x00020000;
                 break;
             case(6):
-                top->start = 0;
+                top->i_start = 0;
             }
         
-        if(top->valid == 1)
+        if(top->o_valid == 1)
         {
             std::cout << "SQUARE ROOT COMPLETE: " << std::endl; 
             std::cout << i << std::endl;
-            std::bitset<32> binary(top->root); // Adjust the size (32) if necessary
+            std::bitset<32> binary(top->o_root); // Adjust the size (32) if necessary
             // std::cout << binary << std::endl;
-            printFixedPointBinary(top->root, integerBits, fractionalBits);
-            printFixedPointDecimal(top->root, integerBits, fractionalBits);
+            printFixedPointBinary(top->o_root, integerBits, fractionalBits);
+            printFixedPointDecimal(top->o_root, integerBits, fractionalBits);
             break;
         }
         
