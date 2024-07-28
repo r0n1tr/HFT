@@ -13,16 +13,7 @@
 #define RESET   "\033[0m"
 #define NUM_TEST_CASES 200
 
-void initialiseInputs(Vorder_book* top, const std::vector<int>& inputs)
-{
-    top->i_reset_n = ;
-    top->i_trade_t = ;
-    top->i_stock_id = ;
-    top->i_order_type = ;
-    top->i_quantity = ;
-    top->i_price = ;
-    top->i_order_id = ;
-}
+
 
 bool verifyOrderBook(Vorder_book* top, const std::vector<int>& expected_outputs, const std::string& test_name)
 {
@@ -58,6 +49,7 @@ bool verifyOrderBook(Vorder_book* top, const std::vector<int>& expected_outputs,
     received_outputs.push_back(top->tb_reg_28);
     received_outputs.push_back(top->tb_reg_29);
     received_outputs.push_back(top->tb_reg_30);
+
     for (int i = 0; i < expected_outputs.size(); i++)
     {
         if (received_outputs[i] != expected_outputs[i])
@@ -91,7 +83,7 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
     received_outputs.push_back(top->o_curr_price);
     received_outputs.push_back(top->o_best_bid); 
     received_outputs.push_back(top->o_best_ask);
-    received_outputs.push_back(top->o->book_is_busy); 
+    received_outputs.push_back(top->o_book_is_busy); 
     received_outputs.push_back(top->o_data_valid);
 
     for (int i = 0; i < received_outputs.size(); i++)
@@ -123,17 +115,34 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
     return true; 
 }
 
+void initialiseInputs(Vorder_book* top, const std::vector<int>& inputs)
+{
+    top->i_reset_n = inputs[0];
+    top->i_trade_type = inputs[1];
+    top->i_stock_id = inputs[2];
+    top->i_order_type = inputs[3];
+    top->i_quantity = inputs[4];
+    top->i_price = inputs[5];
+    top->i_order_id = inputs[6];
+}
+
 int main(int argc, char **argv, char **env)
 {
+    int i; // number of clock cycles to simulate
+    int clk; // module clock signal
 
     int test_count = 0;
     int pass_count = 0;
 
-    std::ifstream file("order_book_test_cases.csv");
-    std::string line;
+    std::ifstream file("Order book test cases.csv");
+    if (!file.is_open()) {
+        std::cerr << "Failed to open the file." << std::endl;
+        return 1;
+    }
 
-    int i; // number of clock cycles to simulate
-    int clk; // module clock signal
+    std::string line;
+    std::getline(file, line); // to skip titles
+    
 
     Verilated::commandArgs(argc, argv);
 
@@ -149,73 +158,101 @@ int main(int argc, char **argv, char **env)
     // simualtion inputs
     top->i_clk = 1;
 
-    for (i = 0; i < 300000; i++)
-    {
-        for(clk = 0; clk < 2; clk++)
-        {
-            tfp->dump (2*i+clk);
+    std::vector<int> inputs(7);
+    std::vector<int> expectedOrderBook(30);
+    std::vector<int> expectedOutputs(5);
+    std::string testCaseName;
+
+    std::getline(file, line); // to skip titles
+    // Read the entire file into a vector of strings
+    std::vector<std::string> lines;
+    
+    while (std::getline(file, line)) {
+        lines.push_back(line);
+    }
+
+    // Close the file
+    file.close();
+    int internal_counter = 0;
+
+    for (int i = 0; i < 300000; i++) {
+        for (int clk = 0; clk < 2; clk++) {
+            tfp->dump(2 * i + clk);
             top->i_clk = !top->i_clk;
             top->eval();
         }
+    
+        if (i % 40 == 0 && internal_counter < lines.size()) {
+            std::stringstream ss(lines[internal_counter]);
+            std::getline(ss, testCaseName, ',');
 
-        std::string ss(line);
-        std::string testCaseName; 
-        std::vector<int> inputs(7);
-        std::vector<int> expectedOrderBook(30);
-        std::vector<int> expectedOutputs(5);
+            for (int j = 0; j < 7; ++j) {
+                std::string input;
+                std::getline(ss, input, ',');
+                if (!input.empty()) {
+                    try {
+                        inputs[j] = std::stoi(input);
+                    } catch (const std::invalid_argument& e) {
+                        std::cerr << "Invalid input in test case: " << testCaseName << " - " << input << std::endl;
+                        return 1;
+                    }
+                }
+            }
 
-        std::getline(ss, testCaseName, ',');
+            for (int j = 0; j < 30; ++j) {
+                std::string output;
+                std::getline(ss, output, ',');
+                if (!output.empty()) {
+                    try {
+                        expectedOrderBook[j] = std::stoi(output);
+                    } catch (const std::invalid_argument& e) {
+                        std::cerr << "Invalid expected order book value in test case: " << testCaseName << " - " << output << std::endl;
+                        return 1;
+                    }
+                }
+            }
 
-        for (int j = 0; j < 7; ++j) {
-            std::string input;
-            std::getline(ss, input, ',');
-            inputs[j] = std::stoi(input);
-        }
+            for (int j = 0; j < 5; ++j) {
+                std::string output;
+                std::getline(ss, output, ',');
+                if (!output.empty()) {
+                    try {
+                        expectedOutputs[j] = std::stoi(output);
+                    } catch (const std::invalid_argument& e) {
+                        std::cerr << "Invalid expected output value in test case: " << testCaseName << " - " << output << std::endl;
+                        return 1;
+                    }
+                }
+            }
 
-        for (int j = 0; j < 30; ++j) {
-            std::string output;
-            std::getline(ss, output, ',');
-            expectedOrderBook[j] = std::stoi(output);
-        }
-
-        for (int j = 0; j < 5; ++j) {
-            std::string output;
-            std::getline(ss, output, ',');
-            expectedOutputs[j] = std::stoi(output);
-        }
-
-        if (i%40 == 0)
-        {
-            // load inputs every 40 clock cycles
             initialiseInputs(top, inputs);
+            internal_counter++;
         }
 
-        if (((i-30)%40 == 0) && (i != 30))
-        {
-            // read outputs 30 clock cycles after inputs intialised
-            if(verifyOrderBook(top, expectedOrderBook, testCaseName) && verifyOutputs(top, expectedOutputs, testCaseName))
-            {
+        if (((i - 30) % 40 == 0) && (i != 30)) {
+            if (verifyOrderBook(top, expectedOrderBook, testCaseName) && verifyOutputs(top, expectedOutputs, testCaseName)) {
                 std::cout << GREEN << testCaseName << ": passed" << RESET << std::endl;
-                pass_count ++;
+                pass_count++;
+            } else {
+                std::cout << RED << testCaseName << ": failed" << RESET << std::endl;
+            }
+
+            test_count++;
+            if (test_count == NUM_TEST_CASES) {
+                break;
             }
         }
-
-        test_count++;
-
-        if(test_count == NUM_TEST_CASES)
-        {
-            if(test_count != pass_count)
-            {
-                std::cout << BOLD << RED << "Only " << pass_count << " cases out of " << NUM_TEST_CASES << "passed" << RESET << std::endl;
-            }
-            else
-            {
-                std::cout << BOLD << GREEN << "All tests passed" << RESET << std::endl;
-            }
-            break;
-        }
-        
     }
+
+        if (test_count != pass_count) {
+            std::cout << BOLD << RED << "Only " << pass_count << " cases out of " << NUM_TEST_CASES << " passed" << RESET << std::endl;
+        } else {
+            std::cout << BOLD << GREEN << "All tests passed" << RESET << std::endl;
+        }
+    
+
     tfp->close();
-    exit(0);
+    delete top;
+    return 0;
 }
+

@@ -106,7 +106,7 @@ module order_book
 
     // TESTING LOGIC:
     always_comb begin
-        if(i_order_type) begin
+        if(i_trade_type) begin
             tb_reg_1 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 0];
             tb_reg_2 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 1];
             tb_reg_3 = order_book_memory_bid[i_stock_id * BOOK_DEPTH + 2];
