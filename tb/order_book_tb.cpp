@@ -24,7 +24,7 @@ void initialiseInputs(Vorder_book* top, const std::vector<int>& inputs)
     top->i_order_id = ;
 }
 
-bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, const std::string& test_name)
+bool verifyOrderBook(Vorder_book* top, const std::vector<int>& expected_outputs, const std::string& test_name)
 {
     // total of 30 outputs for each register on one side of one stock's order book
     std::vector<int> received_outputs;
@@ -83,6 +83,46 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
 
 }
 
+
+bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, const std::string& test_name)
+{
+    std::vector<int> received_outputs;
+
+    received_outputs.push_back(top->o_curr_price);
+    received_outputs.push_back(top->o_best_bid); 
+    received_outputs.push_back(top->o_best_ask);
+    received_outputs.push_back(top->o->book_is_busy); 
+    received_outputs.push_back(top->o_data_valid);
+
+    for (int i = 0; i < received_outputs.size(); i++)
+    {
+        if(received_outputs[i] != expected_outputs[i])
+        {
+            switch (i)
+            {
+            case(0):
+                std::cout << BOLD << RED << test_name << ": curr_price incorrect" << RESET << std::endl;
+                break;
+            case(1):
+                std::cout << BOLD << RED << test_name << ": best_bid incorrect" << RESET << std::endl;
+                break;
+            case(2):
+                std::cout << BOLD << RED << test_name << ": best_ask incorrect" << RESET << std::endl;
+                break;
+            case(3):
+                std::cout << BOLD << RED << test_name << ": book_is_busy incorrect" << RESET << std::endl;
+                break;
+            case(4):
+                std::cout << BOLD << RED << test_name << ": data_valid incorrect" << RESET << std::endl;
+                break;
+            }
+            return false;
+        }
+    }
+
+    return true; 
+}
+
 int main(int argc, char **argv, char **env)
 {
 
@@ -121,7 +161,8 @@ int main(int argc, char **argv, char **env)
         std::string ss(line);
         std::string testCaseName; 
         std::vector<int> inputs(7);
-        std::vector<int> expectedOutputs(30);
+        std::vector<int> expectedOrderBook(30);
+        std::vector<int> expectedOutputs(5);
 
         std::getline(ss, testCaseName, ',');
 
@@ -134,19 +175,25 @@ int main(int argc, char **argv, char **env)
         for (int j = 0; j < 30; ++j) {
             std::string output;
             std::getline(ss, output, ',');
+            expectedOrderBook[j] = std::stoi(output);
+        }
+
+        for (int j = 0; j < 5; ++j) {
+            std::string output;
+            std::getline(ss, output, ',');
             expectedOutputs[j] = std::stoi(output);
         }
 
-        if (i%30 == 0)
+        if (i%40 == 0)
         {
-            // load inputs every 30 clock cycles
+            // load inputs every 40 clock cycles
             initialiseInputs(top, inputs);
         }
 
-        if (((i-20)%30 == 0) && (i != 20))
+        if (((i-30)%40 == 0) && (i != 30))
         {
-            // read outputs 20 clock cycles after inputs intialised
-            if(verifyOutputs(top, expectedOutputs, testCaseName))
+            // read outputs 30 clock cycles after inputs intialised
+            if(verifyOrderBook(top, expectedOrderBook, testCaseName) && verifyOutputs(top, expectedOutputs, testCaseName))
             {
                 std::cout << GREEN << testCaseName << ": passed" << RESET << std::endl;
                 pass_count ++;
