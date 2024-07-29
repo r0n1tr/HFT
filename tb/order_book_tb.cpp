@@ -1,3 +1,4 @@
+#include "TestCase.h"
 #include "Vorder_book.h"
 #include "verilated.h"
 #include "verilated_vcd_c.h"
@@ -11,9 +12,42 @@
 #define GREEN   "\033[32m"
 #define RED     "\033[31m"
 #define RESET   "\033[0m"
-#define NUM_TEST_CASES 200
+#define NUM_TEST_CASES 157
 
 
+
+std::vector<TestCase> readCSV(const std::string& filename)
+{
+    std::vector<TestCase> testCases;
+    std::ifstream file(filename);
+    std::string line;
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string cell;
+        TestCase testCase;
+
+        std::getline(ss, cell, ',');
+        testCase.name = cell;
+
+        for (int i = 0; i < 7; ++i) {
+            std::getline(ss, cell, ',');
+            testCase.inputs.push_back(std::stoi(cell));
+        }
+
+        for (int i = 0; i < 30; ++i) {
+            std::getline(ss, cell, ',');
+            testCase.expectedOrderBook.push_back(std::stoi(cell));
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            std::getline(ss, cell, ',');
+            testCase.expectedOutputs.push_back(std::stoi(cell));
+        }
+
+        testCases.push_back(testCase);
+    }
+    return testCases;
+}
 
 bool verifyOrderBook(Vorder_book* top, const std::vector<int>& expected_outputs, const std::string& test_name)
 {
@@ -75,7 +109,6 @@ bool verifyOrderBook(Vorder_book* top, const std::vector<int>& expected_outputs,
 
 }
 
-
 bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, const std::string& test_name)
 {
     std::vector<int> received_outputs;
@@ -134,15 +167,9 @@ int main(int argc, char **argv, char **env)
     int test_count = 0;
     int pass_count = 0;
 
-    std::ifstream file("order_book_test_cases.csv");
-    if (!file.is_open()) {
-        std::cerr << "Failed to open the file." << std::endl;
-        return 1;
-    }
+    std::string filename = "order_book_test_cases.csv";
 
-    std::string line;
-    // std::getline(file, line); // to skip titles
-    
+    std::vector<TestCase> tests = readCSV(filename);
 
     Verilated::commandArgs(argc, argv);
 
@@ -158,98 +185,44 @@ int main(int argc, char **argv, char **env)
     // simualtion inputs
     top->i_clk = 1;
 
-    std::vector<int> inputs(7);
-    std::vector<int> expectedOrderBook(30);
-    std::vector<int> expectedOutputs(5);
-    std::string testCaseName;
-
-    std::getline(file, line); // to skip titles
-    // Read the entire file into a vector of strings
-    std::vector<std::string> lines;
     
-    while (std::getline(file, line)) {
-        lines.push_back(line);
-        // std::cout << line << std::endl;
-    }
-
+    
     // Close the file
-    file.close();
-    int internal_counter = 0;
 
-    for (int i = 0; i < 300000; i++) {
+    
+    for (int i = 0; i < 7000; i++) {
         for (int clk = 0; clk < 2; clk++) {
             tfp->dump(2 * i + clk);
             top->i_clk = !top->i_clk;
             top->eval();
         }
     
-        if (i % 40 == 0 && internal_counter < lines.size()) {
-            std::stringstream ss(lines[internal_counter]);
-            std::getline(ss, testCaseName, ',');
-
-            for (int j = 0; j < 7; ++j) {
-                std::string input;
-                std::getline(ss, input, ',');
-                if (!input.empty()) {
-                    try {
-                        inputs[j] = std::stoi(input);
-                    } catch (const std::invalid_argument& e) {
-                        std::cerr << "Invalid input in test case: " << testCaseName << " - " << input << std::endl;
-                        return 1;
-                    }
-                }
-            }
-
-            for (int j = 0; j < 30; ++j) {
-                std::string output;
-                std::getline(ss, output, ',');
-                if (!output.empty()) {
-                    try {
-                        expectedOrderBook[j] = std::stoi(output);
-                    } catch (const std::invalid_argument& e) {
-                        std::cerr << "Invalid expected order book value in test case: " << testCaseName << " - " << output << std::endl;
-                        return 1;
-                    }
-                }
-            }
-
-            for (int j = 0; j < 5; ++j) {
-                std::string output;
-                std::getline(ss, output, ',');
-                if (!output.empty()) {
-                    try {
-                        expectedOutputs[j] = std::stoi(output);
-                    } catch (const std::invalid_argument& e) {
-                        std::cerr << "Invalid expected output value in test case: " << testCaseName << " - " << output << std::endl;
-                        return 1;
-                    }
-                }
-            }
-
-            initialiseInputs(top, inputs);
-            internal_counter++;
+        if ((i % 40 == 0) && (i != 0)) {
+            initialiseInputs(top, tests[test_count].inputs);
         }
 
-        if (((i - 30) % 40 == 0) && (i != 30)) {
-            if (verifyOrderBook(top, expectedOrderBook, testCaseName) && verifyOutputs(top, expectedOutputs, testCaseName)) {
-                std::cout << GREEN << testCaseName << ": passed" << RESET << std::endl;
+        if (top->o_data_valid == 1) {
+            if (verifyOrderBook(top, tests[test_count].expectedOrderBook, tests[test_count].name) && verifyOutputs(top, tests[test_count].expectedOutputs, tests[test_count].name)) {
+                std::cout << GREEN << tests[test_count].name << ": passed" << RESET << std::endl;
                 pass_count++;
             } else {
-                std::cout << RED << testCaseName << ": failed" << RESET << std::endl;
+                std::cout << RED << tests[test_count].name << ": failed" << RESET << std::endl;
             }
 
             test_count++;
-            if (test_count == NUM_TEST_CASES) {
+            if (test_count == tests.size()) {
+                // std::cout << i << std::endl;
                 break;
             }
         }
     }
 
-        if (test_count != pass_count) {
-            std::cout << BOLD << RED << "Only " << pass_count << " cases out of " << NUM_TEST_CASES << " passed" << RESET << std::endl;
-        } else {
-            std::cout << BOLD << GREEN << "All tests passed" << RESET << std::endl;
-        }
+    if (test_count != pass_count) {
+        std::cout << BOLD << RED << "Only " << pass_count << " cases out of " << NUM_TEST_CASES << " passed" << RESET << std::endl;
+    } else {
+        std::cout << BOLD << GREEN << "All tests passed" << RESET << std::endl;
+    }
+        
     
 
     tfp->close();

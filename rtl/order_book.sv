@@ -198,12 +198,8 @@ module order_book
     end
 
      always_ff @(posedge i_clk) begin
-        // defaults
         o_data_valid <= 0;
         o_book_is_busy <= 1; 
-        // o_curr_price <= i_price;
-        // o_best_ask <= best_ask_cache[(i_stock_id*3) + 1];
-        // o_best_bid <= best_bid_cache[(i_stock_id*3) + 1];
         curr_state <= next_state;
         case(curr_state)
             IDLE: begin
