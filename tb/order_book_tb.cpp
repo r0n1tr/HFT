@@ -15,7 +15,6 @@
 #define NUM_TEST_CASES 157
 
 
-
 std::vector<TestCase> readCSV(const std::string& filename)
 {
     std::vector<TestCase> testCases;
@@ -150,6 +149,7 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
 
 void initialiseInputs(Vorder_book* top, const std::vector<int>& inputs)
 {
+    // std::cout << "Inputs initialised" << std::endl;
     top->i_reset_n = inputs[0];
     top->i_trade_type = inputs[1];
     top->i_stock_id = inputs[2];
@@ -199,14 +199,17 @@ int main(int argc, char **argv, char **env)
     
         if ((i % 40 == 0) && (i != 0)) {
             initialiseInputs(top, tests[test_count].inputs);
+            top->i_data_valid = 1;
         }
 
-        if (top->o_data_valid == 1) {
+        else if (((i-30)%40 == 0) && (i != 30)) {
+            top->i_trading_logic_ready = 1;
             if (verifyOrderBook(top, tests[test_count].expectedOrderBook, tests[test_count].name) && verifyOutputs(top, tests[test_count].expectedOutputs, tests[test_count].name)) {
                 std::cout << GREEN << tests[test_count].name << ": passed" << RESET << std::endl;
                 pass_count++;
             } else {
-                std::cout << RED << tests[test_count].name << ": failed" << RESET << std::endl;
+                // std::cout << RED << tests[test_count].name << ": failed" << RESET << std::endl;
+                ;
             }
 
             test_count++;
@@ -215,9 +218,16 @@ int main(int argc, char **argv, char **env)
                 break;
             }
         }
+        else
+        {
+            top->i_trading_logic_ready = 0;
+            top->i_data_valid = 0;
+        }
+
+        
     }
 
-    if (test_count != pass_count) {
+    if (pass_count != tests.size()) {
         std::cout << BOLD << RED << "Only " << pass_count << " cases out of " << NUM_TEST_CASES << " passed" << RESET << std::endl;
     } else {
         std::cout << BOLD << GREEN << "All tests passed" << RESET << std::endl;
