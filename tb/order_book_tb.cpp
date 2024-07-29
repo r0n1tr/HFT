@@ -141,7 +141,6 @@ int main(int argc, char **argv, char **env)
     }
 
     std::string line;
-    std::getline(file, line); // to skip titles
     
 
     Verilated::commandArgs(argc, argv);
@@ -163,12 +162,13 @@ int main(int argc, char **argv, char **env)
     std::vector<int> expectedOutputs(5);
     std::string testCaseName;
 
-    std::getline(file, line); // to skip titles
     // Read the entire file into a vector of strings
     std::vector<std::string> lines;
     
+    std::getline(file, line); // to skip titles
     while (std::getline(file, line)) {
         lines.push_back(line);
+        // std::cout << line << std::endl;
     }
 
     // Close the file
@@ -185,6 +185,7 @@ int main(int argc, char **argv, char **env)
         if (i % 40 == 0 && internal_counter < lines.size()) {
             std::stringstream ss(lines[internal_counter]);
             std::getline(ss, testCaseName, ',');
+            // std::cout << testCaseName << " ";
 
             for (int j = 0; j < 7; ++j) {
                 std::string input;
@@ -192,6 +193,7 @@ int main(int argc, char **argv, char **env)
                 if (!input.empty()) {
                     try {
                         inputs[j] = std::stoi(input);
+                        // std::cout << input << std::endl;
                     } catch (const std::invalid_argument& e) {
                         std::cerr << "Invalid input in test case: " << testCaseName << " - " << input << std::endl;
                         return 1;
