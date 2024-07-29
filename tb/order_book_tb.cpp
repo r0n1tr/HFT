@@ -134,14 +134,14 @@ int main(int argc, char **argv, char **env)
     int test_count = 0;
     int pass_count = 0;
 
-    std::ifstream file("Order book test cases.csv");
+    std::ifstream file("order_book_test_cases.csv");
     if (!file.is_open()) {
         std::cerr << "Failed to open the file." << std::endl;
         return 1;
     }
 
     std::string line;
-    std::getline(file, line); // to skip titles
+    // std::getline(file, line); // to skip titles
     
 
     Verilated::commandArgs(argc, argv);
@@ -169,6 +169,7 @@ int main(int argc, char **argv, char **env)
     
     while (std::getline(file, line)) {
         lines.push_back(line);
+        // std::cout << line << std::endl;
     }
 
     // Close the file
