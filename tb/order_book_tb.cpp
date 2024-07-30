@@ -89,17 +89,17 @@ bool verifyOrderBook(Vorder_book* top, const std::vector<int>& expected_outputs,
         {
             if (i%3 == 0)
             {
-                std::cout << BOLD << RED << test_name << ": Register 1 (stock_id, order_type, quantity) incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": Register 1 (stock_id, order_type, quantity) incorrect in order " << ((i-(i%3))/3) + 1 << " of 10" << RESET << std::endl;
                 return false;
             }
             else if (i%3 == 1)
             {
-                std::cout << BOLD << RED << test_name << ": Register 2 (price) incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": Register 2 (price) incorrect in order " << ((i-(i%3))/3) + 1 << " of 10, Expected: " << expected_outputs[i] << ", got: " << received_outputs[i] << RESET << std::endl;
                 return false;
             }
             else
             {
-                std::cout << BOLD << RED << test_name << ": Register 3 (order_id) incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": Register 3 (order_id) incorrect in order " << ((i-(i%3))/3) + 1 << " of 10" << RESET << std::endl;
                 return false;
             }
         }
