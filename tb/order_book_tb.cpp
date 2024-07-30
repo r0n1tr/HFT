@@ -31,7 +31,12 @@ std::vector<TestCase> readCSV(const std::string& filename)
         for (int i = 0; i < 7; ++i) {
             std::getline(ss, cell, ',');
             testCase.inputs.push_back(std::stoi(cell));
+            if (i == 2)
+            {
+                testCase.stock_id = (std::stoi(cell));
+            }
         }
+
 
         for (int i = 0; i < 30; ++i) {
             std::getline(ss, cell, ',');
@@ -204,6 +209,7 @@ int main(int argc, char **argv, char **env)
 
         else if (((i-30)%40 == 0) && (i != 30)) {
             top->i_trading_logic_ready = 1;
+            top->tb_stock_id = tests[test_count].stock_id;
             if (verifyOrderBook(top, tests[test_count].expectedOrderBook, tests[test_count].name) && verifyOutputs(top, tests[test_count].expectedOutputs, tests[test_count].name)) {
                 std::cout << GREEN << tests[test_count].name << ": passed" << RESET << std::endl;
                 pass_count++;
