@@ -9,7 +9,6 @@ struct TestCase {
     std::vector<int> inputs;
     std::vector<int> expectedOrderBook;
     std::vector<int> expectedOutputs;
-    int stock_id;
 };
 
 #endif 
