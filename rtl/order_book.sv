@@ -129,6 +129,8 @@ module order_book
     output logic      [31:0] tb_reg_119,
     output logic      [31:0] tb_reg_120,
     input logic       [1:0]  tb_stock_id,
+    input logic              tb_test_count_reset_n,
+    output logic      [31:0] tb_test_count,
 
     input logic             i_clk,
     input logic             i_reset_n, //LOGIC HIGH
@@ -350,6 +352,14 @@ module order_book
         end
     end
 
+    // more testing logic
+    always_ff @(posedge i_clk) begin
+        if(!tb_test_count_reset_n) tb_test_count <= 1;
+        else begin 
+            if(i_data_valid) tb_test_count <= tb_test_count + 1;
+        end
+    end
+
     always_comb begin 
         if(!i_trade_type) begin
             /* verilator lint_off WIDTH */
@@ -382,6 +392,7 @@ module order_book
                 num_trades_ask[k] <= 0;
             end
             curr_state <= IDLE; 
+            o_curr_price <= 0;
         end
     end
 

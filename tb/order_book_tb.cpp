@@ -261,6 +261,7 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
 void initialiseInputs(Vorder_book* top, const std::vector<int>& inputs)
 {
     // std::cout << "Inputs initialised" << std::endl;
+    top->tb_test_count_reset_n = 1;
     top->i_reset_n = inputs[0];
     top->i_trade_type = inputs[1];
     top->i_stock_id = inputs[2];
