@@ -34,7 +34,7 @@ std::vector<TestCase> readCSV(const std::string& filename)
         }
 
 
-        for (int i = 0; i < 30; ++i) {
+        for (int i = 0; i < 120; ++i) {
             std::getline(ss, cell, ',');
             testCase.expectedOrderBook.push_back(std::stoi(cell));
         }
@@ -83,24 +83,134 @@ bool verifyOrderBook(Vorder_book* top, const std::vector<int>& expected_outputs,
     received_outputs.push_back(top->tb_reg_28);
     received_outputs.push_back(top->tb_reg_29);
     received_outputs.push_back(top->tb_reg_30);
+    received_outputs.push_back(top->tb_reg_31);
+    received_outputs.push_back(top->tb_reg_32);
+    received_outputs.push_back(top->tb_reg_33);
+    received_outputs.push_back(top->tb_reg_34);
+    received_outputs.push_back(top->tb_reg_35);
+    received_outputs.push_back(top->tb_reg_36);
+    received_outputs.push_back(top->tb_reg_37);
+    received_outputs.push_back(top->tb_reg_38);
+    received_outputs.push_back(top->tb_reg_39);
+    received_outputs.push_back(top->tb_reg_40);
+    received_outputs.push_back(top->tb_reg_41);
+    received_outputs.push_back(top->tb_reg_42);
+    received_outputs.push_back(top->tb_reg_43);
+    received_outputs.push_back(top->tb_reg_44);
+    received_outputs.push_back(top->tb_reg_45);
+    received_outputs.push_back(top->tb_reg_46);
+    received_outputs.push_back(top->tb_reg_47);
+    received_outputs.push_back(top->tb_reg_48);
+    received_outputs.push_back(top->tb_reg_49);
+    received_outputs.push_back(top->tb_reg_50);
+    received_outputs.push_back(top->tb_reg_51);
+    received_outputs.push_back(top->tb_reg_52);
+    received_outputs.push_back(top->tb_reg_53);
+    received_outputs.push_back(top->tb_reg_54);
+    received_outputs.push_back(top->tb_reg_55);
+    received_outputs.push_back(top->tb_reg_56);
+    received_outputs.push_back(top->tb_reg_57);
+    received_outputs.push_back(top->tb_reg_58);
+    received_outputs.push_back(top->tb_reg_59);
+    received_outputs.push_back(top->tb_reg_60);
+    received_outputs.push_back(top->tb_reg_61);
+    received_outputs.push_back(top->tb_reg_62);
+    received_outputs.push_back(top->tb_reg_63);
+    received_outputs.push_back(top->tb_reg_64);
+    received_outputs.push_back(top->tb_reg_65);
+    received_outputs.push_back(top->tb_reg_66);
+    received_outputs.push_back(top->tb_reg_67);
+    received_outputs.push_back(top->tb_reg_68);
+    received_outputs.push_back(top->tb_reg_69);
+    received_outputs.push_back(top->tb_reg_70);
+    received_outputs.push_back(top->tb_reg_71);
+    received_outputs.push_back(top->tb_reg_72);
+    received_outputs.push_back(top->tb_reg_73);
+    received_outputs.push_back(top->tb_reg_74);
+    received_outputs.push_back(top->tb_reg_75);
+    received_outputs.push_back(top->tb_reg_76);
+    received_outputs.push_back(top->tb_reg_77);
+    received_outputs.push_back(top->tb_reg_78);
+    received_outputs.push_back(top->tb_reg_79);
+    received_outputs.push_back(top->tb_reg_80);
+    received_outputs.push_back(top->tb_reg_81);
+    received_outputs.push_back(top->tb_reg_82);
+    received_outputs.push_back(top->tb_reg_83);
+    received_outputs.push_back(top->tb_reg_84);
+    received_outputs.push_back(top->tb_reg_85);
+    received_outputs.push_back(top->tb_reg_86);
+    received_outputs.push_back(top->tb_reg_87);
+    received_outputs.push_back(top->tb_reg_88);
+    received_outputs.push_back(top->tb_reg_89);
+    received_outputs.push_back(top->tb_reg_90);
+    received_outputs.push_back(top->tb_reg_91);
+    received_outputs.push_back(top->tb_reg_92);
+    received_outputs.push_back(top->tb_reg_93);
+    received_outputs.push_back(top->tb_reg_94);
+    received_outputs.push_back(top->tb_reg_95);
+    received_outputs.push_back(top->tb_reg_96);
+    received_outputs.push_back(top->tb_reg_97);
+    received_outputs.push_back(top->tb_reg_98);
+    received_outputs.push_back(top->tb_reg_99);
+    received_outputs.push_back(top->tb_reg_100);
+    received_outputs.push_back(top->tb_reg_101);
+    received_outputs.push_back(top->tb_reg_102);
+    received_outputs.push_back(top->tb_reg_103);
+    received_outputs.push_back(top->tb_reg_104);
+    received_outputs.push_back(top->tb_reg_105);
+    received_outputs.push_back(top->tb_reg_106);
+    received_outputs.push_back(top->tb_reg_107);
+    received_outputs.push_back(top->tb_reg_108);
+    received_outputs.push_back(top->tb_reg_109);
+    received_outputs.push_back(top->tb_reg_110);
+    received_outputs.push_back(top->tb_reg_111);
+    received_outputs.push_back(top->tb_reg_112);
+    received_outputs.push_back(top->tb_reg_113);
+    received_outputs.push_back(top->tb_reg_114);
+    received_outputs.push_back(top->tb_reg_115);
+    received_outputs.push_back(top->tb_reg_116);
+    received_outputs.push_back(top->tb_reg_117);
+    received_outputs.push_back(top->tb_reg_118);
+    received_outputs.push_back(top->tb_reg_119);
+    received_outputs.push_back(top->tb_reg_120);
 
+    int order_book_no = 0;
     for (int i = 0; i < expected_outputs.size(); i++)
     {
         if (received_outputs[i] != expected_outputs[i])
         {
+            if (i < 30)
+            {
+                order_book_no = 0;
+            }
+            else if ((i > 29) && (i < 60))
+            {
+                order_book_no = 1; 
+            }
+            else if ((i > 59) && (i < 90))
+            {
+                order_book_no = 2;
+            }
+            else
+            {
+                order_book_no = 3;
+            }
+
+            int trade_number = (i - (order_book_no*30))/3 + 1;
+
             if (i%3 == 0)
             {
-                std::cout << BOLD << RED << test_name << ": Register 1 (stock_id, order_type, quantity) incorrect in order " << ((i-(i%3))/3) + 1 << " of 10, Expected: " << expected_outputs[i] << ", got: " << received_outputs[i] << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": Register 1 (stock_id, order_type, quantity) incorrect. Expected: " << expected_outputs[i] << ", got: " << received_outputs[i] << ". Issue in order book: " << order_book_no  << ", Trade Slot: " << trade_number  << " of 10"<< RESET << std::endl;
                 return false;
             }
             else if (i%3 == 1)
             {
-                std::cout << BOLD << RED << test_name << ": Register 2 (price) incorrect in order " << ((i-(i%3))/3) + 1 << " of 10, Expected: " << expected_outputs[i] << ", got: " << received_outputs[i] << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": Register 2 (price) incorrect. Expected: " << expected_outputs[i] << ", got: " << received_outputs[i] << ". Issue in order book: " << order_book_no << ", Trade Slot: " << trade_number  << " of 10" << RESET << std::endl;
                 return false;
             }
             else
             {
-                std::cout << BOLD << RED << test_name << ": Register 3 (order_id) incorrect in order " << ((i-(i%3))/3) + 1 << " of 10" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": Register 3 (order_id) incorrect Expected: " << expected_outputs[i] << ", got: " << received_outputs[i] << ". Issue in order book: " << order_book_no << ", Trade Slot: " << trade_number  << " of 10" << RESET << std::endl;
                 return false;
             }
         }
@@ -168,7 +278,7 @@ int main(int argc, char **argv, char **env)
     int test_count = 0;
     int pass_count = 0;
 
-    std::string filename = "order_book_test_cases.csv";
+    std::string filename = "order_book_test_cases_new.csv";
 
     std::vector<TestCase> tests = readCSV(filename);
 

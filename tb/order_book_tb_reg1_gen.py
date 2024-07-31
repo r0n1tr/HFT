@@ -13,9 +13,9 @@ def convert_to_32bit(stock_id, order_type, quantity):
     return result
 
 
-stock_id = 2       
+stock_id = 3     
 order_type = 0     
-quantity = 39
+quantity = 68
 
 result = convert_to_32bit(stock_id, order_type, quantity)
 print(f"32-bit decimal result: {result}")
