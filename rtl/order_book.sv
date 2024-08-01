@@ -559,7 +559,8 @@ module order_book
                         /* verilator lint_on WIDTH */
                         which_book <= 1;
                         curr_state <= SHIFT_BOOK;
-                        o_curr_price <= curr_bid_price_cache[i_stock_id];
+                        // o_curr_price <= curr_bid_price_cache[i_stock_id];
+                        o_curr_price <= 0;
                     end
                 if (order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
 
@@ -568,7 +569,8 @@ module order_book
                     /* verilator lint_on WIDTH */
                     which_book <= 0;
                     curr_state <= SHIFT_BOOK;
-                    o_curr_price <= curr_ask_price_cache[i_stock_id];
+                    // o_curr_price <= curr_ask_price_cache[i_stock_id];
+                    o_curr_price <= 0;
 
                 end
                 search_pointer <= search_pointer + 1;
@@ -658,10 +660,13 @@ module order_book
                 // end
                 if(which_book)begin
 
-                    o_curr_price <= curr_bid_price_cache[i_stock_id];
+                    // o_curr_price <= curr_bid_price_cache[i_stock_id];
+                    o_curr_price <= 0;
+                    
                 end
                 else begin
-                    o_curr_price <= curr_ask_price_cache[i_stock_id];
+                    // o_curr_price <= curr_ask_price_cache[i_stock_id];
+                    o_curr_price <= 0;
                 end
             end
             UPDATE_CACHE: begin
