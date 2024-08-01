@@ -158,8 +158,8 @@ module order_book
     logic [REG_WIDTH - 1 : 0] best_bid_cache [CACHE_DEPTH*NUM_STOCKS*3 - 1 : 0];
     logic [REG_WIDTH - 1 : 0] best_ask_cache [CACHE_DEPTH*NUM_STOCKS*3 - 1 : 0];
     // 4 stores to store prev curr prices for each stock
-    logic [REG_WIDTH - 1 : 0] curr_price_cache [CACHE_DEPTH*NUM_STOCKS - 1 : 0]; //to store the previous curr price on cancellation of order.
-
+    logic [REG_WIDTH - 1 : 0] curr_bid_price_cache [BOOK_DEPTH*NUM_STOCKS - 1 : 0]; //to store the previous curr price on cancellation of order.
+    logic [REG_WIDTH - 1 : 0] curr_ask_price_cache [BOOK_DEPTH*NUM_STOCKS - 1 : 0];
 
     // internal pointer logic, to keep track of where to write a new trade into - we will just keep this as an array, which we can index via the stock id
     localparam ADDR_WIDTH = $clog2(BOOK_DEPTH*NUM_STOCKS*3);
@@ -481,7 +481,8 @@ module order_book
                 best_ask_cache[j] <= 32'b0;
             end
             for(int l = 0; l < CACHE_DEPTH*NUM_STOCKS; l++) begin
-                curr_price_cache[l] <= 32'b0;
+                curr_bid_price_cache[l] <= 32'b0;
+                curr_ask_price_cache[l] <= 32'b0;
             end
             for(int k = 0; k < NUM_STOCKS; k++) begin
                 // write_pointer_array_bid[k] <= 0;
@@ -533,21 +534,24 @@ module order_book
                     order_book_memory_bid[write_pointer_array_bid[i_stock_id] + 2] <= i_order_id;
                     // for wrap around
                     num_trades_bid[i_stock_id] <= (num_trades_bid[i_stock_id] + 1) % BOOK_DEPTH;
+                    curr_bid_price_cache[i_stock_id] <= i_price;
                     
                 end else begin
                     order_book_memory_ask[write_pointer_array_ask[i_stock_id]] <= reg1;
                     order_book_memory_ask[write_pointer_array_ask[i_stock_id] + 1] <= i_price;
                     order_book_memory_ask[write_pointer_array_ask[i_stock_id] + 2] <= i_order_id;
+
                     num_trades_ask[i_stock_id] <= (num_trades_ask[i_stock_id] + 1) % BOOK_DEPTH;
+                    curr_ask_price_cache[i_stock_id] <= i_price;
                     
                 end
                 o_curr_price <= i_price;
-                curr_price_cache[i_stock_id] <= i_price;
+                
                 curr_state <= UPDATE_CACHE;
 
             end
             CANCEL_ORDER: begin
-                o_curr_price <= curr_price_cache[i_stock_id];
+                
                 // test_index <= i_stock_id;
                 if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
                         /* verilator lint_off WIDTH */
@@ -555,17 +559,16 @@ module order_book
                         /* verilator lint_on WIDTH */
                         which_book <= 1;
                         curr_state <= SHIFT_BOOK;
-                        
-
+                        o_curr_price <= curr_bid_price_cache[i_stock_id];
                     end
-                if (order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
+                if (order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
 
                     /* verilator lint_off WIDTH */
                     cancel_register <= (i_stock_id * BOOK_DEPTH) + ((search_pointer));
                     /* verilator lint_on WIDTH */
                     which_book <= 0;
                     curr_state <= SHIFT_BOOK;
-                    // o_curr_price <= curr_price_cache[i_stock_id];
+                    o_curr_price <= curr_ask_price_cache[i_stock_id];
 
                 end
                 search_pointer <= search_pointer + 1;
@@ -653,7 +656,13 @@ module order_book
                 //         curr_state <= UPDATE_CACHE;
                 //     end
                 // end
-                o_curr_price <= curr_price_cache[i_stock_id];
+                if(which_book)begin
+
+                    o_curr_price <= curr_bid_price_cache[i_stock_id];
+                end
+                else begin
+                    o_curr_price <= curr_ask_price_cache[i_stock_id];
+                end
             end
             UPDATE_CACHE: begin
                 case (i_order_type)
