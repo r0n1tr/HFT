@@ -724,9 +724,9 @@ module order_book
                     end 
                     // ask
                     else if ((i_trade_type && (i_order_id == best_ask_cache[(i_stock_id*3) + 2]))) begin
-                        if ((order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1] < temp_min_price) && (order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1] != 0))begin
+                        test_index <= (i_stock_id * BOOK_DEPTH) + (3*search_pointer);
+                        if ((order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1] <= temp_min_price) && (order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1] != 0))begin
                             found <= 1;
-                            test_index <= (i_stock_id * BOOK_DEPTH) + (3*search_pointer);
                             temp_min_reg1 <= order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer))];
                             temp_min_price <= order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1];
                             temp_min_order_id <= order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 2];
