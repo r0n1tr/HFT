@@ -236,19 +236,19 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
             switch (i)
             {
             case(0):
-                std::cout << BOLD << RED << test_name << ": curr_price incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": curr_price incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
             case(1):
-                std::cout << BOLD << RED << test_name << ": best_bid incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": best_bid incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
             case(2):
-                std::cout << BOLD << RED << test_name << ": best_ask incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": best_ask incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
             case(3):
-                std::cout << BOLD << RED << test_name << ": book_is_busy incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": book_is_busy incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
             case(4):
-                std::cout << BOLD << RED << test_name << ": data_valid incorrect" << RESET << std::endl;
+                std::cout << BOLD << RED << test_name << ": data_valid incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
             }
             return false;
