@@ -469,6 +469,7 @@ module order_book
         end
     end
 
+    // reset logic 
     always_ff @(posedge i_clk) begin
         reg1 <= {12'b0, {i_stock_id}, {i_order_type}, {i_quantity}};
         if (!i_reset_n) begin
@@ -680,7 +681,7 @@ module order_book
                             
                         end
                     end else begin
-                        if(i_price <= best_ask_cache[(i_stock_id*3)+1]) begin
+                        if((i_price <= best_ask_cache[(i_stock_id*3)+1]) || (best_ask_cache[(i_stock_id*3)+1] == 0)) begin
                             best_ask_cache[(i_stock_id*3)] <= reg1;
                             best_ask_cache[(i_stock_id*3)+1] <= i_price;
                             best_ask_cache[(i_stock_id*3)+2] <= i_order_id;
