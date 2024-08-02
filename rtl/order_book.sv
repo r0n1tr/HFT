@@ -583,11 +583,32 @@ module order_book
 
                 end
                 search_pointer <= search_pointer + 1;
+
+                // Not found means that we looked through all the orders but can't cancel, check if this is in the cache, if its the cached order, then we want to cancel it, if it isn't then we are attempting to cancel an "expired" order, in which case, do nothing?
+                if (search_pointer == BOOK_DEPTH - 1) begin
+                    o_curr_price <= 0;
+                    if(best_bid_cache[(3*(i_stock_id*CACHE_DEPTH))+2] == i_order_id) begin
+                        // execute has cancelled this order from the order book, but we have still kept it in cache, so now we need to find next best
+                        found <= 1;
+                        curr_state <= UPDATE_CACHE; 
+                        search_pointer <= 0;
+                    end 
+                    else if (best_ask_cache[(3*(i_stock_id*CACHE_DEPTH))+2] == i_order_id) begin
+                        curr_state <= UPDATE_CACHE; 
+                        search_pointer <= 0;
+                    end
+                    else begin
+                        // trying to cancel expired order, do nothing
+                        curr_state <= FINISH;
+                    end
+                end
             end 
             EXECUTE_ORDER: begin //3
-                if (order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + search_pointer + 2] == i_order_id) begin
-                    order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + search_pointer][15:0] <= order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + search_pointer][15:0] - i_quantity;
-                    if(order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + search_pointer][15:0] == i_quantity) begin
+                test_index <= (3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2;
+                if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
+                    order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] - i_quantity;
+                    if(order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] == i_quantity) begin
+                        // found <= 1;
                         which_book <= 1;
                         /* verilator lint_off WIDTH */
                         cancel_register <= (i_stock_id * BOOK_DEPTH) + search_pointer;
@@ -597,11 +618,12 @@ module order_book
                     else begin
                         curr_state <= UPDATE_CACHE;
                     end
+                    o_curr_price <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1];
 
                 end
-                if (order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + search_pointer + 2] == i_order_id) begin
-                    order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + search_pointer][15:0] <= order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + search_pointer][15:0] - i_quantity;
-                    if(order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + search_pointer][15:0] == i_quantity) begin
+                if (order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
+                    order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] <= order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] - i_quantity;
+                    if(order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] == i_quantity) begin
                         which_book <= 0;
                         /* verilator lint_off WIDTH */
                         cancel_register <= (i_stock_id * BOOK_DEPTH) + search_pointer;
@@ -611,9 +633,11 @@ module order_book
                     else begin
                         curr_state <= UPDATE_CACHE;
                     end
+                    o_curr_price <= order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1];
                 end
 
                 search_pointer <= search_pointer + 1;
+
                 // curr_state <= UPDATE_CACHE;
             end
             SHIFT_BOOK: begin //4
@@ -655,28 +679,6 @@ module order_book
                     end
                 end
 
-                // else begin
-                //     if (cancel_register < ((i_stock_id*BOOK_DEPTH + BOOK_DEPTH*3) - 3)) begin // counter = cancelled trade number 
-                //         order_book_memory_ask[cancel_register] <= order_book_memory_ask[cancel_register+3];
-                //         order_book_memory_ask[cancel_register+1] <= order_book_memory_ask[cancel_register+4];
-                //         order_book_memory_ask[cancel_register+2] <= order_book_memory_ask[cancel_register+5]; 
-                //         cancel_register <= cancel_register + 3;
-                //         curr_state <= SHIFT_BOOK;
-                //     end
-                //     else begin 
-                //         curr_state <= UPDATE_CACHE;
-                //     end
-                // end
-                if(which_book)begin
-
-                    // o_curr_price <= curr_bid_price_cache[i_stock_id];
-                    o_curr_price <= 0;
-                    
-                end
-                else begin
-                    // o_curr_price <= curr_ask_price_cache[i_stock_id];
-                    o_curr_price <= 0;
-                end
                 search_pointer <= 0;
             end
             UPDATE_CACHE: begin //5
@@ -705,10 +707,11 @@ module order_book
 
                     if(!i_trade_type && (i_order_id == best_bid_cache[(i_stock_id*3) + 2])) begin 
                         // valid delete - update bid cache
-                        if (order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1] > temp_max_price) begin
-                            temp_max_reg1 <= order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + (3*search_pointer)];
-                            temp_max_price <= order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1];
-                            temp_max_order_id <= order_book_memory_bid[(i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2];
+                        // found <= 1;
+                        if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1] > temp_max_price) begin
+                            temp_max_reg1 <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)];
+                            temp_max_price <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1];
+                            temp_max_order_id <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2];
                             curr_state <= UPDATE_CACHE; 
                         end
                         search_pointer <= search_pointer + 1;
@@ -749,6 +752,7 @@ module order_book
                     end
                     
                 end
+                EXECUTE: curr_state <= FINISH; 
                 default: ;
                 endcase
                 
