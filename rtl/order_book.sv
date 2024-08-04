@@ -143,7 +143,6 @@ module order_book
     input logic [31:0]      i_order_id,
     input logic             i_data_valid, // FROM PARSER
     input logic             i_trading_logic_ready, // FROM TRADING LOGICs
-    output logic [31:0]     o_curr_price,
     output logic [31:0]     o_best_bid,
     output logic [31:0]     o_best_ask,
     output logic            o_book_is_busy, // can only read from the book (from trading logic) when book is not busy
@@ -497,7 +496,6 @@ module order_book
                 num_trades_ask[k] <= 0;
             end
             curr_state <= IDLE; 
-            o_curr_price <= 0;
         end
     end
 
@@ -534,7 +532,6 @@ module order_book
                 end 
             end
             ADD_ORDER: begin //1
-                // o_curr_price <= i_price;
                 if(!i_trade_type) begin
                     order_book_memory_bid[write_pointer_array_bid[i_stock_id]] <= reg1;
                     order_book_memory_bid[write_pointer_array_bid[i_stock_id] + 1] <= i_price;
@@ -552,7 +549,6 @@ module order_book
                     curr_ask_price_cache[i_stock_id] <= i_price;
                     
                 end
-                o_curr_price <= i_price;
                 
                 curr_state <= UPDATE_CACHE;
 
@@ -566,8 +562,6 @@ module order_book
                     /* verilator lint_on WIDTH */
                     which_book <= 1;
                     curr_state <= SHIFT_BOOK;
-                    // o_curr_price <= curr_bid_price_cache[i_stock_id];
-                    o_curr_price <= 0;
                     search_pointer <= 0;
                     num_trades_bid[i_stock_id] <= (num_trades_bid[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_bid[i_stock_id] - 1);
                 end
@@ -579,15 +573,12 @@ module order_book
                     which_book <= 0;
                     curr_state <= SHIFT_BOOK;
                     search_pointer <= 0;
-                    // o_curr_price <= curr_ask_price_cache[i_stock_id];
-                    o_curr_price <= 0;
                     num_trades_ask[i_stock_id] <= (num_trades_ask[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_ask[i_stock_id] - 1);
                 end
                 search_pointer <= search_pointer + 1;
 
                 // Not found means that we looked through all the orders but can't cancel, check if this is in the cache, if its the cached order, then we want to cancel it, if it isn't then we are attempting to cancel an "expired" order, in which case, do nothing?
                 if (search_pointer == BOOK_DEPTH - 1) begin
-                    o_curr_price <= 0;
                     if(best_bid_cache[(3*(i_stock_id*CACHE_DEPTH))+2] == i_order_id) begin
                         // execute has cancelled this order from the order book, but we have still kept it in cache, so now we need to find next best
                         found <= 1;
@@ -622,7 +613,6 @@ module order_book
                     else begin
                         curr_state <= UPDATE_CACHE;
                     end
-                    o_curr_price <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1];
 
                 end
                 if (order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
@@ -638,7 +628,6 @@ module order_book
                     else begin
                         curr_state <= UPDATE_CACHE;
                     end
-                    o_curr_price <= order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1];
                 end
 
                 search_pointer <= search_pointer + 1;
@@ -783,7 +772,6 @@ module order_book
     always_ff @(posedge i_clk) begin
         o_best_bid <= best_bid_cache[(i_stock_id*3)+1];
         o_best_ask <= best_ask_cache[(i_stock_id*3)+1];
-        // o_curr_price <= i_price;
     end 
 
 endmodule
