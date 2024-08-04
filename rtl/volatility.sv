@@ -12,6 +12,7 @@ module volatility
     input logic [DATA_WIDTH - 1 : 0]            i_best_ask,
     input logic [DATA_WIDTH - 1 : 0]            i_best_bid,
     output logic [DATA_WIDTH - 1 : 0]           o_volatility,
+    output logic [DATA_WIDTH - 1 : 0]           o_curr_price, // also output curr price, needed for reference price, 
     output logic                                o_data_valid
 );  
 
@@ -47,6 +48,7 @@ module volatility
         .i_stock_id(i_stock_id),
         .i_valid(addr_valid),
         .o_volatility(o_volatility),
+        .o_curr_price(o_curr_price),
         .o_data_valid(o_data_valid)
     );
 

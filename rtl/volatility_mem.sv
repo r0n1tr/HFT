@@ -15,6 +15,7 @@ module volatility_mem
     input logic [$clog2(NUM_STOCKS) - 1 : 0]                    i_stock_id,
     input logic                                                 i_valid,
     output logic [DATA_WIDTH - 1 : 0]                           o_volatility,
+    output logic [DATA_WIDTH - 1 : 0]                           o_curr_price,
     output logic                                                o_data_valid
 );  
 
@@ -36,6 +37,7 @@ module volatility_mem
                 moving_sum[i_stock_id] <= moving_sum[i_stock_id] - remove_reg[i_stock_id] + (i_best_ask+i_best_bid) >>> 2;
                 moving_square_sum[i_stock_id] <= moving_square_sum[i_stock_id] - (remove_reg[i_stock_id]**2) + (((i_best_ask+i_best_bid) >>> 2)**2);
                 o_data_valid <= 1;
+                o_curr_price <= (i_best_ask+i_best_bid) >>> 2;
             end
             else begin
                 o_data_valid <= 0;
