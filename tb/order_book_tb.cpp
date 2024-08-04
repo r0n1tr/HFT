@@ -279,7 +279,7 @@ int main(int argc, char **argv, char **env)
     int test_count = 0;
     int pass_count = 0;
 
-    std::string filename = "order_book_test_cases.csv";
+    std::string filename = "order_book_test_cases_sell_test.csv";
 
     std::vector<TestCase> tests = readCSV(filename);
 
