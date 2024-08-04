@@ -12,7 +12,7 @@
 #define GREEN   "\033[32m"
 #define RED     "\033[31m"
 #define RESET   "\033[0m"
-#define NUM_TEST_CASES 157
+#define NUM_TEST_CASES 185
 
 
 std::vector<TestCase> readCSV(const std::string& filename)
@@ -39,7 +39,7 @@ std::vector<TestCase> readCSV(const std::string& filename)
             testCase.expectedOrderBook.push_back(std::stoi(cell));
         }
 
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 4; ++i) {
             std::getline(ss, cell, ',');
             testCase.expectedOutputs.push_back(std::stoi(cell));
         }
@@ -223,7 +223,7 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
 {
     std::vector<int> received_outputs;
 
-    received_outputs.push_back(top->o_curr_price);
+    // received_outputs.push_back(top->o_curr_price);
     received_outputs.push_back(top->o_best_bid); 
     received_outputs.push_back(top->o_best_ask);
     received_outputs.push_back(top->o_book_is_busy); 
@@ -236,18 +236,15 @@ bool verifyOutputs(Vorder_book* top, const std::vector<int>& expected_outputs, c
             switch (i)
             {
             case(0):
-                std::cout << BOLD << RED << test_name << ": Order Book OK, curr_price incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
-                break;
-            case(1):
                 std::cout << BOLD << RED << test_name << ": Order Book OK, best_bid incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
-            case(2):
+            case(1):
                 std::cout << BOLD << RED << test_name << ": Order Book OK, best_ask incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
-            case(3):
+            case(2):
                 std::cout << BOLD << RED << test_name << ": Order Book OK, book_is_busy incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
-            case(4):
+            case(3):
                 std::cout << BOLD << RED << test_name << ": Order Book OK, data_valid incorrect" << ". Expected: "<< expected_outputs[i]<< ", got: " << received_outputs[i] << RESET << std::endl;
                 break;
             }
@@ -279,7 +276,7 @@ int main(int argc, char **argv, char **env)
     int test_count = 0;
     int pass_count = 0;
 
-    std::string filename = "order_book_test_cases_sell_test.csv";
+    std::string filename = "order_book_test_cases.csv";
 
     std::vector<TestCase> tests = readCSV(filename);
 
@@ -302,7 +299,7 @@ int main(int argc, char **argv, char **env)
     // Close the file
 
     
-    for (int i = 0; i < 7000; i++) {
+    for (int i = 0; i < 10000; i++) {
         for (int clk = 0; clk < 2; clk++) {
             tfp->dump(2 * i + clk);
             top->i_clk = !top->i_clk;

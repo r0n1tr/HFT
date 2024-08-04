@@ -561,15 +561,16 @@ module order_book
                 
                 // test_index <= i_stock_id;
                 if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
-                        /* verilator lint_off WIDTH */
-                        cancel_register <= (i_stock_id * BOOK_DEPTH) + ((search_pointer));
-                        /* verilator lint_on WIDTH */
-                        which_book <= 1;
-                        curr_state <= SHIFT_BOOK;
-                        // o_curr_price <= curr_bid_price_cache[i_stock_id];
-                        o_curr_price <= 0;
-                        search_pointer <= 0;
-                    end
+                    /* verilator lint_off WIDTH */
+                    cancel_register <= (i_stock_id * BOOK_DEPTH) + ((search_pointer));
+                    /* verilator lint_on WIDTH */
+                    which_book <= 1;
+                    curr_state <= SHIFT_BOOK;
+                    // o_curr_price <= curr_bid_price_cache[i_stock_id];
+                    o_curr_price <= 0;
+                    search_pointer <= 0;
+                    num_trades_bid[i_stock_id] <= (num_trades_bid[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_bid[i_stock_id] - 1);
+                end
                 if (order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
 
                     /* verilator lint_off WIDTH */
@@ -580,7 +581,7 @@ module order_book
                     search_pointer <= 0;
                     // o_curr_price <= curr_ask_price_cache[i_stock_id];
                     o_curr_price <= 0;
-
+                    num_trades_ask[i_stock_id] <= (num_trades_ask[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_ask[i_stock_id] - 1);
                 end
                 search_pointer <= search_pointer + 1;
 
@@ -602,6 +603,8 @@ module order_book
                         curr_state <= FINISH;
                     end
                 end
+
+                
             end 
             EXECUTE_ORDER: begin //3
                 test_index <= (3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2;
@@ -614,6 +617,7 @@ module order_book
                         cancel_register <= (i_stock_id * BOOK_DEPTH) + search_pointer;
                         /* verilator lint_on WIDTH */
                         curr_state <= SHIFT_BOOK;
+                        num_trades_bid[i_stock_id] <= (num_trades_bid[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_bid[i_stock_id] - 1);
                     end 
                     else begin
                         curr_state <= UPDATE_CACHE;
@@ -629,6 +633,7 @@ module order_book
                         cancel_register <= (i_stock_id * BOOK_DEPTH) + search_pointer;
                         /* verilator lint_on WIDTH */
                         curr_state <= SHIFT_BOOK;
+                        num_trades_ask[i_stock_id] <= (num_trades_ask[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_ask[i_stock_id] - 1);
                     end
                     else begin
                         curr_state <= UPDATE_CACHE;

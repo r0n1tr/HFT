@@ -13,7 +13,7 @@ def convert_to_32bit(stock_id, order_type, quantity):
     return result
 
 
-stock_id = 3     
+stock_id = 3
 order_type = 0     
 quantity = 68
 
