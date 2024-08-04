@@ -24,7 +24,7 @@ module ref_price
         end
         else begin
             if(i_data_valid) begin 
-                o_data_valid <= i_curr_price - (i_inventory_state * RISK_FACTOR * i_volatility*(TERMINAL_TIME - i_curr_time));
+                o_ref_price <= i_curr_price - (i_inventory_state * RISK_FACTOR * i_volatility*(TERMINAL_TIME - i_curr_time));
                 o_data_valid <= 1;
             end
             else begin
