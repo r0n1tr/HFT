@@ -14,6 +14,9 @@ module spread
     output logic                     o_data_valid
 );
 
+    timeunit 1ns;
+    timeprecision 1ns;
+
     always_ff @(posedge i_clk) begin 
         if(i_data_valid) begin
             o_spread <= RISK_FACTOR * i_volatility*(TERMINAL_TIME - i_curr_time) + LOGARITHM;
