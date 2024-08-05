@@ -1,3 +1,4 @@
 /obj_dir
 /__pycache__
 /sim_build
+*.vcd
