@@ -20,7 +20,7 @@ async def my_second_test(dut):
 
     await cocotb.start(generate_clock(dut))  # run the clock "in the background"
 
-    await Timer(5, units="ns")  # wait a bit
+    await Timer(10, units="ns")  # wait a bit
     await FallingEdge(dut.clk)  # wait for falling edge/"negedge"
 
     dut._log.info("my_signal_1 is %s", dut.my_signal_1.value)
