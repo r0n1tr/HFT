@@ -1,5 +1,6 @@
+`include "../rtl/spread.sv"
 `timescale 1ns/1ps
-module spread
+module spread_wrapper
 #(
     parameter DATA_WIDTH = 32,
     parameter LOGARITHM = 121, // TODO: work out + more appropriate name
@@ -15,14 +16,19 @@ module spread
     output logic                     o_data_valid
 );
 
-    always_ff @(posedge i_clk) begin 
-        if(i_data_valid) begin
-            o_spread <= RISK_FACTOR * i_volatility*(TERMINAL_TIME - i_curr_time) + LOGARITHM;
-            o_data_valid <= 1; 
-        end
-        else begin 
-            o_data_valid <= 0;
-        end
-    end    
+spread spread(
+    .i_clk(i_clk),
+    .i_curr_time(i_curr_time),
+    .i_volatility(i_volatility),
+    .i_data_valid(i_data_valid),
+    .o_spread(o_spread),
+    .o_data_valid(o_data_valid)
+);
+
+    initial
+    begin
+        $dumpfile("test.vcd");
+        $dumpvars;
+    end
 
 endmodule

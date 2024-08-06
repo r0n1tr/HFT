@@ -1,24 +1,15 @@
 import cocotb
 from cocotb.triggers import FallingEdge, Timer
-
-
-async def generate_clock(dut):
-    """Generate clock pulses."""
-
-    for cycle in range(10):
-        dut.i_clk.value = 0
-        await Timer(1, units="ns")
-        dut.i_clk.value = 1
-        await Timer(1, units="ns")
+from cocotb.clock import Clock
 
 
 @cocotb.test()
 async def my_second_test(dut):
-    """Try accessing the design."""
+    """Testing spread calculations"""
 
-    await cocotb.start(generate_clock(dut))  # run the clock "in the background"
+    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
 
-    await Timer(5, units="ns")  # wait a bit
+    await Timer(100, units="ns")  # wait a bit
     await FallingEdge(dut.i_clk)  # wait for falling edge/"negedge"
 
     dut._log.info("my_signal_1 is %s", dut.o_spread)
