@@ -1,6 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1722939616" />
-    <testcase name="my_second_test" classname="test_my_design" file="/home/snesamal/Documents/HFT/tb/test_my_design.py" lineno="17" time="0.0015745162963867188" sim_time_ns="10.001" ratio_time="6351.791990308903" />
-  </testsuite>
-</testsuites>

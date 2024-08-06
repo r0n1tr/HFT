@@ -16,7 +16,7 @@ my_design my_design(
     initial
     begin
         $dumpfile("test.vcd");
-        $dumpvars(0,my_design);
+        $dumpvars;
     end
 
 endmodule
