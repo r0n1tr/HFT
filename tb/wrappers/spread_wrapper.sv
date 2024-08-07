@@ -12,7 +12,7 @@ module spread_wrapper
     input logic [DATA_WIDTH - 1 : 0] i_curr_time,
     input logic [DATA_WIDTH - 1 : 0] i_volatility,
     input logic                      i_data_valid,
-    output logic                      o_spread,
+    output logic                     o_spread,
     output logic                     o_data_valid
 );
 
