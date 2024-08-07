@@ -1,19 +1,34 @@
 import numpy as np
 
-# Define the number of fractional bits
-fractional_bits = 8
-total_bits = 10
-max_int = 2 ** (total_bits - 1)
+def float_to_fixed(value, frac_bits=8):
+    """Converts a floating-point number to fixed-point representation."""
+    fixed_value = int(round(value * (1 << frac_bits)))
+    return fixed_value
 
-# Generate lookup table
+def fixed_to_hex(value, width=16):
+    """Converts a fixed-point number to a hexadecimal string with specified width."""
+    return f"{value & ((1 << width) - 1):0{width // 4}X}"
+
+# Define the range and number of steps
+x_min = -1.0
+x_max = 1.0
+num_steps = 100  # Number of steps in the lookup table
+step_size = (x_max - x_min) / (num_steps - 1)
+
+# Initialize the lookup table
 lookup_table = []
 
-for i in range(2 ** total_bits):
-    fixed_point_value = (i - max_int) / float(2 ** fractional_bits)
-    exp_value = np.exp(fixed_point_value)
-    lookup_table.append(exp_value)
+# Populate the lookup table
+for i in range(num_steps):
+    x = x_min + i * step_size
+    y = np.exp(x)
+    y_fixed = float_to_fixed(y)
+    lookup_table.append(y_fixed)
 
-# Save to a memory initialization file
-with open("exp_lut.mem", "w") as file:
+# Write the lookup table to a .mem file
+with open('exp_lut.mem', 'w') as f:
     for value in lookup_table:
-        file.write(f"{int(value * (2 ** 8)):04x}\n")
+        hex_value = fixed_to_hex(value, width=16)  # Use 16-bit fixed-point format
+        f.write(f"{hex_value}\n")
+
+print("Lookup table written to 'lookup_table.mem'")
