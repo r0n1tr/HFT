@@ -1,4 +1,3 @@
-`timescale 1ns/1ps
 module spread
 #(
     parameter FP_WORD_SIZE = 64,
