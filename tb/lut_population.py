@@ -32,3 +32,6 @@ with open('exp_lut.mem', 'w') as f:
         f.write(f"{hex_value}\n")
 
 print("Lookup table written to 'lookup_table.mem'")
+
+
+# printed in fixed point precision when taken into exp module we need to /256 to express the correct value of e^x

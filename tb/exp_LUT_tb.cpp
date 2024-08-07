@@ -3,18 +3,23 @@
 #include "verilated_vcd_c.h"
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 
 int main(int argc, char **argv, char **env)
 {
     int i; // number of clock cycles to simulate
     int clk; // module clock signal
+    float o_root = 0.0;
+    float o_rem = 0.0;
+    bool valid;
+    double constant = 1.52e-5;
 
     Verilated::commandArgs(argc, argv);
 
     // top level instance
     Vexp_LUT* top = new Vexp_LUT;
 
-    // trace dump initialisation - signal tracing turned on, tell verilator when to dump the waveform to exp_LUT.vcd
+    // trace dump initialization - signal tracing turned on, tell Verilator when to dump the waveform to exp_LUT.vcd
     Verilated::traceEverOn(true);
     VerilatedVcdC* tfp = new VerilatedVcdC;
     top->trace(tfp, 99);
@@ -25,41 +30,40 @@ int main(int argc, char **argv, char **env)
 
     for (i = 0; i < 40; i++)
     {
-        for (clk = 0; clk < 2; clk++)
+        for(clk = 0; clk < 2; clk++)
         {
-            tfp->dump(2*i+clk);
+            tfp->dump(2 * i + clk);
             top->i_clk = !top->i_clk;
             top->eval();
         }
 
-        // Apply inputs and print the outputs
         if (i == 2)
         {
-            top->argument = 1 << 16; // 1.0 in fixed-point (1 << 16)
-            top->eval();
-            std::cout << "exp(1) = 0x" << std::hex << top->exp_output << std::dec << std::endl;
+            // 1.0 decimal
+            top->i_arg = 0x0010;
+            int o_result_fixed = top->o_result;
+            float o_result_float = o_result_fixed / static_cast<float>(1 << 8); // assuming Q8.8 fixed-point format
+
+            // Print in hexadecimal
+            std::cout << "o_result (hex): " << std::hex << std::setw(4) << std::setfill('0') << o_result_fixed << std::dec << std::endl;
+
+            // Print in decimal
+            std::cout << "o_result (float): " << o_result_float << std::endl;
         }
         if (i == 4)
         {
-            top->argument = 5 << 16; // 5.0 in fixed-point (5 << 16)
-            top->eval();
-            std::cout << "exp(5) = 0x" << std::hex << top->exp_output << std::dec << std::endl;
-        }
-        if (i == 6)
-        {
-            top->argument = 10 << 16; // 10.0 in fixed-point (10 << 16)
-            top->eval();
-            std::cout << "exp(10) = 0x" << std::hex << top->exp_output << std::dec << std::endl;
-        }
-        if (i == 8)
-        {
-            top->argument = 100 << 16; // 100.0 in fixed-point (100 << 16)
-            top->eval();
-            std::cout << "exp(100) = 0x" << std::hex << top->exp_output << std::dec << std::endl;
+            top->i_arg = 0x0020;
+            int o_result_fixed = top->o_result;
+            float o_result_float = o_result_fixed / static_cast<float>(1 << 8); // assuming Q8.8 fixed-point format
+
+            // Print in hexadecimal
+            std::cout << "o_result (hex): " << std::hex << std::setw(4) << std::setfill('0') << o_result_fixed << std::dec << std::endl;
+
+            // Print in decimal
+            std::cout << "o_result (float): " << o_result_float << std::endl;
         }
     }
 
     tfp->close();
-    delete top;
     exit(0);
 }
