@@ -29,7 +29,7 @@ async def reset_test(dut):
 
     dut.i_data_valid.value = 1
     dut.i_curr_price.value = random.randint(10000, 50000)
-    dut.i_inventory_state.value = random.randint(10000, 50000)
+    dut.i_inventory_state.value = make_fixed_point_input(random.randint(10000, 50000))
     dut.i_curr_time.value = random.randint(0, 22500)
     dut.i_volatility.value = make_fixed_point_input(random.uniform(0.5, 5.5))
     dut.i_terminal_time.value = TERMINAL_TIME
@@ -71,13 +71,13 @@ async def fixed_inputs(dut):
         await RisingEdge(dut.i_clk)
 
     input_curr_price = 1234567
-    input_inventory_state = 9982
+    input_inventory_state = 0.9982
     input_curr_time = 17890
     input_volatility = 1.892
 
     # Test case inputs
     dut.i_curr_price.value = input_curr_price
-    dut.i_inventory_state.value = input_inventory_state
+    dut.i_inventory_state.value = make_fixed_point_input(input_inventory_state)
     dut.i_curr_time.value = input_curr_time
     dut.i_volatility.value = make_fixed_point_input(input_volatility)
     dut.i_terminal_time.value = TERMINAL_TIME
@@ -117,14 +117,14 @@ async def random_inputs(dut):
         await RisingEdge(dut.i_clk)
 
     input_curr_price = random.randint(10000, 2000000)
-    input_inventory_state = random.randint(4000, 10000)
+    input_inventory_state = random.uniform(-1, 1)
     input_curr_time = random.randint(0, 22500)
     input_volatility = random.uniform(0.5, 5.5)
     input_risk_factor = random.uniform(0.1, 0.5)
 
     # Test case inputs
     dut.i_curr_price.value = input_curr_price
-    dut.i_inventory_state.value = input_inventory_state
+    dut.i_inventory_state.value = make_fixed_point_input(input_inventory_state)
     dut.i_curr_time.value = input_curr_time
     dut.i_volatility.value = make_fixed_point_input(input_volatility)
     dut.i_terminal_time.value = TERMINAL_TIME

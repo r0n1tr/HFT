@@ -9,7 +9,7 @@ module ref_price_wrapper
     input logic                                         i_clk,
     input logic                                         i_reset_n,
     input logic [DATA_WIDTH - 1 : 0]                    i_curr_price, // not fixed point, need to conver it to fixed point
-    input logic [DATA_WIDTH - 1 : 0]                    i_inventory_state,
+    input logic [FP_WORD_SIZE - 1 : 0]                  i_inventory_state,
     input logic [DATA_WIDTH - 1 : 0]                    i_curr_time, 
     input logic [FP_WORD_SIZE - 1 : 0]                  i_volatility,
     input logic [DATA_WIDTH - 1 : 0]                    i_terminal_time,

@@ -7,7 +7,7 @@ module ref_price
     input logic                                         i_clk,
     input logic                                         i_reset_n,
     input logic [DATA_WIDTH - 1 : 0]                    i_curr_price, // not fixed point, need to conver it to fixed point
-    input logic [DATA_WIDTH - 1 : 0]                    i_inventory_state,
+    input logic [FP_WORD_SIZE - 1 : 0]                  i_inventory_state, // normalised inventory
     input logic [DATA_WIDTH - 1 : 0]                    i_curr_time, 
     input logic [FP_WORD_SIZE - 1 : 0]                  i_volatility,
     input logic [DATA_WIDTH - 1 : 0]                    i_terminal_time,
@@ -27,7 +27,7 @@ module ref_price
         else begin
             if(i_data_valid) begin 
                 // Calculation is doing: curr_price - (inventory * volatility * risk_factor *(terminal - curr time))
-                reg_ref_price <= ({{(FP_WORD_SIZE+DATA_WIDTH){1'b0}}, {i_curr_price}, {(2*FP_WORD_SIZE){1'b0}}}) - ({i_inventory_state, {(DATA_WIDTH){1'b0}}} * i_risk_factor * i_volatility*({i_terminal_time, {(DATA_WIDTH){1'b0}}} - {i_curr_time, {(DATA_WIDTH){1'b0}}}));
+                reg_ref_price <= ({{(FP_WORD_SIZE+DATA_WIDTH){1'b0}}, {i_curr_price}, {(2*FP_WORD_SIZE){1'b0}}}) - (i_inventory_state * i_risk_factor * i_volatility*({i_terminal_time, {(DATA_WIDTH){1'b0}}} - {i_curr_time, {(DATA_WIDTH){1'b0}}}));
                 o_data_valid <= 1;
             end
             else begin
