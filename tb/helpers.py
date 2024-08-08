@@ -1,4 +1,4 @@
-def decimal_to_fixed_point(decimal_value):
+def make_fixed_point_input(decimal_value):
     # Shift the decimal value by 2^32 (to account for 32 bits fractional part)
     scaled_value = round(decimal_value * (1 << 32))
     
@@ -10,7 +10,7 @@ def decimal_to_fixed_point(decimal_value):
     
     return fixed_point_value
 
-def fixed_point_to_decimal(fixed_point):
+def convert_fixed_point_output(fixed_point):
     # Mask to extract the integer part (upper 32 bits)
     integer_mask = 0xFFFFFFFF00000000
     # Mask to extract the fractional part (lower 32 bits)
@@ -33,13 +33,3 @@ def fixed_point_to_decimal(fixed_point):
         decimal_value -= (1 << 32)  # Adjust for negative numbers
     
     return decimal_value
-
-# Example usage
-fixed_point_number = 0x00006831999B3A30  # Example fixed-point number
-decimal_value = fixed_point_to_decimal(fixed_point_number)
-print(decimal_value)
-print("#############################")
-decimal_input = 26673.6
-binary_as_decimal = decimal_to_fixed_point(decimal_input)
-print(binary_as_decimal)
-
