@@ -12,7 +12,7 @@ def fixed_to_hex(value, width=16):
 # Define the range and number of steps
 x_min = -1.0
 x_max = 1.0
-num_steps = 100  # Number of steps in the lookup table
+num_steps = 1000  # Number of steps in the lookup table
 step_size = (x_max - x_min) / (num_steps - 1)
 
 # Initialize the lookup table

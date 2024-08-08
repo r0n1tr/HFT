@@ -40,7 +40,7 @@ int main(int argc, char **argv, char **env)
         if (i == 2)
         {
             // 1.0 decimal
-            top->i_arg = 0x0010;
+            top->i_arg = 0x0100;
             int o_result_fixed = top->o_result;
             float o_result_float = o_result_fixed / static_cast<float>(1 << 8); // assuming Q8.8 fixed-point format
 
