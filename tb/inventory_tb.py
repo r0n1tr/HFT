@@ -28,7 +28,7 @@ def modify_inventory(stock_id, quantity, side):
 @cocotb.test()
 async def return_inventory(dut):
     """Read inventory state at the start"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     # reset to default inputs for test case
     dut.i_reset_n.value = 0
@@ -38,7 +38,6 @@ async def return_inventory(dut):
     dut.i_execute_order_quantity.value = 0
     dut.i_execute_order.value = 0
     dut.i_execute_order_side.value = 0
-
 
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
@@ -87,7 +86,7 @@ async def return_inventory(dut):
 @cocotb.test()
 async def fixed_input_test_1(dut):
     """Execute order on all stocks"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -186,11 +185,12 @@ async def fixed_input_test_1(dut):
     epsilon = actual_3 - received_3
     assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
 
-'''
+
+
 @cocotb.test()
 async def fixed_input_test_2(dut):
-    """Execute order on all stocks"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    """Execute another buy order on all stocks"""
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -200,15 +200,100 @@ async def fixed_input_test_2(dut):
     dut.i_execute_order.value = 0
     dut.i_execute_order_side.value = 0
 
-
     await RisingEdge(dut.i_clk)
+
+    quantity_0 = 191
+    quantity_1 = 251
+    quantity_2 = 317
+    quantity_3 = 443
+    # stock 0:
+    dut.i_stock_id.value = 0
+    dut.i_execute_order_quantity.value = quantity_0
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 1:
+    dut.i_stock_id.value = 1
+    dut.i_execute_order_quantity.value = quantity_1
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 2:
+    dut.i_stock_id.value = 2
+    dut.i_execute_order_quantity.value = quantity_2
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 3:
+    dut.i_stock_id.value = 3
+    dut.i_execute_order_quantity.value = quantity_3
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+
+    # determine expected values:
+    actual_0 = modify_inventory(0, quantity_0, 0)
+    actual_1 = modify_inventory(1, quantity_1, 0)
+    actual_2 = modify_inventory(2, quantity_2, 0)
+    actual_3 = modify_inventory(3, quantity_3, 0)
+
+
+    # perform reads:
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 0
+    await Timer (0.1, units="ns")
+    received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 1
+    await Timer (0.1, units="ns")
+    received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 2
+    await Timer (0.1, units="ns")
+    received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 3
+    await Timer (0.1, units="ns")
+    received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+
+    #log outputs:
+    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
+    dut._log.info("Received inventory for stock 0: %s \t", received_0)
+    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
+    dut._log.info("Received inventory for stock 1: %s \t", received_1)
+    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
+    dut._log.info("Received inventory for stock 2: %s \t", received_2)
+    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
+    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+
+
+    # verify
+    epsilon = actual_0 - received_0
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 0"
+
+    epsilon = actual_1 - received_1
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 1"
+
+    epsilon = actual_2 - received_2
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 2"
+
+    epsilon = actual_3 - received_3
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
 
 
 
 @cocotb.test()
 async def fixed_input_test_3(dut):
-    """Execute order on all stocks"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    """Execute a sell order on all stocks"""
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -218,15 +303,99 @@ async def fixed_input_test_3(dut):
     dut.i_execute_order.value = 0
     dut.i_execute_order_side.value = 0
 
-
     await RisingEdge(dut.i_clk)
 
+    quantity_0 = 89
+    quantity_1 = 91
+    quantity_2 = 113
+    quantity_3 = 213
+    # stock 0:
+    dut.i_stock_id.value = 0
+    dut.i_execute_order_quantity.value = quantity_0
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 1:
+    dut.i_stock_id.value = 1
+    dut.i_execute_order_quantity.value = quantity_1
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 2:
+    dut.i_stock_id.value = 2
+    dut.i_execute_order_quantity.value = quantity_2
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 3:
+    dut.i_stock_id.value = 3
+    dut.i_execute_order_quantity.value = quantity_3
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+
+    # determine expected values:
+    actual_0 = modify_inventory(0, quantity_0, 1)
+    actual_1 = modify_inventory(1, quantity_1, 1)
+    actual_2 = modify_inventory(2, quantity_2, 1)
+    actual_3 = modify_inventory(3, quantity_3, 1)
+
+
+    # perform reads:
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 0
+    await Timer (0.1, units="ns")
+    received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 1
+    await Timer (0.1, units="ns")
+    received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 2
+    await Timer (0.1, units="ns")
+    received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 3
+    await Timer (0.1, units="ns")
+    received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+
+    #log outputs:
+    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
+    dut._log.info("Received inventory for stock 0: %s \t", received_0)
+    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
+    dut._log.info("Received inventory for stock 1: %s \t", received_1)
+    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
+    dut._log.info("Received inventory for stock 2: %s \t", received_2)
+    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
+    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+
+
+    # verify
+    epsilon = actual_0 - received_0
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 0"
+
+    epsilon = actual_1 - received_1
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 1"
+
+    epsilon = actual_2 - received_2
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 2"
+
+    epsilon = actual_3 - received_3
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
 
 
 @cocotb.test()
 async def fixed_input_test_4(dut):
-    """Execute order on all stocks"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    """Execute another sell order on all stocks"""
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -236,15 +405,100 @@ async def fixed_input_test_4(dut):
     dut.i_execute_order.value = 0
     dut.i_execute_order_side.value = 0
 
-
     await RisingEdge(dut.i_clk)
+
+    quantity_0 = 389
+    quantity_1 = 291
+    quantity_2 = 413
+    quantity_3 = 553
+    # stock 0:
+    dut.i_stock_id.value = 0
+    dut.i_execute_order_quantity.value = quantity_0
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 1:
+    dut.i_stock_id.value = 1
+    dut.i_execute_order_quantity.value = quantity_1
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 2:
+    dut.i_stock_id.value = 2
+    dut.i_execute_order_quantity.value = quantity_2
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 3:
+    dut.i_stock_id.value = 3
+    dut.i_execute_order_quantity.value = quantity_3
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+
+    # determine expected values:
+    actual_0 = modify_inventory(0, quantity_0, 1)
+    actual_1 = modify_inventory(1, quantity_1, 1)
+    actual_2 = modify_inventory(2, quantity_2, 1)
+    actual_3 = modify_inventory(3, quantity_3, 1)
+
+
+    # perform reads:
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 0
+    await Timer (0.1, units="ns")
+    received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 1
+    await Timer (0.1, units="ns")
+    received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 2
+    await Timer (0.1, units="ns")
+    received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 3
+    await Timer (0.1, units="ns")
+    received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+
+    #log outputs:
+    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
+    dut._log.info("Received inventory for stock 0: %s \t", received_0)
+    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
+    dut._log.info("Received inventory for stock 1: %s \t", received_1)
+    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
+    dut._log.info("Received inventory for stock 2: %s \t", received_2)
+    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
+    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+
+
+    # verify
+    epsilon = actual_0 - received_0
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 0"
+
+    epsilon = actual_1 - received_1
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 1"
+
+    epsilon = actual_2 - received_2
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 2"
+
+    epsilon = actual_3 - received_3
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
 
 
 
 @cocotb.test()
 async def random_input_test_1(dut):
-    """Random order test on inventory"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    """Random buy order test on inventory"""
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -254,15 +508,101 @@ async def random_input_test_1(dut):
     dut.i_execute_order.value = 0
     dut.i_execute_order_side.value = 0
 
-
     await RisingEdge(dut.i_clk)
+
+     # perform execute orders on each stock sequentially:
+    quantity_0 = random.randint(100, 1000)
+    quantity_1 = random.randint(100, 1000)
+    quantity_2 = random.randint(100, 1000)
+    quantity_3 = random.randint(100, 1000)
+    # stock 0:
+    dut.i_stock_id.value = 0
+    dut.i_execute_order_quantity.value = quantity_0
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 1:
+    dut.i_stock_id.value = 1
+    dut.i_execute_order_quantity.value = quantity_1
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 2:
+    dut.i_stock_id.value = 2
+    dut.i_execute_order_quantity.value = quantity_2
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 3:
+    dut.i_stock_id.value = 3
+    dut.i_execute_order_quantity.value = quantity_3
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+
+    # determine expected values:
+    actual_0 = modify_inventory(0, quantity_0, 0)
+    actual_1 = modify_inventory(1, quantity_1, 0)
+    actual_2 = modify_inventory(2, quantity_2, 0)
+    actual_3 = modify_inventory(3, quantity_3, 0)
+
+
+    # perform reads:
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 0
+    await Timer (0.1, units="ns")
+    received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 1
+    await Timer (0.1, units="ns")
+    received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 2
+    await Timer (0.1, units="ns")
+    received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 3
+    await Timer (0.1, units="ns")
+    received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+
+    #log outputs:
+    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
+    dut._log.info("Received inventory for stock 0: %s \t", received_0)
+    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
+    dut._log.info("Received inventory for stock 1: %s \t", received_1)
+    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
+    dut._log.info("Received inventory for stock 2: %s \t", received_2)
+    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
+    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+
+
+    # verify
+    epsilon = actual_0 - received_0
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 0"
+
+    epsilon = actual_1 - received_1
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 1"
+
+    epsilon = actual_2 - received_2
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 2"
+
+    epsilon = actual_3 - received_3
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
 
 
 
 @cocotb.test()
 async def random_input_test_2(dut):
-    """Random order test on inventory"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())  
+    """Random sell order test on inventory"""
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())  
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -273,13 +613,100 @@ async def random_input_test_2(dut):
     dut.i_execute_order_side.value = 0
 
     await RisingEdge(dut.i_clk)
+
+     # perform execute orders on each stock sequentially:
+    quantity_0 = random.randint(100, 1000)
+    quantity_1 = random.randint(100, 1000)
+    quantity_2 = random.randint(100, 1000)
+    quantity_3 = random.randint(100, 1000)
+    # stock 0:
+    dut.i_stock_id.value = 0
+    dut.i_execute_order_quantity.value = quantity_0
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 1:
+    dut.i_stock_id.value = 1
+    dut.i_execute_order_quantity.value = quantity_1
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 2:
+    dut.i_stock_id.value = 2
+    dut.i_execute_order_quantity.value = quantity_2
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 3:
+    dut.i_stock_id.value = 3
+    dut.i_execute_order_quantity.value = quantity_3
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+
+    # determine expected values:
+    actual_0 = modify_inventory(0, quantity_0, 1)
+    actual_1 = modify_inventory(1, quantity_1, 1)
+    actual_2 = modify_inventory(2, quantity_2, 1)
+    actual_3 = modify_inventory(3, quantity_3, 1)
+
+
+    # perform reads:
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 0
+    await Timer (0.1, units="ns")
+    received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 1
+    await Timer (0.1, units="ns")
+    received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 2
+    await Timer (0.1, units="ns")
+    received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 3
+    await Timer (0.1, units="ns")
+    received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+
+    #log outputs:
+    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
+    dut._log.info("Received inventory for stock 0: %s \t", received_0)
+    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
+    dut._log.info("Received inventory for stock 1: %s \t", received_1)
+    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
+    dut._log.info("Received inventory for stock 2: %s \t", received_2)
+    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
+    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+
+
+    # verify
+    epsilon = actual_0 - received_0
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 0"
+
+    epsilon = actual_1 - received_1
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 1"
+
+    epsilon = actual_2 - received_2
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 2"
+
+    epsilon = actual_3 - received_3
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
 
 
 
 @cocotb.test()
 async def random_input_random_stock_1(dut):
-    """Random order test on inventory, with order of inputs switched"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    """Random sell order test on inventory, with order of inputs switched"""
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -289,14 +716,101 @@ async def random_input_random_stock_1(dut):
     dut.i_execute_order.value = 0
     dut.i_execute_order_side.value = 0
 
-
     await RisingEdge(dut.i_clk)
+
+     # perform execute orders on each stock sequentially:
+    quantity_0 = random.randint(100, 1000)
+    quantity_1 = random.randint(100, 1000)
+    quantity_2 = random.randint(100, 1000)
+    quantity_3 = random.randint(100, 1000)
+    #stock 3:
+    dut.i_stock_id.value = 3
+    dut.i_execute_order_quantity.value = quantity_3
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 1:
+    dut.i_stock_id.value = 1
+    dut.i_execute_order_quantity.value = quantity_1
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    # stock 0:
+    dut.i_stock_id.value = 0
+    dut.i_execute_order_quantity.value = quantity_0
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+    #stock 2:
+    dut.i_stock_id.value = 2
+    dut.i_execute_order_quantity.value = quantity_2
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 1 # sell side
+    await RisingEdge(dut.i_clk)
+
+    # determine expected values:
+    actual_0 = modify_inventory(0, quantity_0, 1)
+    actual_1 = modify_inventory(1, quantity_1, 1)
+    actual_2 = modify_inventory(2, quantity_2, 1)
+    actual_3 = modify_inventory(3, quantity_3, 1)
+
+
+    # perform reads:
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 0
+    await Timer (0.1, units="ns")
+    received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 1
+    await Timer (0.1, units="ns")
+    received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 2
+    await Timer (0.1, units="ns")
+    received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 3
+    await Timer (0.1, units="ns")
+    received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+
+    #log outputs:
+    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
+    dut._log.info("Received inventory for stock 0: %s \t", received_0)
+    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
+    dut._log.info("Received inventory for stock 1: %s \t", received_1)
+    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
+    dut._log.info("Received inventory for stock 2: %s \t", received_2)
+    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
+    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+
+
+    # verify
+    epsilon = actual_0 - received_0
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 0"
+
+    epsilon = actual_1 - received_1
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 1"
+
+    epsilon = actual_2 - received_2
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 2"
+
+    epsilon = actual_3 - received_3
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
+
 
 
 @cocotb.test()
 async def random_input_random_stock_2(dut):
-    """Random order test on inventory, with order of inputs switched"""
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    """Random buy order test on inventory, with order of inputs switched"""
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
@@ -306,15 +820,103 @@ async def random_input_random_stock_2(dut):
     dut.i_execute_order.value = 0
     dut.i_execute_order_side.value = 0
 
+    await RisingEdge(dut.i_clk)
 
+     # perform execute orders on each stock sequentially:
+    quantity_0 = random.randint(100, 1000)
+    quantity_1 = random.randint(100, 1000)
+    quantity_2 = random.randint(100, 1000)
+    quantity_3 = random.randint(100, 1000)
+    #stock 1:
+    dut.i_stock_id.value = 1
+    dut.i_execute_order_quantity.value = quantity_1
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 3:
+    dut.i_stock_id.value = 3
+    dut.i_execute_order_quantity.value = quantity_3
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    # stock 0:
+    dut.i_stock_id.value = 0
+    dut.i_execute_order_quantity.value = quantity_0
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+    #stock 2:
+    dut.i_stock_id.value = 2
+    dut.i_execute_order_quantity.value = quantity_2
+    dut.i_execute_order.value = 1
+    dut.i_execute_order_side.value = 0 # buy side
+    await RisingEdge(dut.i_clk)
+
+    # determine expected values:
+    actual_0 = modify_inventory(0, quantity_0, 0)
+    actual_1 = modify_inventory(1, quantity_1, 0)
+    actual_2 = modify_inventory(2, quantity_2, 0)
+    actual_3 = modify_inventory(3, quantity_3, 0)
+
+
+    # perform reads:
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 0
+    await Timer (0.1, units="ns")
+    received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 1
+    await Timer (0.1, units="ns")
+    received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 2
+    await Timer (0.1, units="ns")
+    received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
+    await RisingEdge(dut.i_clk)
+
+    dut.i_ren.value = 1
+    dut.i_stock_id.value = 3
+    await Timer (0.1, units="ns")
+    received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
 
+    #log outputs:
+    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
+    dut._log.info("Received inventory for stock 0: %s \t", received_0)
+    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
+    dut._log.info("Received inventory for stock 1: %s \t", received_1)
+    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
+    dut._log.info("Received inventory for stock 2: %s \t", received_2)
+    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
+    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+
+
+    # verify
+    epsilon = actual_0 - received_0
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 0"
+
+    epsilon = actual_1 - received_1
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 1"
+
+    epsilon = actual_2 - received_2
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 2"
+
+    epsilon = actual_3 - received_3
+    assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
+
+
+
+'''
 @cocotb.test()
 async def reset_test(dut):
 
     """Testing reset functionality"""  
-    cocotb.fork(Clock(dut.i_clk, 10, "ns").start())
+    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
     dut.i_ren.value = 0
