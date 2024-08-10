@@ -424,6 +424,7 @@ async def fixed_input_test_3(dut):
     assert abs(epsilon) < IDEAL_DELTA, "Incorrect inventory 3"
 
 
+
 @cocotb.test()
 async def fixed_input_test_4(dut):
     """Execute another sell order on all stocks"""
@@ -1003,6 +1004,7 @@ async def reset_test(dut):
     reset_inventory()
 
     await RisingEdge(dut.i_clk)
+    dut.i_reset_n.value = 1
 
     await Timer(0.1, units="ns")
 
