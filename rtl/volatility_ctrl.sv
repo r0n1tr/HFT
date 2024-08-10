@@ -27,6 +27,7 @@ module volatility_ctrl
                 write_address[i] <= i_buffer_size * i;
                 /* verilator lint_on WIDTH */
             end
+            o_addr_valid <= 0;
         end
         else begin
             write_address[i_stock_id] <= write_address_next[i_stock_id];
