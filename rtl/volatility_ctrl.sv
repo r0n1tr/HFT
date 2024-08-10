@@ -2,13 +2,15 @@
 module volatility_ctrl
 #(
     parameter NUM_STOCKS = 4,
-    parameter BUFFER_SIZE = 20
+    parameter BUFFER_SIZE = 20,
+    parameter DATA_WIDTH = 32
 )
 (
     input logic                                             i_clk,
     input logic                                             i_reset_n,
     input logic [$clog2(NUM_STOCKS) - 1 : 0]                i_stock_id,
     input logic                                             i_data_valid,
+    input logic [DATA_WIDTH - 1 : 0]                        i_buffer_size,
     output logic [$clog2(NUM_STOCKS*BUFFER_SIZE) - 1 : 0]   o_write_address,
     output logic                                            o_addr_valid
 );
@@ -22,7 +24,7 @@ module volatility_ctrl
         if (!i_reset_n) begin
             for (int i = 0; i < NUM_STOCKS; i++) begin
                 /* verilator lint_off WIDTH */
-                write_address[i] <= BUFFER_SIZE * i;
+                write_address[i] <= i_buffer_size * i;
                 /* verilator lint_on WIDTH */
             end
         end
@@ -33,7 +35,7 @@ module volatility_ctrl
     end
 
     always_comb begin
-        if(i_data_valid) write_address_next[i_stock_id] = (BUFFER_SIZE*i_stock_id)+(write_address[i_stock_id] + 1)%10; 
+        if(i_data_valid) write_address_next[i_stock_id] = (i_buffer_size*i_stock_id)+(write_address[i_stock_id] + 1)%i_buffer_size; 
         else write_address_next[i_stock_id] = write_address[i_stock_id];
     end
 
