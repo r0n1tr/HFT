@@ -49,8 +49,8 @@ async def return_inventory(dut):
     dut.i_stock_id.value = 0
     actual_inventory_0 = read_inventory(0)
     received_inventory_0 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 0: %s \t", actual_inventory_0)
-    dut._log.info("Received inventory 0: %s \t", received_inventory_0)
+    dut._log.info("Actual inventory 0: %s  ", actual_inventory_0)
+    dut._log.info("Received inventory 0: %s  ", received_inventory_0)
 
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
@@ -59,8 +59,8 @@ async def return_inventory(dut):
     dut.i_stock_id.value = 1
     actual_inventory_1 = read_inventory(1)
     received_inventory_1 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 1: %s \t", actual_inventory_1)
-    dut._log.info("Received inventory 1: %s \t", received_inventory_1)
+    dut._log.info("Actual inventory 1: %s  ", actual_inventory_1)
+    dut._log.info("Received inventory 1: %s  ", received_inventory_1)
 
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
@@ -69,8 +69,8 @@ async def return_inventory(dut):
     dut.i_stock_id.value = 1
     actual_inventory_2 = read_inventory(2)
     received_inventory_2 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 2: %s \t", actual_inventory_2)
-    dut._log.info("Received inventory 2: %s \t", received_inventory_2)
+    dut._log.info("Actual inventory 2: %s  ", actual_inventory_2)
+    dut._log.info("Received inventory 2: %s  ", received_inventory_2)
 
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
@@ -79,10 +79,15 @@ async def return_inventory(dut):
     dut.i_stock_id.value = 1
     actual_inventory_3 = read_inventory(3)
     received_inventory_3 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 3: %s \t", actual_inventory_3)
-    dut._log.info("Received inventory 3: %s \t", received_inventory_3)
+    dut._log.info("Actual inventory 3: %s  ", actual_inventory_3)
+    dut._log.info("Received inventory 3: %s  ", received_inventory_3)
 
     await RisingEdge(dut.i_clk)
+
+    assert received_inventory_0 == actual_inventory_0 , "Inventory 0 incorrect"
+    assert received_inventory_1 == actual_inventory_1 , "Inventory 1 incorrect"
+    assert received_inventory_2 == actual_inventory_2 , "Inventory 2 incorrect"
+    assert received_inventory_3 == actual_inventory_3 , "Inventory 3 incorrect"
 
 
 
@@ -173,14 +178,14 @@ async def fixed_input_test_1(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -284,14 +289,14 @@ async def fixed_input_test_2(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -395,14 +400,14 @@ async def fixed_input_test_3(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -505,14 +510,14 @@ async def fixed_input_test_4(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -617,14 +622,14 @@ async def random_input_test_1(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -729,14 +734,14 @@ async def random_input_test_2(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -841,14 +846,14 @@ async def random_input_random_stock_1(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -953,14 +958,14 @@ async def random_input_random_stock_2(dut):
 
 
     #log outputs:
-    dut._log.info("Actual inventory for stock 0: %s \t", actual_0)
-    dut._log.info("Received inventory for stock 0: %s \t", received_0)
-    dut._log.info("Actual inventory for stock 1: %s \t", actual_1)
-    dut._log.info("Received inventory for stock 1: %s \t", received_1)
-    dut._log.info("Actual inventory for stock 2: %s \t", actual_2)
-    dut._log.info("Received inventory for stock 2: %s \t", received_2)
-    dut._log.info("Actual inventory for stock 3: %s \t", actual_3)
-    dut._log.info("Received inventory for stock 3: %s \t", received_3)
+    dut._log.info("Actual inventory for stock 0: %s  ", actual_0)
+    dut._log.info("Received inventory for stock 0: %s  ", received_0)
+    dut._log.info("Actual inventory for stock 1: %s  ", actual_1)
+    dut._log.info("Received inventory for stock 1: %s  ", received_1)
+    dut._log.info("Actual inventory for stock 2: %s  ", actual_2)
+    dut._log.info("Received inventory for stock 2: %s  ", received_2)
+    dut._log.info("Actual inventory for stock 3: %s  ", actual_3)
+    dut._log.info("Received inventory for stock 3: %s  ", received_3)
 
 
     # verify
@@ -994,7 +999,7 @@ async def reset_test(dut):
 
     await RisingEdge(dut.i_clk)
 
-    dut.i_reset_n.value = 1
+    dut.i_reset_n.value = 0
     reset_inventory()
 
     await RisingEdge(dut.i_clk)
@@ -1005,8 +1010,8 @@ async def reset_test(dut):
     dut.i_stock_id.value = 0
     actual_inventory_0 = read_inventory(0)
     received_inventory_0 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 0: %s \t", actual_inventory_0)
-    dut._log.info("Received inventory 0: %s \t", received_inventory_0)
+    dut._log.info("Actual inventory 0: %s  ", actual_inventory_0)
+    dut._log.info("Received inventory 0: %s  ", received_inventory_0)
 
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
@@ -1015,27 +1020,32 @@ async def reset_test(dut):
     dut.i_stock_id.value = 1
     actual_inventory_1 = read_inventory(1)
     received_inventory_1 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 1: %s \t", actual_inventory_1)
-    dut._log.info("Received inventory 1: %s \t", received_inventory_1)
+    dut._log.info("Actual inventory 1: %s  ", actual_inventory_1)
+    dut._log.info("Received inventory 1: %s  ", received_inventory_1)
 
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
     dut.i_ren.value = 1
-    dut.i_stock_id.value = 1
+    dut.i_stock_id.value = 2
     actual_inventory_2 = read_inventory(2)
     received_inventory_2 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 2: %s \t", actual_inventory_2)
-    dut._log.info("Received inventory 2: %s \t", received_inventory_2)
+    dut._log.info("Actual inventory 2: %s  ", actual_inventory_2)
+    dut._log.info("Received inventory 2: %s  ", received_inventory_2)
 
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
     dut.i_ren.value = 1
-    dut.i_stock_id.value = 1
+    dut.i_stock_id.value = 3
     actual_inventory_3 = read_inventory(3)
     received_inventory_3 = int(dut.o_norm_inventory.value)
-    dut._log.info("Actual inventory 3: %s \t", actual_inventory_3)
-    dut._log.info("Received inventory 3: %s \t", received_inventory_3)
+    dut._log.info("Actual inventory 3: %s  ", actual_inventory_3)
+    dut._log.info("Received inventory 3: %s  ", received_inventory_3)
 
     await RisingEdge(dut.i_clk)
+
+    assert received_inventory_0 == actual_inventory_0 , "Inventory 0 incorrect"
+    assert received_inventory_1 == actual_inventory_1 , "Inventory 1 incorrect"
+    assert received_inventory_2 == actual_inventory_2 , "Inventory 2 incorrect"
+    assert received_inventory_3 == actual_inventory_3 , "Inventory 3 incorrect"

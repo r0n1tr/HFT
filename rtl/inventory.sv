@@ -34,6 +34,9 @@ module inventory
                 // temp1 <= norm_inventory[i_stock_id][95:32];
                 norm_inventory[i_stock_id] <= i_execute_order_side ? (norm_inventory[i_stock_id] - (({i_execute_order_quantity, {(DATA_WIDTH){1'b0}}})*i_max_inventory_reciprocal)) : (norm_inventory[i_stock_id] + (({i_execute_order_quantity, {(DATA_WIDTH){1'b0}}})*i_max_inventory_reciprocal));
             end
+            else begin 
+                norm_inventory[i_stock_id] <= norm_inventory[i_stock_id];
+            end
         end
     end
 
@@ -44,7 +47,7 @@ module inventory
     assign temp4 = norm_inventory[3][95:32];
 
     // always_ff @(posedge i_clk) begin
-    //     o_norm_inventory <= i_ren ? norm_inventory[i_stock_id] : 0;
+    //     o_norm_inventory <= i_ren ? norm_inventory[i_stock_id][95:32] : 0;
     // end
 
 endmodule
