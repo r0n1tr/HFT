@@ -18,6 +18,10 @@ module inventory
 );
 
     logic signed [2*FP_WORD_SIZE - 1 : 0]         norm_inventory [NUM_STOCKS - 1 : 0];
+    logic signed [FP_WORD_SIZE - 1 : 0]           temp1;
+    logic signed [FP_WORD_SIZE - 1 : 0]           temp2;
+    logic signed [FP_WORD_SIZE - 1 : 0]           temp3;
+    logic signed [FP_WORD_SIZE - 1 : 0]           temp4;
 
     always_ff @(posedge i_clk) begin
         if(!i_reset_n) begin
@@ -27,12 +31,18 @@ module inventory
         end
         else begin
             if (i_execute_order) begin
+                // temp1 <= norm_inventory[i_stock_id][95:32];
                 norm_inventory[i_stock_id] <= i_execute_order_side ? (norm_inventory[i_stock_id] - (({i_execute_order_quantity, {(DATA_WIDTH){1'b0}}})*i_max_inventory_reciprocal)) : (norm_inventory[i_stock_id] + (({i_execute_order_quantity, {(DATA_WIDTH){1'b0}}})*i_max_inventory_reciprocal));
             end
         end
     end
 
     assign o_norm_inventory = i_ren ? norm_inventory[i_stock_id][95:32] : 0;
+    assign temp1 = norm_inventory[0][95:32];
+    assign temp2 = norm_inventory[1][95:32];
+    assign temp3 = norm_inventory[2][95:32];
+    assign temp4 = norm_inventory[3][95:32];
+
     // always_ff @(posedge i_clk) begin
     //     o_norm_inventory <= i_ren ? norm_inventory[i_stock_id] : 0;
     // end
