@@ -29,17 +29,27 @@ module volatility_ctrl
             end
             o_addr_valid <= 0;
         end
-        else begin
-            write_address[i_stock_id] <= write_address_next[i_stock_id];
-            o_addr_valid <= i_data_valid ? 1 : 0;
-        end
     end
 
     always_comb begin
-        if(i_data_valid) write_address_next[i_stock_id] = (i_buffer_size*i_stock_id)+(write_address[i_stock_id] + 1)%i_buffer_size; 
-        else write_address_next[i_stock_id] = write_address[i_stock_id];
+        if(i_data_valid) begin
+            write_address_next[i_stock_id] = (i_buffer_size*i_stock_id)+((write_address[i_stock_id])%i_buffer_size); 
+        end
+        else begin
+            write_address_next[i_stock_id] = write_address[i_stock_id];
+        end
     end
 
-    assign o_write_address = write_address[i_stock_id];
+    always_ff @(posedge i_clk) begin
+        if(i_data_valid) begin
+            write_address[i_stock_id] <= write_address_next[i_stock_id] + 1;
+            o_write_address <= write_address_next[i_stock_id];
+            o_addr_valid <= 1;
+        end 
+        else begin
+            o_addr_valid = 0; 
+            write_address[i_stock_id] = write_address[i_stock_id];
+        end
+    end
 
 endmodule

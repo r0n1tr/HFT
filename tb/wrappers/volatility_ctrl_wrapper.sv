@@ -30,7 +30,7 @@ module volatility_ctrl_wrapper
     initial
     begin
         $dumpfile("test.vcd");
-        $dumpvars;
+        $dumpvars(0, volatility_ctrl_wrapper);
     end
 
 endmodule
