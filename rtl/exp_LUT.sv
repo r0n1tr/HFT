@@ -1,3 +1,11 @@
+// lut of 10k entries, -1 to 1 
+
+// fixed point numbers - 32 integers // fixed point 32.32
+
+
+
+
+
 module exp_LUT #(
     parameter INPUT_WIDTH = 10,  // width of input
     parameter OUTPUT_WIDTH = 16  // width of output
