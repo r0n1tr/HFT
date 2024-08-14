@@ -2,6 +2,7 @@
 // Var(X) = E(X^2) – (E(X))^2
 module volatility_mem
 #(
+    parameter FP_WORD_SIZE = 64,
     parameter DATA_WIDTH = 32,
     parameter BUFFER_SIZE = 20,
     parameter NUM_STOCKS = 4
@@ -14,7 +15,10 @@ module volatility_mem
     input logic [DATA_WIDTH - 1 : 0]                            i_best_bid,
     input logic [$clog2(NUM_STOCKS) - 1 : 0]                    i_stock_id,
     input logic                                                 i_valid,
-    output logic [DATA_WIDTH - 1 : 0]                           o_volatility,
+    input logc [DATA_WIDTH - 1 : 0]                             i_buffer_size,
+    input logic [FP_WORD_SIZE - 1 : 0]                          i_buffer_size_reciprocal.
+    input logic [DATA_WIDTH - 1 : 0]                            i_num_stocks,
+    output logic [FP_WORD_SIZE - 1 : 0]                         o_volatility,
     output logic [DATA_WIDTH - 1 : 0]                           o_curr_price,
     output logic                                                o_data_valid
 );  
@@ -27,7 +31,7 @@ module volatility_mem
 
     always_ff @(posedge i_clk) begin
         if(!i_reset_n) begin
-            for(int i = 0; i < NUM_STOCKS*BUFFER_SIZE; i++) begin
+            for(int i = 0; i < i_num_stocks*i_buffer_size; i++) begin
                 buffer[i] = 0;
             end
         end
@@ -50,7 +54,7 @@ module volatility_mem
         remove_reg[i_stock_id] = buffer[i_write_address];
     end
 
-    assign o_volatility = (moving_square_sum/BUFFER_SIZE) - ((moving_sum/BUFFER_SIZE)**2); // TODO: replace with fixed point. not sure if this logic is entirely valid though - need to testbench
+    assign o_volatility = (moving_square_sum*i_buffer_size_reciprocal) - ((moving_sum*i_buffer_size_reciprocal)**2); // TODO: replace with fixed point. not sure if this logic is entirely valid though - need to testbench
 
 
 endmodule
