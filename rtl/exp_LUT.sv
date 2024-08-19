@@ -6,31 +6,40 @@
 
 
 
-module exp_LUT #(
-    parameter INPUT_WIDTH = 10,  // width of input
-    parameter OUTPUT_WIDTH = 16  // width of output
-) (
-    input  logic i_clk,
-    input  logic signed [INPUT_WIDTH-1:0] i_arg,  // fixed-point input in Q1.8 format
-    output logic [OUTPUT_WIDTH-1:0] o_result  // fixed-point output in Q8.8 format
+module exp_LUT #
+(
+    parameter array_size = 1_000_000
+)
+(
+    input logic i_clk,
+    input logic signed [34:0] input_value, // q1.34 fixed-point input
+    output logic [63:0] exp_value // Scaled exponential value output
 );
+    
+    logic [63:0] lut [array_size-1:0];
 
-    // Adjust size according to the number of steps (1024 entries for 10-bit indices)
-    logic [15:0] LUT [0:999];
-
-    // Initialize the lookup table from the .mem file
+    // Read the exponential values from the memory file
     initial begin
-        $readmemh("exp_lut.mem", LUT);
+        $readmemh("/home/ronit/HFT/HFT/rtl/exp_values.mem", lut);
     end
 
-    // Intermediate variable to hold the computed index
-    logic [9:0] lut_index;
-
-    // Convert the 10-bit fixed-point input to a 10-bit index
-    always_ff @(posedge i_clk) begin
-        // Convert Q1.8 input to an index range of 0 to 1023
-        lut_index <= (i_arg + 10'sh200) * 1000;  // Offset to make it unsigned (adding 2^9 to shift the range from [-512, 511] to [0, 1023])
-        o_result <= LUT[lut_index];
+    // Calculate the index based on the input_value
+    logic [19:0] index; // 20-bit index to cover array_size (log2(1000000) = ~20 bits)
+    always_comb begin
+        // Scale and clamp the input_value to the range of indices
+        if (input_value < 35'sh0C00000000) // -1.0 in q1.34
+            index = 0;
+        else if (input_value > 35'sh0400000000) // 1.0 in q1.34
+            index = array_size-1;
+        else begin
+            // Equivalent of (input_value + 1.0) * (array_size-1) / 2.0 in q1.34
+            logic signed [68:0] scaled_value; // 69-bit value to accommodate the calculation
+            scaled_value = (input_value + 35'sd17179869184) * (array_size-1);
+            index = scaled_value[68:49]; // Division by 2^34 and truncation to 20 bits
+        end
     end
+
+    // Lookup the exponential value and multiply by base_order
+    assign exp_value = lut[index];
 
 endmodule

@@ -9,7 +9,8 @@ x_values = np.linspace(-1.0, 1.0, array_size)
 exp_values = np.exp(x_values)
 
 # Round the exponential values to 5 decimal places
-exp_values_rounded = np.round(exp_values, 5)
+exp_values_rounded = np.round(exp_values, 9)
+print(exp_values_rounded)
 
 # Define the base_order variable
 base_order = 100
