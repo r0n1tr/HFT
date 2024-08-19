@@ -19,7 +19,7 @@ def lookup_exp_value(input_value):
     # Ensure the input_value is within the valid range
     if input_value < -1.0 or input_value > 1.0:
         raise ValueError("Input value must be between -1.0 and 1.0 inclusive.")
-
+    
     # Calculate the corresponding index
     index = int(round((input_value + 1.0) * (array_size-1) / 2.0))
     
