@@ -7,13 +7,13 @@ module exp_lut #
 )
 (
     input logic i_clk,
-    input logic [63:0] input_value, // q32.32 fixed-point input
+    input logic signed [63:0] input_value, // q32.32 fixed-point input
     output logic [63:0] exp_value // Scaled exponential value output
 );
     
     logic [63:0] lut [array_size-1:0];
     logic [31:0] temp;
-    logic signed [127:0] scaled_value;
+    logic [127:0] scaled_value;
     // Read the exponential values from the memory file
     initial begin
         $readmemh("/home/ronit/HFT/HFT/rtl/exp_values.mem", lut);
@@ -23,18 +23,24 @@ module exp_lut #
     always_comb begin
         temp = input_value[63:32];
             // Scale and clamp the input_value to the range of indices
-            if (temp == 32'h00000003) begin// -1.0 in q32.32
-                index = 0;
+            if(temp[31] == 0) begin
+                if(input_value > 64'h0000_0001_0000_0000) begin
+                    index = array_size - 1;
+                end
+                else begin  
+                    scaled_value = (input_value + 64'h0000000100000000) * (array_size-1) * 0.5;
+                    index = scaled_value[63:32]; // Division by 2^32 and truncation to 20 bits  
+                end
             end
-            else if (temp == 32'h00000001) begin
-
-                index = array_size - 1;
+            else begin
+                if(input_value < 64'hFFFF_FFFE_FFFF_FF00) begin
+                    index = 0;
+                end
+                else begin
+                    scaled_value = (input_value + 64'h0000000100000000) * (array_size-1) * 0.5;
+                    index = scaled_value[63:32]; // Division by 2^32 and truncation to 20 bits  
+                end
             end
-            else begin 
-                scaled_value = (input_value + 64'h0000000100000000) * (array_size-1) * 0.5;
-                index = scaled_value[63:32]; // Division by 2^32 and truncation to 20 bits    
-            end
-
     end
 
     // Lookup the exponential value

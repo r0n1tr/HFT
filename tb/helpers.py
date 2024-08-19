@@ -10,6 +10,32 @@ def make_fixed_point_input(decimal_value):
     
     return fixed_point_value
 
+
+def make_fixed_point_input_signed(decimal_value):
+    # Check if the input value is within the allowable range for Q1.32 format
+    if decimal_value < -2.0 or decimal_value >= 2.0:
+        raise ValueError("Input value is out of the allowable range for Q1.32 fixed-point format")
+
+    # Scale the decimal value to the fixed-point format Q1.32 (1 integer bit + 32 fractional bits)
+    scaled_value = round(decimal_value * (1 << 32))  # This scales to 32 fractional bits
+
+    # Mask to ensure the value fits in a 64-bit signed integer (two's complement)
+    # Ensure that the value fits in the range [-2^63, 2^63 - 1]
+    if scaled_value >= 0:
+        # Positive value; fit it into a 64-bit signed integer
+        fixed_point_value = scaled_value & ((1 << 64) - 1)
+    else:
+        # Negative value; convert to two's complement format
+        fixed_point_value = (scaled_value + (1 << 64)) & ((1 << 64) - 1)
+    
+    # Format the value as a hexadecimal string
+    hex_value = f"0x{fixed_point_value:016X}"
+    
+    return hex_value
+
+
+
+
 def convert_fixed_point_output(fixed_point):
     # Mask to extract the integer part (upper 32 bits)
     integer_mask = 0xFFFFFFFF00000000
@@ -36,4 +62,6 @@ def convert_fixed_point_output(fixed_point):
 
 
 
-print(convert_fixed_point_output(0x00000002B7E132B5))
+print(make_fixed_point_input(1.0329))
+
+print(convert_fixed_point_output(0xFFFF_FFFF_1000_0000))

@@ -6,7 +6,7 @@ module exp_lut_wrapper
 )
 (
     input logic i_clk,
-    input logic signed [34:0] input_value, // q1.34 fixed-point input
+    input logic signed [63:0] input_value, // q1.34 fixed-point input
     output logic [63:0] exp_value // Scaled exponential value output
 );
 
