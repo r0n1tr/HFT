@@ -4,7 +4,8 @@ module order_quantity
 (
    input logic i_clk,
    input logic signed [63:0] inventory_state,
-   output logic [63:0] order_out
+   output logic [63:0] order_out,
+   output logic [32:0] order_filter
 );
 
    localparam shape_parameter = 0.005;
@@ -23,6 +24,7 @@ module order_quantity
    assign mult = 64'h0000006400000000 * temp; // min order quant = 100
 
    // Extract desired bits from mult and assign to order_out
-   assign order_out = mult[72:32]; // Assuming you want a 64-bit output
+   assign order_out = mult[95:32]; // Assuming you want a 64-bit output
+   assign order_filter = order_out[63:32];
 
 endmodule

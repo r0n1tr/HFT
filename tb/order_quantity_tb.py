@@ -31,7 +31,9 @@ async def parameterized_fixed_input_test(dut):
 
         # Capture and convert the output
         output = convert_fixed_point_output(dut.order_quant.value)
-        dut._log.info(f"Input: {test_value} => order_quant: {output}")
+        print(dut.order_filter.value)
+        order_filter = dut.order_filter.value
+        dut._log.info(f"Input: {test_value} => order_quant: {output} => order_filter: {int(order_filter)}")
 
         # Optionally, check the output against the expected value
         expected_output = (100 * math.exp(shape_parameter * test_value))
