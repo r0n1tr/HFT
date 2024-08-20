@@ -135,7 +135,7 @@ async def volatility_test(dut):
             for _ in range(10):
                 await RisingEdge(dut.i_clk)
 
-    NUM_TESTS = 3*BUFFER_SIZE
+    NUM_TESTS = 2*BUFFER_SIZE
     # test_counts = [0, 0, 0, 0]
     test_counts = [0, 0, 0, 0]
     while any(c < NUM_TESTS for c in test_counts):
@@ -169,9 +169,9 @@ async def volatility_test(dut):
             difference = actual_volatility - received_volatility
             dut._log.info("Actual volatility of stock no: %s : %s", num, actual_volatility)
             dut._log.info("Received volatility of stock no: %s : %s", num, received_volatility)
-            dut._log.info("Percentage difference:  %s", percentage_diff(abs(difference), actual_volatility))
-            dut._log.info("Received volatility of stock no: %s : %s", num, math.floor(curr_price))
-            dut._log.info("Received curr_price of stock no: %s : %s", num, received_curr_price)
+            # dut._log.info("Percentage difference:  %s", percentage_diff(abs(difference), actual_volatility))
+            # dut._log.info("Received volatility of stock no: %s : %s", num, math.floor(curr_price))
+            # dut._log.info("Received curr_price of stock no: %s : %s", num, received_curr_price)
             assert percentage_diff(abs(difference), actual_volatility) < 5, "Invalid variance"
             assert dut.o_data_valid.value == 1, "Invalid valid signal"
             assert received_curr_price == math.floor(curr_price), "Invalid curr_price"

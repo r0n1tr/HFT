@@ -47,7 +47,7 @@ module volatility_ctrl
             o_addr_valid <= 1;
         end 
         else begin
-            o_addr_valid = 0; 
+            o_addr_valid <= 0; 
             write_address[i_stock_id] = write_address[i_stock_id];
         end
     end

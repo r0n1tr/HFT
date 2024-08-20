@@ -18,8 +18,7 @@ module volatility_mem
     input logic                                                 i_valid,
     input logic [DATA_WIDTH - 1 : 0]                            i_buffer_size,
     input logic [FP_WORD_SIZE - 1 : 0]                          i_buffer_size_reciprocal,
-    input logic [DATA_WIDTH - 1 : 0]                            i_num_stocks,
-    output logic [FP_WORD_SIZE - 1 : 0]                           o_volatility,
+    output logic [FP_WORD_SIZE - 1 : 0]                         o_volatility,
     output logic [DATA_WIDTH - 1 : 0]                           o_curr_price,
     output logic                                                o_data_valid
 );  
@@ -43,7 +42,9 @@ module volatility_mem
     logic [FP_WORD_SIZE - 1 : 0]  term6;
     logic [FP_WORD_SIZE - 1 : 0]  term7;
 
-    logic [95:0]    term1;
+    logic flag;
+
+    logic [DATA_WIDTH-1:0]    term1;
     logic [95:0]    term2;
     logic [63:0]    term3;
 
@@ -62,36 +63,30 @@ module volatility_mem
             end
             o_data_valid <= 0;
             o_curr_price <= 0;
+            flag <= 0;
         end
         else begin
             if (i_valid) begin
+                flag <= 0;
                 buffer[i_write_address] <= ((i_best_ask+i_best_bid) >>> 1);
                 moving_sum[i_stock_id] <= moving_sum[i_stock_id] - remove_reg[i_stock_id] + ((i_best_ask+i_best_bid) >>> 1);
                 moving_square_sum[i_stock_id] <= moving_square_sum[i_stock_id] - (remove_reg[i_stock_id]**2) + (((i_best_ask+i_best_bid) >>> 1)**2);
                 o_data_valid <= 1;
                 o_curr_price <= ((i_best_ask+i_best_bid) >>> 1);
-
-
-
-                // term6 <= (moving_square_sum[i_stock_id] - (remove_reg[i_stock_id]**2) + (((i_best_ask+i_best_bid) >>> 1)**2)) >>> division;
-                // term7 <= ((moving_sum[i_stock_id] - remove_reg[i_stock_id] + ((i_best_ask+i_best_bid) >>> 1)) >>> division)**2;
             end
             else begin
                 o_data_valid <= 0;
+                flag <= 1;
+                o_curr_price <= 0;
             end
         end
     end
 
     always_comb begin
-        // store what we are overwriting in something a reg to calculate the removal's effect on the stats
         if(i_valid) remove_reg[i_stock_id] = buffer[i_write_address];
         else remove_reg[i_stock_id] = 0;
     end
 
-
-    // assign moving_square_sum_t = moving_square_sum[i_stock_id];
-    // assign moving_sum_t = moving_sum[i_stock_id];
-    // assign remove_reg_t = remove_reg[i_stock_id];
 
 
     always_comb begin 
@@ -112,8 +107,13 @@ module volatility_mem
         // o_volatility_t = term6 - term7;
     end
 
+    // assign term1 = buffer[95];
+    assign moving_square_sum_t = moving_square_sum[i_stock_id];
+    assign moving_sum_t = moving_sum[i_stock_id];
+    assign remove_reg_t = remove_reg[i_stock_id];
     // assign term1 = mean_squared[127:32];
     // assign term2 = squared_mean[191:96];
+    // assign term1 = moving_sum[i_stock_id];
     assign o_volatility = mean_squared[127:32]-squared_mean[191:96];
     // assign o_volatility = mean_squared[95:32]-squared_mean[159:96];
     // assign term5 = mean_squared[127:32]-squared_mean[191:96];

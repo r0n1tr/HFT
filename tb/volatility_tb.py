@@ -2,6 +2,7 @@ import cocotb
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 from cocotb.triggers import Timer, RisingEdge
 from cocotb.clock import Clock
 from helpers import make_fixed_point_input, convert_fixed_point_output 
@@ -94,7 +95,7 @@ async def volatility_test(dut):
 
     # make sure each each slot is filled in buffer, before actually taking readings:
 
-    NUM_TESTS = 1 # Populate every term in the buffer, or else, we get very big variances
+    NUM_TESTS = BUFFER_SIZE # Populate every term in the buffer, or else, we get very big variances
 
     test_counts = [0, 0, 0, 0]
     # test_counts = [0]
@@ -124,13 +125,68 @@ async def volatility_test(dut):
             # dut._log.info("regular: %s", write_address)
             buffers[num][convert_address(num, write_address)] = curr_price
             actual_volatility = return_variance(num)
-            # received_volatility = convert_fixed_point_output(dut.o_volatility.value)
             dut._log.info("Actual volatility of stock no: %s : %s", num, actual_volatility)
-            # dut._log.info("Received volatility of stock no: %s : %s", num, received_volatility)
             test_counts[num] += 1
             dut.i_data_valid.value = 0
+            for _ in range(1):
+                await RisingEdge(dut.i_clk)
+            await Timer(0.1, units="ns")
+            received_volatility = convert_fixed_point_output(dut.o_volatility.value)
+            dut._log.info("Received volatility of stock no: %s : %s", num, received_volatility)
+            # dut._log.info("Valid: %s", dut.o_data_valid.value)
             for _ in range(10):
                 await RisingEdge(dut.i_clk)
+
+
+
+    NUM_TESTS = 3*BUFFER_SIZE # Populate every term in the buffer, or else, we get very big variances
+
+    test_counts = [0, 0, 0, 0]
+    # test_counts = [0]
+    while any(c < NUM_TESTS for c in test_counts):
+        num = random.randint(0, 3)
+        if test_counts[num] < NUM_TESTS:
+            if num == 0:
+                best_bid = random.randint(100_0000, 100_0050)
+                best_ask = random.randint(100_0000, 100_0050)
+            elif num == 1:
+                best_bid = random.randint(200_0000, 200_0050)
+                best_ask = random.randint(200_0000, 200_0050)
+            elif num == 2:
+                best_bid = random.randint(300_0000, 300_0050)
+                best_ask = random.randint(300_0000, 300_0050)
+            else:
+                best_bid = random.randint(400_0000, 400_0050)
+                best_ask = random.randint(400_0000, 400_0050)   
+            # best_bid = random.randint(100_0000, 100_0050)
+            # best_ask = random.randint(100_0000, 100_0050) 
+            write_address = generate_address(num)
+            cocotb.start_soon(load_test_inputs(dut, num, best_ask, best_bid))
+            await RisingEdge(dut.i_clk)
+            # await Timer(0.1, units="ns")
+            curr_price = (best_bid+best_ask)/2
+            # dut._log.info("converted: %s", convert_address(num, write_address))
+            # dut._log.info("regular: %s", write_address)
+            buffers[num][convert_address(num, write_address)] = curr_price
+            actual_volatility = return_variance(num)
+            dut._log.info("Actual volatility of stock no: %s : %s", num, actual_volatility)
+            test_counts[num] += 1
+            dut.i_data_valid.value = 0
+            for _ in range(1):
+                await RisingEdge(dut.i_clk)
+            await Timer(0.1, units="ns")
+            received_volatility = convert_fixed_point_output(dut.o_volatility.value)
+            dut._log.info("Received volatility of stock no: %s : %s", num, received_volatility)
+            # dut._log.info("Valid: %s", dut.o_data_valid.value)
+            assert dut.o_data_valid.value == 1, "Invalid valid signal"
+            received_curr_price = int(dut.o_curr_price.value)
+            dut._log.info("Received curr_price of stock no: %s : %s", num, received_curr_price)
+            assert received_curr_price == math.floor(curr_price), "Invalid curr_price"
+            difference = actual_volatility - received_volatility
+            assert percentage_diff(abs(difference), actual_volatility) < 5, "Invalid variance"
+            for _ in range(10):
+                await RisingEdge(dut.i_clk)
+        
 
     for _ in range(10):
         await RisingEdge(dut.i_clk)
