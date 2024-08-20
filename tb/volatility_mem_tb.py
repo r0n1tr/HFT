@@ -1,6 +1,5 @@
 import cocotb
 import random
-import math
 import matplotlib.pyplot as plt
 import numpy as np
 from cocotb.triggers import Timer, RisingEdge
@@ -50,6 +49,9 @@ def generate_address(stock_id):
 
 def convert_address(stock_id, address):
     return (address - (stock_id*BUFFER_SIZE))
+
+def percentage_diff(diff, actual):
+    return ((diff/actual)*100)
 
 
 async def toggle_reset(dut):
@@ -102,8 +104,20 @@ async def volatility_test(dut):
     while any(c < NUM_TESTS for c in test_counts):
         num = random.randint(0, 3)
         if test_counts[num] < NUM_TESTS:
-            best_bid = random.randint(100_0000, 100_0050)
-            best_ask = random.randint(100_0000, 100_0050)
+            if num == 0:
+                best_bid = random.randint(100_0000, 100_0050)
+                best_ask = random.randint(100_0000, 100_0050)
+            elif num == 1:
+                best_bid = random.randint(200_0000, 200_0050)
+                best_ask = random.randint(200_0000, 200_0050)
+            elif num == 2:
+                best_bid = random.randint(300_0000, 300_0050)
+                best_ask = random.randint(300_0000, 300_0050)
+            else:
+                best_bid = random.randint(400_0000, 400_0050)
+                best_ask = random.randint(400_0000, 400_0050)   
+            # best_bid = random.randint(100_0000, 100_0050)
+            # best_ask = random.randint(100_0000, 100_0050) 
             write_address = generate_address(num)
             cocotb.start_soon(load_test_inputs(dut, num, best_ask, best_bid, write_address))
             await RisingEdge(dut.i_clk)
@@ -126,8 +140,20 @@ async def volatility_test(dut):
     while any(c < NUM_TESTS for c in test_counts):
         num = random.randint(0, 3)
         if test_counts[num] < NUM_TESTS:
-            best_bid = random.randint(100_0000, 100_0500)
-            best_ask = random.randint(100_0000, 100_0500)
+            if num == 0:
+                best_bid = random.randint(100_0000, 100_0050)
+                best_ask = random.randint(100_0000, 100_0050)
+            elif num == 1:
+                best_bid = random.randint(200_0000, 200_0050)
+                best_ask = random.randint(200_0000, 200_0050)
+            elif num == 2:
+                best_bid = random.randint(300_0000, 300_0050)
+                best_ask = random.randint(300_0000, 300_0050)
+            else:
+                best_bid = random.randint(400_0000, 400_0050)
+                best_ask = random.randint(400_0000, 400_0050) 
+            # best_bid = random.randint(100_0000, 100_0050)
+            # best_ask = random.randint(100_0000, 100_0050) 
             write_address = generate_address(num)
             cocotb.start_soon(load_test_inputs(dut, num, best_ask, best_bid, write_address))
             await RisingEdge(dut.i_clk)
@@ -141,6 +167,7 @@ async def volatility_test(dut):
             dut._log.info("Actual volatility of stock no: %s : %s", num, actual_volatility)
             dut._log.info("Received volatility of stock no: %s : %s", num, received_volatility)
             difference = actual_volatility - received_volatility
+            dut._log.info("Percentage difference:  %s", percentage_diff(abs(difference), actual_volatility))
             assert abs(difference) < IDEAL_DELTA, "Invalid variance"
             assert dut.o_data_valid.value == 1, "Invalid valid signal"
             test_counts[num] += 1
@@ -151,7 +178,3 @@ async def volatility_test(dut):
         await RisingEdge(dut.i_clk)
 
 
-@cocotb.test()
-async def volatility_test_overflow(dut):
-    """Testing variance of output is correct until buffer is full"""
-    cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
