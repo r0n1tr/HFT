@@ -62,6 +62,6 @@ def convert_fixed_point_output(fixed_point):
 
 
 
-print(make_fixed_point_input(1.0329))
+print(make_fixed_point_input(100))
 
 print(convert_fixed_point_output(0xFFFF_FFFF_1000_0000))

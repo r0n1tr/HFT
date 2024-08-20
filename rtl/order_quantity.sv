@@ -1,11 +1,28 @@
-module order_quantity #
+`include "../rtl/exp_lut.sv"
+
+module order_quantity 
 (
    input logic i_clk,
-   input logic 
-)
-(
-    
+   input logic signed [63:0] inventory_state,
+   output logic [63:0] order_out
 );
-    
+
+   localparam shape_parameter = 0.005;
    
+   logic [63:0] temp;
+   logic [127:0] mult; 
+
+   // Instantiate exp_lut
+   exp_lut my_exp_lut (
+      .i_clk(i_clk),
+      .input_value(shape_parameter * inventory_state),
+      .exp_value(temp)
+   );
+
+   // Perform multiplication with continuous assignment
+   assign mult = 64'h0000006400000000 * temp; // min order quant = 100
+
+   // Extract desired bits from mult and assign to order_out
+   assign order_out = mult[72:32]; // Assuming you want a 64-bit output
+
 endmodule

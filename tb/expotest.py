@@ -26,6 +26,14 @@ def lookup_exp_value(input_value):
     # Retrieve the exponential value from the array and multiply by base_order
     return base_order * exp_values_rounded[index]
 
+print(lookup_exp_value(0.30349))
+print(lookup_exp_value(0.5))
+print(lookup_exp_value(1.0))
+print(lookup_exp_value(-0.3))
+print(lookup_exp_value(0.123456))
+print(lookup_exp_value(-0.99839))
+print(lookup_exp_value(0.48548))
+print(lookup_exp_value(0.826813))
 # # Example usage
 # counter = 0
 # for i in range (len(exp_values)):
@@ -37,18 +45,18 @@ def lookup_exp_value(input_value):
 #         counter += 1
 
 # Write the rounded exponential values to a .mem file
-with open("exp_values.mem", "w") as mem_file:
-    for value in exp_values_rounded:
-        # Convert the floating point value to fixed point q32.32 format
-        fixed_point_value = int(value * (1 << 32))
+# with open("exp_values.mem", "w") as mem_file:
+#     for value in exp_values_rounded:
+#         # Convert the floating point value to fixed point q32.32 format
+#         fixed_point_value = int(value * (1 << 32))
         
-        # Convert to 64-bit hexadecimal representation
-        hex_value = f"{fixed_point_value:016X}"
+#         # Convert to 64-bit hexadecimal representation
+#         hex_value = f"{fixed_point_value:016X}"
         
-        # Write the hexadecimal value to the file
-        mem_file.write(hex_value + "\n")
+#         # Write the hexadecimal value to the file
+#         mem_file.write(hex_value + "\n")
 
-print("Exponential values have been written to exp_values.mem")        
+# print("Exponential values have been written to exp_values.mem")        
 
 
 # print("success")
