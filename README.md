@@ -1,5 +1,6 @@
 # HFT
 
+![image](https://github.com/user-attachments/assets/f1c2beb8-8abf-45e7-bbe7-cc3e84dbe167)
 
 ## Refer to HFT document for further details:
 
