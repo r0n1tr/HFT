@@ -19,6 +19,7 @@ module volatility_mem_wrapper
     input logic [FP_WORD_SIZE - 1 : 0]                          i_buffer_size_reciprocal,
     output logic [FP_WORD_SIZE - 1 : 0]                         o_volatility,
     output logic [DATA_WIDTH - 1 : 0]                           o_curr_price,
+    output logic                                                o_buffer_full,
     output logic                                                o_data_valid
 );  
 
@@ -35,6 +36,7 @@ module volatility_mem_wrapper
         .i_buffer_size_reciprocal(i_buffer_size_reciprocal),
         .o_volatility(o_volatility),
         .o_curr_price(o_curr_price),
+        .o_buffer_full(o_buffer_full),
         .o_data_valid(o_data_valid)
     );
 
