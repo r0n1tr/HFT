@@ -6,7 +6,7 @@ Timestamp           4               32’h0300        Time that order happened  
 Order number        4               32’h03BA        Unique value to distinguish order           3
 Buy or sell         1/8             1’b1            A Buy order                                 1
 Shares              4               32’h01BB        The total number of shares                  4
-Stock Symbol        8               64”h0AAB        2341 Which stock the order concerns         5, 6    
+Stock Symbol        8               64'h0AAB        2341 Which stock the order concerns         5, 6    
 Price               4               32’hBABB        The price offered to buy                    7
 */
 module parser
