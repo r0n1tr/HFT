@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-MODULE_NAME=exp_LUT
+MODULE_NAME=$1
 
 # cleanup
 rm -rf obj_dir
