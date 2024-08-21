@@ -5,12 +5,11 @@ module spread
 )
 (
     input logic                                     i_clk,
-    input logic [DATA_WIDTH - 1 : 0]                i_curr_time, // Need to be converted to our standard form for fixed point
+    input logic [FP_WORD_SIZE - 1 : 0]              i_curr_time, // Need to be converted to our standard form for fixed point
     input logic signed [FP_WORD_SIZE - 1 : 0]       i_volatility,
     input logic                                     i_data_valid,
     input logic signed [FP_WORD_SIZE - 1 : 0]       i_logarithm,
     input logic signed [FP_WORD_SIZE - 1 : 0]       i_risk_factor,
-    input logic [DATA_WIDTH - 1 : 0]                i_terminal_time,
     output logic signed [FP_WORD_SIZE - 1 : 0]      o_spread,
     output logic                                    o_data_valid
 );
@@ -19,7 +18,7 @@ module spread
 
     always_ff @(posedge i_clk) begin 
         if(i_data_valid) begin
-            mult_result <= i_risk_factor*i_volatility*({i_terminal_time, {(DATA_WIDTH){1'b0}}} - {i_curr_time, {(DATA_WIDTH){1'b0}}}) + {{(FP_WORD_SIZE){1'b0}}, i_logarithm, {(FP_WORD_SIZE){1'b0}}};
+            mult_result <= i_risk_factor*i_volatility*(i_curr_time) + {{(FP_WORD_SIZE){1'b0}}, i_logarithm, {(FP_WORD_SIZE){1'b0}}};
             o_data_valid <= 1; 
         end
         else begin 
