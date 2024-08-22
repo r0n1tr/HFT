@@ -2,6 +2,7 @@ import random
 import time
 import struct
 import argparse
+import datetime
 
 # Define stock symbols
 stocks = ['AAPL', 'GOOGL', 'AMZN', 'MSFT']
@@ -27,10 +28,19 @@ def generate_price():
 def generate_quantity():
     return random.randint(1, 1000)
 
-# Function to generate a timestamp in microseconds since epoch
+# Function to generate a timestamp in microseconds since epoch - want to conver this to time in seconds of current day
 def generate_timestamp():
-    return int(time.time() * 1000000) & 0xFFFFFFFF  # Ensure it fits in 4 bytes
+    current_time = time.time()
+    now = datetime.datetime.now()
 
+    # start of trading day
+    nine_thirty_am = datetime.datetime(now.year, now.month, now.day, 9, 30)
+    nine_thirty_am_timestamp = time.mktime(nine_thirty_am.timetuple())
+
+    # Calculate the seconds since 9:30 AM today
+    seconds_since_nine_thirty = current_time - nine_thirty_am_timestamp
+
+    return round(seconds_since_nine_thirty)
 # Function to convert string to fixed-length bytes, padded with spaces
 def str_to_fixed_bytes(s, length):
     return s.ljust(length).encode('ascii')
