@@ -2,7 +2,7 @@
 ITCH Format:
 Data Type           Byte Size       Type            Value Meaning                               Register Number
 Message             1               8’hA            Add order                                   1
-Timestamp           4               32’h0300        Time that order happened                    2
+Timestamp           4               32’h0300        Time that order happened                    8
 Order number        4               32’h03BA        Unique value to distinguish order           3
 Buy or sell         1/8             1’b1            A Buy order                                 1
 Shares              4               32’h01BB        The total number of shares                  4
@@ -11,7 +11,8 @@ Price               4               32’hBABB        The price offered to buy  
 */
 module parser
 #(
-    parameter REG_WIDTH = 32
+    parameter REG_WIDTH = 32,
+    parameter FP_WORD_SIZE = 64
 )
 (
     input logic                         i_clk, 
@@ -23,12 +24,14 @@ module parser
     input logic [REG_WIDTH - 1 : 0]     i_reg_5,
     input logic [REG_WIDTH - 1 : 0]     i_reg_6,
     input logic [REG_WIDTH - 1 : 0]     i_reg_7,
+    input logic [REG_WIDTH - 1 : 0]     i_reg_8,
     output logic [1:0]                  o_stock_symbol,
     output logic [REG_WIDTH - 1 : 0]    o_order_id,
     output logic [REG_WIDTH - 1 : 0]    o_price,
     output logic [15:0]                 o_quantity,
     output logic [1:0]                  o_order_type,
     output logic                        o_trade_type,
+    output logic [FP_WORD_SIZE - 1 : 0] o_curr_time,
     output logic                        o_valid
 );
 
@@ -70,6 +73,7 @@ module parser
                     o_price <= {i_reg_6[15:0], i_reg_7[31:16]};
                     o_quantity <= i_reg_4[31:16];
                     o_trade_type <= i_reg_3[16] ? BUY : SELL;
+                    o_curr_time <= {i_reg_8, 32'b0};
                 end
                 8'h58: begin
                     o_order_type <= CANCEL;
@@ -78,6 +82,7 @@ module parser
                     o_price <= 0;
                     o_quantity <= 0;
                     o_trade_type <= 0;
+                    o_curr_time <= {i_reg_8, 32'b0};
                 end
                 8'h45: begin 
                     o_order_type <= EXECUTE;
@@ -86,6 +91,7 @@ module parser
                     o_price <= 0;
                     o_quantity <= {i_reg_3[7:0], i_reg_4[31:24]};
                     o_trade_type <= 0;
+                    o_curr_time <= {i_reg_8, 32'b0};
                 end
                 default: begin 
                     o_order_type <= 0;
@@ -94,6 +100,7 @@ module parser
                     o_price <= 0;
                     o_quantity <= 0;
                     o_trade_type <= 0;
+                    o_curr_time <= {i_reg_8, 32'b0};
                 end
             endcase
         end
