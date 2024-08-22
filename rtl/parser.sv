@@ -25,6 +25,7 @@ module parser
     input logic [REG_WIDTH - 1 : 0]     i_reg_6,
     input logic [REG_WIDTH - 1 : 0]     i_reg_7,
     input logic [REG_WIDTH - 1 : 0]     i_reg_8,
+    
     output logic [1:0]                  o_stock_symbol,
     output logic [REG_WIDTH - 1 : 0]    o_order_id,
     output logic [REG_WIDTH - 1 : 0]    o_price,

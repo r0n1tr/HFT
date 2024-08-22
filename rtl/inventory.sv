@@ -14,6 +14,7 @@ module inventory
     input logic [DATA_WIDTH - 1 : 0]            i_execute_order_quantity, // When we have a execute order, we need to re adjust the normalised inventory, this needs to happen during the culculation of volatility 
     input logic                                 i_execute_order,
     input logic                                 i_execute_order_side, // 0: buy, 1: sell
+    
     output logic signed [FP_WORD_SIZE - 1 : 0]  o_norm_inventory // output inventory
 );
 

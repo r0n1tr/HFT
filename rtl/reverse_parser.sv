@@ -9,7 +9,7 @@ Shares              4               32’h01BB        The total number of shares
 Stock Symbol        8               64”h0AAB        2341 Which stock the order concerns         5, 6    
 Price               4               32’hBABB        The price offered to buy                    7
 */
-module parser
+module reverse_parser
 #(
     parameter REG_WIDTH = 32
 )
@@ -26,14 +26,14 @@ module parser
     input logic                        i_book_is_busy,
     input logic [63:0]                 i_stock_id,
     
-    output logic                         o_valid,
     output logic [REG_WIDTH - 1 : 0]     o_reg_1,
     output logic [REG_WIDTH - 1 : 0]     o_reg_2,
     output logic [REG_WIDTH - 1 : 0]     o_reg_3,
     output logic [REG_WIDTH - 1 : 0]     o_reg_4,
     output logic [REG_WIDTH - 1 : 0]     o_reg_5,
     output logic [REG_WIDTH - 1 : 0]     o_reg_6,
-    output logic [REG_WIDTH - 1 : 0]     o_reg_7
+    output logic [REG_WIDTH - 1 : 0]     o_reg_7,
+    output logic                         o_valid
 
 );
 

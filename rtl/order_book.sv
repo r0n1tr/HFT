@@ -128,8 +128,10 @@ module order_book
     output logic      [31:0] tb_reg_118,
     output logic      [31:0] tb_reg_119,
     output logic      [31:0] tb_reg_120,
+
     input logic       [1:0]  tb_stock_id,
     input logic              tb_test_count_reset_n,
+    
     output logic      [31:0] tb_test_count,
     
 

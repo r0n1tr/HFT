@@ -14,6 +14,7 @@ module trading_logic
     input logic [FP_WORD_SIZE - 1 : 0]              i_inventory_state,
     input logic                                     i_data_valid,
     input logic  [$clog2(NUM_STOCKS) - 1 : 0]       i_stock_id,
+    
     output logic [DATA_WIDTH - 1 : 0]               o_buy_price,
     output logic [DATA_WIDTH - 1 : 0]               o_sell_price,
     output logic                                    o_data_valid
