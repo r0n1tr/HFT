@@ -35,7 +35,6 @@ async def return_inventory(dut):
 
     # reset to default inputs for test case
     dut.i_reset_n.value = 0
-    dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -45,7 +44,6 @@ async def return_inventory(dut):
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     actual_inventory_0 = read_inventory(0)
     received_inventory_0 = int(dut.o_norm_inventory.value)
@@ -55,7 +53,6 @@ async def return_inventory(dut):
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     actual_inventory_1 = read_inventory(1)
     received_inventory_1 = int(dut.o_norm_inventory.value)
@@ -65,7 +62,6 @@ async def return_inventory(dut):
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     actual_inventory_2 = read_inventory(2)
     received_inventory_2 = int(dut.o_norm_inventory.value)
@@ -75,7 +71,6 @@ async def return_inventory(dut):
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     actual_inventory_3 = read_inventory(3)
     received_inventory_3 = int(dut.o_norm_inventory.value)
@@ -97,7 +92,6 @@ async def fixed_input_test_1(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -152,25 +146,21 @@ async def fixed_input_test_1(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -209,7 +199,6 @@ async def fixed_input_test_2(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -263,25 +252,21 @@ async def fixed_input_test_2(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -320,7 +305,6 @@ async def fixed_input_test_3(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -374,25 +358,21 @@ async def fixed_input_test_3(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -431,7 +411,6 @@ async def fixed_input_test_4(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -485,25 +464,21 @@ async def fixed_input_test_4(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -542,7 +517,6 @@ async def random_input_test_1(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -597,25 +571,25 @@ async def random_input_test_1(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -654,7 +628,7 @@ async def random_input_test_2(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())  
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
+    # dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -709,25 +683,25 @@ async def random_input_test_2(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -766,7 +740,7 @@ async def random_input_random_stock_1(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
+    # dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -821,25 +795,25 @@ async def random_input_random_stock_1(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -878,7 +852,7 @@ async def random_input_random_stock_2(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
+    # dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -933,25 +907,25 @@ async def random_input_random_stock_2(dut):
 
 
     # perform reads:
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     await Timer (0.1, units="ns")
     received_0 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     await Timer (0.1, units="ns")
     received_1 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     await Timer (0.1, units="ns")
     received_2 = convert_fixed_point_output(dut.o_norm_inventory.value)
     await RisingEdge(dut.i_clk)
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     await Timer (0.1, units="ns")
     received_3 = convert_fixed_point_output(dut.o_norm_inventory.value)
@@ -991,7 +965,7 @@ async def reset_test(dut):
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
 
     dut.i_reset_n.value = 1
-    dut.i_ren.value = 0
+    # dut.i_ren.value = 0
     dut.i_stock_id.value = 0
     dut.i_max_inventory_reciprocal.value = make_fixed_point_input(1/MAX_INVENTORY)
     dut.i_execute_order_quantity.value = 0
@@ -1008,7 +982,7 @@ async def reset_test(dut):
 
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 0
     actual_inventory_0 = read_inventory(0)
     received_inventory_0 = int(dut.o_norm_inventory.value)
@@ -1018,7 +992,7 @@ async def reset_test(dut):
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 1
     actual_inventory_1 = read_inventory(1)
     received_inventory_1 = int(dut.o_norm_inventory.value)
@@ -1028,7 +1002,7 @@ async def reset_test(dut):
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 2
     actual_inventory_2 = read_inventory(2)
     received_inventory_2 = int(dut.o_norm_inventory.value)
@@ -1038,7 +1012,7 @@ async def reset_test(dut):
     await RisingEdge(dut.i_clk)
     await Timer(0.1, units="ns")
 
-    dut.i_ren.value = 1
+    # dut.i_ren.value = 1
     dut.i_stock_id.value = 3
     actual_inventory_3 = read_inventory(3)
     received_inventory_3 = int(dut.o_norm_inventory.value)

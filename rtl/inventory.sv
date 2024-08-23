@@ -8,7 +8,6 @@ module inventory
 (
     input logic                                 i_clk,
     input logic                                 i_reset_n,
-    input logic                                 i_ren,
     input logic [$clog2(NUM_STOCKS) - 1 : 0 ]   i_stock_id,
     input logic [FP_WORD_SIZE - 1 : 0]          i_max_inventory_reciprocal, // keep this the same for all stocks for simplicity
     input logic [DATA_WIDTH - 1 : 0]            i_execute_order_quantity, // When we have a execute order, we need to re adjust the normalised inventory, this needs to happen during the culculation of volatility 
@@ -41,7 +40,7 @@ module inventory
         end
     end
 
-    assign o_norm_inventory = i_ren ? norm_inventory[i_stock_id][95:32] : 0;
+    assign o_norm_inventory = norm_inventory[i_stock_id][95:32];
     assign temp1 = norm_inventory[0][95:32];
     assign temp2 = norm_inventory[1][95:32];
     assign temp3 = norm_inventory[2][95:32];

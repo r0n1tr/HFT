@@ -9,7 +9,6 @@ module inventory_wrapper
 (
     input logic                                 i_clk,
     input logic                                 i_reset_n,
-    input logic                                 i_ren,
     input logic [$clog2(NUM_STOCKS) - 1 : 0 ]   i_stock_id,
     input logic [FP_WORD_SIZE - 1 : 0]          i_max_inventory_reciprocal, // keep this the same for all stocks for simplicity
     input logic [DATA_WIDTH - 1 : 0]            i_execute_order_quantity, // When we have a i_execute order, we need to re adjust the normalised inventory, this needs to happen during the culculation of volatility 
@@ -22,7 +21,6 @@ module inventory_wrapper
     (
         .i_clk(i_clk),
         .i_reset_n(i_reset_n),
-        .i_ren(i_ren),
         .i_stock_id(i_stock_id),
         .i_max_inventory_reciprocal(i_max_inventory_reciprocal),
         .i_execute_order_quantity(i_execute_order_quantity),

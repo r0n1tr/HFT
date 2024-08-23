@@ -145,9 +145,14 @@ module order_book
     input logic [31:0]      i_order_id,
     input logic             i_data_valid, // FROM PARSER
     input logic             i_trading_logic_ready, // FROM TRADING LOGICs
+    input logic [63:0]      i_curr_time,
     output logic [31:0]     o_best_bid,
     output logic [31:0]     o_best_ask,
     output logic            o_book_is_busy, // can only read from the book (from trading logic) when book is not busy
+    output logic            o_execute_order,
+    output logic [31:0]     o_quantity,
+    output logic [63:0]     o_curr_time,
+    output logic            o_trade_type,
     output logic            o_data_valid // data is valid when high
 );
     // order book array. Each trade takes up 3 32 bit wide registers.
@@ -185,6 +190,8 @@ module order_book
 
     logic [31:0] test_index;
     logic found;
+
+    logic reg_execute_order;
 
     typedef enum logic [$clog2(NUM_STOCKS) - 1: 0] { 
         ADD = 0, 
@@ -504,6 +511,7 @@ module order_book
      always_ff @(posedge i_clk) begin
         o_data_valid <= 0;
         o_book_is_busy <= 1; 
+        o_execute_order <= 0;
         // curr_state <= next_state;
         found <= 0;
         case(curr_state)
@@ -604,7 +612,6 @@ module order_book
                 if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
                     order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] - i_quantity;
                     if(order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] == i_quantity) begin
-                        // found <= 1;
                         which_book <= 1;
                         /* verilator lint_off WIDTH */
                         cancel_register <= (i_stock_id * BOOK_DEPTH) + search_pointer;
@@ -634,11 +641,16 @@ module order_book
 
                 search_pointer <= search_pointer + 1;
 
-                // curr_state <= UPDATE_CACHE;
+                if (i_order_id[31:29] == 0) begin
+                    reg_execute_order <= 1;
+                end
+                else begin
+                    reg_execute_order <= 0;
+                end
+
             end
             SHIFT_BOOK: begin //4
-                // test_index <= cancel_register;
-                // test_index <=  3*i_stock_id*BOOK_DEPTH+((3*BOOK_DEPTH)-1);
+
                 if(which_book) begin
                     if ((cancel_register-(i_stock_id*BOOK_DEPTH)) < BOOK_DEPTH-1) begin // counter = cancelled trade number 
                         order_book_memory_bid[3*cancel_register] <= order_book_memory_bid[(3*cancel_register)+3];
@@ -703,7 +715,6 @@ module order_book
 
                     if(!i_trade_type && (i_order_id == best_bid_cache[(i_stock_id*3) + 2])) begin 
                         // valid delete - update bid cache
-                        // found <= 1;
                         if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1] > temp_max_price) begin
                             temp_max_reg1 <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)];
                             temp_max_price <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 1];
@@ -717,8 +728,6 @@ module order_book
                             best_bid_cache[(i_stock_id*3)+1] <= temp_max_price;
                             best_bid_cache[(i_stock_id*3)+2] <= temp_max_order_id;
                             curr_state <= FINISH;
-                            // o_data_valid <= 1;
-                            // o_book_is_busy <= 0;
                         end
                     end 
                     // ask
@@ -738,8 +747,7 @@ module order_book
                             best_ask_cache[(i_stock_id*3)+1] <= temp_min_price;
                             best_ask_cache[(i_stock_id*3)+2] <= temp_min_order_id;
                             curr_state <= FINISH;
-                            // o_data_valid <= 1;
-                            // o_book_is_busy <= 0;
+
                         end
                     end
                     else begin
@@ -752,12 +760,6 @@ module order_book
                 default: ;
                 endcase
                 
-                // next_state <= IDLE;
-                // if the next state is IDLE, then:
-                //o_book_is_busy <= 0;
-
-                // after all sequence of orders from the feed have been completed, FSM will go to update_Cache accepting state and datavalid flag is valid
-                // o_data_valid <= 1;
 
             end
             FINISH: begin
@@ -766,6 +768,10 @@ module order_book
                 curr_state <= i_trading_logic_ready ? IDLE : FINISH;
                 search_pointer <= 0;
                 temp_min_price <= 32'b11111111111111111111111111111111;
+                o_execute_order <= reg_execute_order ? 1 : 0;
+                reg_execute_order <= 0;
+                o_curr_time <= i_curr_time;
+                o_trade_type <= ~which_book;
             end 
             // default: next_state <= curr_state; 
         endcase
@@ -774,6 +780,7 @@ module order_book
     always_ff @(posedge i_clk) begin
         o_best_bid <= best_bid_cache[(i_stock_id*3)+1];
         o_best_ask <= best_ask_cache[(i_stock_id*3)+1];
+        o_quantity <= i_execute_order_quantity;
     end 
 
 endmodule
