@@ -1,5 +1,5 @@
-// `include "../rtl/volatility_mem.sv"
-// `include "../rtl/volatility_ctrl.sv"
+`include "../rtl/volatility_mem.sv"
+`include "../rtl/volatility_ctrl.sv"
 module volatility
 #(
     parameter DATA_WIDTH = 32,

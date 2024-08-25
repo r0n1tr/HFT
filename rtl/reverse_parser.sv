@@ -24,7 +24,9 @@ module reverse_parser
     //input logic [1:0]                  i_order_type,
     input logic                        i_trade_type,
     input logic                        i_book_is_busy,
-    input logic [63:0]                 i_stock_id,
+    // input logic [63:0]                 i_stock_id,
+    input logic                        i_data_valid,
+
     
     output logic [REG_WIDTH - 1 : 0]     o_reg_1,
     output logic [REG_WIDTH - 1 : 0]     o_reg_2,
@@ -56,42 +58,50 @@ module reverse_parser
     } stock_t;
 
 
-    always_comb begin
-        {o_reg_4[15:0], o_reg_5, o_reg_6[31:16]} = i_stock_id;
-    end
+    // always_comb begin
+    //     {o_reg_4[15:0], o_reg_5, o_reg_6[31:16]} = i_stock_id;
+    // end
 
 
     always_ff @(posedge i_clk) begin
 
-        if(!i_book_is_busy) begin
+        if(i_data_valid) begin
             o_valid <= 1;
             //o_order_type <= ADD;
             // add order
             o_reg_1 <= {{8'hA}, i_trade_type};
 
             //timestamp -- need to figure out how to do realtime 
-            o_reg_2 <= 32'h0300 // insert realtime but for now hardcoded
+            o_reg_2 <= 32'h0300; // insert realtime but for now hardcoded
 
             //order number
-            o_reg_3 <= 32'h03BA //again have to figure out how to randomly generate unique ref
+            o_reg_3 <= 32'h03BA; //again have to figure out how to randomly generate unique ref
 
             // quantity/shares
-            o_reg_4 <= i_quantity;
+            o_reg_4 <= {{15'b0}, i_quantity};
 
             //stock symbol
             case (i_stock_symbol)
-                00: o_reg_5 <= 32'h4141504c;
+                00: begin
+                    o_reg_5 <= 32'h4141504c;
                     o_reg_6 <= 32'h20202020;
-                01: o_reg_5 <= 32'h414d5a4e;
+                end 
+                01: begin
+                    o_reg_5 <= 32'h414d5a4e;
                     o_reg_6 <= 32'h20202020;
-                10: o_reg_5 <= 32'h474f4f47;
+                end    
+                10: begin
+                    o_reg_5 <= 32'h474f4f47;
                     o_reg_6 <= 32'h4c202020;
-                11: o_reg_5 <= 32'h4d534654;
+                end
+                11: begin
+                    o_reg_5 <= 32'h4d534654;
                     o_reg_6 <= 32'h20202020;
-
-                default: 
+                end
+            default: begin
                     o_reg_5 <= 32'h0;
                     o_reg_6 <= 32'h0;
+            end
             endcase
 
             // price from quote price module

@@ -145,6 +145,7 @@ module order_book
     input logic [31:0]      i_order_id,
     input logic             i_data_valid, // FROM PARSER
     input logic             i_trading_logic_ready, // FROM TRADING LOGICs
+    input logic [15:0]      i_execute_order_quantity,
     input logic [63:0]      i_curr_time,
     output logic [31:0]     o_best_bid,
     output logic [31:0]     o_best_ask,

@@ -1,3 +1,9 @@
+`include "../rtl/volatility.sv"
+`include "../rtl/spread.sv"
+`include "../rtl/ref_price.sv"
+`include "../rtl/quote_price.sv"
+
+
 module trading_logic
 #(
     parameter DATA_WIDTH = 32,
