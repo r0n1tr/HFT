@@ -86,6 +86,9 @@ class OrderBook:
         execute_address = 0
         book_side = 0
         found = 0
+        print(type(i))
+        print(type(OrderBook.NUM_REGISTERS))
+        print(type(OrderBook.ORDER_ID_REG))
         for i in range(OrderBook.BUFFER_SIZE):
             if (self.buy_orders[stock_id][(i*OrderBook.NUM_REGISTERS) + OrderBook.ORDER_ID_REG] == order_id):
                 execute_address = (i*OrderBook.NUM_REGISTERS)
