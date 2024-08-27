@@ -51,6 +51,7 @@ module trading_logic
         .i_best_bid(i_best_bid),
         .i_buffer_size(32'd32),
         .i_buffer_size_reciprocal(64'h0000_0000_0800_0000), // 1/32
+        
         .o_volatility(w_volatility),
         .o_curr_price(w_curr_price), 
         .o_buffer_full(w_buffer_full),
