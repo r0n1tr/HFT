@@ -144,6 +144,7 @@ class OrderBook:
     def update_cache(self, stock_id, order_id, order_side, order_quantity, order_price, order_type):
         if(order_type == "add"):
             print("updating from add order")
+            print(str(order_price))
             if (order_side == "buy"):
                 if (self.buy_cache[stock_id][OrderBook.ORDER_PRICE_REG] < order_price):
                     order_data = [stock_id, order_type, order_quantity, order_price, order_id]
