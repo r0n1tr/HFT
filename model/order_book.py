@@ -136,10 +136,10 @@ class OrderBook:
         else:
             raise ValueError(f"Invalid order_side: {order_side}. Expected 'buy' or 'sell'.")
 
-    def return_best_ask(self, stock_id):
+    def return_best_bid(self, stock_id):
         return self.buy_cache[stock_id][OrderBook.ORDER_PRICE_REG]
 
-    def return_best_bid(self, stock_id):
+    def return_best_ask(self, stock_id):
         return self.sell_cache[stock_id][OrderBook.ORDER_PRICE_REG]
 
     def update_cache(self, stock_id, order_id, order_side, order_quantity, order_price, order_type):
