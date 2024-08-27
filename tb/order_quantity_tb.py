@@ -7,7 +7,7 @@ from helpers import make_fixed_point_input, convert_fixed_point_output
 # Define a list of input values for testing
 test_values = [0.30349, 0.5, 1.0, -0.3, 0.123456, -0.99839, 0.48548, 0.826813]
 test_answers = [135.458, 164.87199999999999, 271.828, 74.08200000000001, 113.14, 36.847, 162.49499999999998, 228.602]
-shape_parameter = 0.005
+shape_parameter = 0.000001
 @cocotb.test()
 async def parameterized_fixed_input_test(dut):
     """Parameterized Fixed input testing"""

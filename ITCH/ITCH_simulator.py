@@ -193,7 +193,7 @@ def format_hex_message(hex_message, length):
     # Pad the hex_message with zeroes to ensure it's the desired length
     padded_length = length
     padded_hex_message = hex_message.ljust(padded_length, '0')
-
+    
     # Format the padded hex_message in groups of 8 characters
     return ' '.join(padded_hex_message[i:i+8] for i in range(0, len(padded_hex_message), 8))
 
