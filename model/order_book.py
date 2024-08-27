@@ -144,13 +144,13 @@ class OrderBook:
     def update_cache(self, stock_id, order_id, order_side, order_quantity, order_price, order_type):
         if(order_type == "add"):
             if (order_side == "buy"):
-                if (self.buy_cache[OrderBook.ORDER_PRICE_REG] < order_price):
+                if (self.buy_cache[stock_id][OrderBook.ORDER_PRICE_REG] < order_price):
                     order_data = [stock_id, order_type, order_quantity, order_price, order_id]
                     self.buy_cache[stock_id][0:OrderBook.NUM_REGISTERS] = order_data
                 else:
                     return
             elif(order_side == "sell"):
-                if (self.sell_cache[OrderBook.ORDER_PRICE_REG] > order_price):
+                if (self.sell_cache[stock_id][OrderBook.ORDER_PRICE_REG] > order_price):
                     order_data = [stock_id, order_type, order_quantity, order_price, order_id]
                     self.sell_cache[stock_id][0:OrderBook.NUM_REGISTERS] = order_data
                 else:
