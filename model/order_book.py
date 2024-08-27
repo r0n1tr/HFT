@@ -17,7 +17,7 @@ class OrderBook:
         self.buy_write_addresses = [0] * OrderBook.NUM_STOCKS
         self.sell_write_addresses = [0] * OrderBook.NUM_STOCKS
         self.buy_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
-        self.sell_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
+        self.sell_cache = [[999999999] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
 
     def generate_address(self, stock_id, order_side):
         if order_side == "buy":
@@ -146,6 +146,7 @@ class OrderBook:
         if(order_type == "add"):
             print("updating from add order")
             print(str(order_price))
+            print(order_side)
             if (order_side == "buy"):
                 if (self.buy_cache[stock_id][OrderBook.ORDER_PRICE_REG] < order_price):
                     order_data = [stock_id, order_type, order_quantity, order_price, order_id]
