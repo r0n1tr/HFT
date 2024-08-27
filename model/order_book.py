@@ -43,6 +43,7 @@ class OrderBook:
             self.update_cache(stock_id, order_id, "buy", order_quantity, order_price, order_type)
         elif order_side == "sell":
             self.sell_orders[stock_id][write_address:write_address+OrderBook.NUM_REGISTERS] = order_data
+            self.update_cache(stock_id, order_id, "sell", order_quantity, order_price, order_type)
         else:
             raise ValueError(f"Invalid order_side: {order_side}. Expected 'buy' or 'sell'.")
         
