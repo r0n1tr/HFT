@@ -14,8 +14,8 @@ class OrderBook:
     def __init__(self):
         self.buy_orders = [[0] * OrderBook.NUM_REGISTERS * OrderBook.BUFFER_SIZE for _ in range(OrderBook.NUM_STOCKS)]
         self.sell_orders = [[0] * OrderBook.NUM_REGISTERS * OrderBook.BUFFER_SIZE for _ in range(OrderBook.NUM_STOCKS)]
-        self.buy_write_addresses = [[0] for _ in range(OrderBook.NUM_STOCKS)]
-        self.sell_write_addresses = [[0] for _ in range(OrderBook.NUM_STOCKS)]
+        self.buy_write_addresses = [0] * OrderBook.NUM_STOCKS
+        self.sell_write_addresses = [0] * OrderBook.NUM_STOCKS
         self.buy_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
         self.sell_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
 
