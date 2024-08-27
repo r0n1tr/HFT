@@ -79,6 +79,30 @@ class OrderBook:
             return
 
     def cancel_order(self, stock_id, order_side, order_id, order_type = "cancel"):
+        execute_address = 0
+        book_side = 0
+        found = 0
+        for i in range(OrderBook.BUFFER_SIZE):
+            if (self.buy_orders[stock_id][(i*OrderBook.NUM_REGISTERS) + OrderBook.ORDER_ID_REG] == order_id):
+                execute_address = (i*OrderBook.NUM_REGISTERS)
+                book_side = 0
+                found = True
+                break
+            elif (self.sell_orders[stock_id][(i*OrderBook.NUM_REGISTERS) + OrderBook.ORDER_ID_REG] == order_id):
+                execute_address = (i*OrderBook.NUM_REGISTERS) 
+                book_side = 1
+                found = True
+                break
+            else:
+                pass
+
+        if(found):
+            if (book_side == 0):
+                self.shift_book(stock_id, "buy", execute_address)
+            else:
+                self.shift_book(stock_id, "sell", execute_address)
+
+        self.update_cache(stock_id, order_id, order_side, order_quantity=0, order_price=0, order_type="cancel")
 
 
     def shift_book(self, stock_id, order_side, execute_address):
@@ -135,9 +159,35 @@ class OrderBook:
                 raise ValueError(f"Invalid order_side: {order_side}. Expected 'buy' or 'sell'.")
         elif(order_type == "cancel"):
             if (order_side == "buy"):
-            
+                if(order_id == self.buy_cache[stock_id][OrderBook.ORDER_ID_REG]):
+                    tmp_max = self.buy_orders[stock_id][OrderBook.ORDER_PRICE_REG]
+                    base_address = 0
+                    for i in range(OrderBook.BUFFER_SIZE):
+                        if(self.buy_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] > tmp_max):
+                            tmp_max = self.buy_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG]
+                            base_address = i * OrderBook.NUM_REGISTERS
+                    arr = self.buy_orders[stock_id]
+                    cache = self.buy_cache[stock_id]
+                    cache[OrderBook.STOCK_ID_REG] = arr[base_address + OrderBook.STOCK_ID_REG]
+                    cache[OrderBook.ORDER_TYPE_REG] = arr[base_address + OrderBook.ORDER_TYPE_REG]
+                    cache[OrderBook.ORDER_QUANTITY_REG] = arr[base_address + OrderBook.ORDER_QUANTITY_REG]
+                    cache[OrderBook.ORDER_PRICE_REG] = arr[base_address + OrderBook.ORDER_PRICE_REG]
+                    cache[OrderBook.ORDER_ID_REG] = arr[base_address + OrderBook.ORDER_ID_REG]
             elif(order_side == "sell"):
-
+                if(order_id == self.sell_cache[stock_id][OrderBook.ORDER_ID_REG]):
+                    tmp_min = self.sell_orders[stock_id][OrderBook.ORDER_PRICE_REG]
+                    base_address = 0
+                    for i in range(OrderBook.BUFFER_SIZE):
+                        if(self.sell_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] < tmp_min):
+                            tmp_min = self.sell_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG]
+                            base_address = i * OrderBook.NUM_REGISTERS
+                    arr = self.sell_orders[stock_id]
+                    cache = self.sell_cache[stock_id]
+                    cache[OrderBook.STOCK_ID_REG] = arr[base_address + OrderBook.STOCK_ID_REG]
+                    cache[OrderBook.ORDER_TYPE_REG] = arr[base_address + OrderBook.ORDER_TYPE_REG]
+                    cache[OrderBook.ORDER_QUANTITY_REG] = arr[base_address + OrderBook.ORDER_QUANTITY_REG]
+                    cache[OrderBook.ORDER_PRICE_REG] = arr[base_address + OrderBook.ORDER_PRICE_REG]
+                    cache[OrderBook.ORDER_ID_REG] = arr[base_address + OrderBook.ORDER_ID_REG]
             else:
                 raise ValueError(f"Invalid order_side: {order_side}. Expected 'buy' or 'sell'.")
         else:
