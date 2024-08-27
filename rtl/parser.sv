@@ -17,7 +17,7 @@ module parser
 (
     input logic                         i_clk, 
     input logic                         i_book_is_busy,
-    input logic [REG_WIDTH - 1 : 0]     i_reg_1,
+    input logic [REG_WIDTH - 1 : 0]     i_reg_1, // order type - add cancel etc.
     input logic [REG_WIDTH - 1 : 0]     i_reg_2,
     input logic [REG_WIDTH - 1 : 0]     i_reg_3,
     input logic [REG_WIDTH - 1 : 0]     i_reg_4,
