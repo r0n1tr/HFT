@@ -55,10 +55,11 @@ class Exchange:
         elif order_type == "CANCEL":
             timestamp, order_id, order_price, order_quantity, order_side = self.create_cancel_order(stock_id)
         elif order_type == "EXECUTE":
-            self.create_execute_order(stock_id)
+            timestamp, order_id, order_price, order_quantity, order_side = self.create_execute_order(stock_id)
         else:
             raise ValueError(f"Invalid order_type: {order_type}. Expected: 'ADD', 'CANCEL' or 'EXECUTE'")
        
+        print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
         return order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price
     
 
@@ -96,7 +97,7 @@ class Exchange:
         order_id = generate_order_id()
         order_price = generate_order_price(stock_id)
         order_quantity = generate_order_quantity()
-        order_side = random.chice(["buy", "sell"])
+        order_side = random.choice(["buy", "sell"])
 
         if stock_id == 0:
             self.order_book_0[order_id] = {
@@ -157,7 +158,7 @@ class Exchange:
         timestamp = generate_timestamp()
         order_price = None
         order_side = None
-        order_id = self.select_order_id_closest_to_best_price(self, stock_id)
+        order_id = self.select_order_id_closest_to_best_price(stock_id)
         order_quantity = min(generate_order_quantity(), order_book[order_id]['quantity'])
         
         return timestamp, order_id, order_price, order_quantity, order_side
