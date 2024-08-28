@@ -6,7 +6,7 @@ order_ids = []
 
 def generate_order_id():
     while True:
-        number = random.randint(1, 4294967295)
+        number = random.randint(536870911, 4294967295)
         if number not in order_ids:
             order_ids.append(number)
             return number
@@ -96,8 +96,8 @@ def convert_to_int_list(order_list):
         ADD Order Format:
         Bytes:      Bits:       Message:
         1           0-7:        "A" for add order
-        2           8-23:       Locate code identifying the security - a random number associated with a specific stock, new every day - TODO: function for this
-        2           24-39:      Internal tracking number - TODO: write a function to generate this
+        2           8-23:       Locate code identifying the security - a random number associated with a specific stock, new every day
+        2           24-39:      Internal tracking number
         6           40-87:      Timestamp - nanoseconds since midnight - we will just do seconds since start of trading day
         8           88-151:     Order ID
         1           152-159:    Buy or sell indicator - 0 or 1
@@ -202,7 +202,6 @@ def convert_to_int_list(order_list):
         raise ValueError(f"Inavlid order type: {order_type}, expected add, cancel or execute only")
 
 
-
 class Exchange:
     NUM_STOCKS = 4
 
@@ -235,9 +234,6 @@ class Exchange:
                 print(hex_format)
                 # print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
             return hex_format
-    
-
-    # TODO: def insert_order_to_exchange(self, stock_id):
 
 
     def generate_order_type(self, stock_id):
@@ -430,3 +426,8 @@ class Exchange:
         
         selected_order_id = random.choices(order_ids, weights=weight_values, k=1)[0]
         return selected_order_id
+    
+
+    def insert_into_exchange(self, order_informaiton):
+        # Need to know what format the order is going to be received in
+        pass
