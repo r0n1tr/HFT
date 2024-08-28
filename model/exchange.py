@@ -160,6 +160,9 @@ class Exchange:
         order_side = None
         order_id = self.select_order_id_closest_to_best_price(stock_id)
         order_quantity = min(generate_order_quantity(), order_book[order_id]['quantity'])
+        order_book[order_id]['quantity'] -= order_quantity
+        if (order_book[order_id]['quantity'] == 0):
+            self.remove_order_from_book(stock_id, order_id)
         
         return timestamp, order_id, order_price, order_quantity, order_side
 
