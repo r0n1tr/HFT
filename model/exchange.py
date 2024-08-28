@@ -430,4 +430,45 @@ class Exchange:
 
     def insert_into_exchange(self, order_informaiton):
         # Need to know what format the order is going to be received in
-        pass
+        # afaik it order information needs to have the following in a list
+        stock_id = order_informaiton[]
+        timestamp = generate_timestamp()
+        order_id = order_informaiton[]
+        order_price = order_informaiton[]
+        order_quantity = order_informaiton[]
+        order_side = order_informaiton[]
+
+        if stock_id == 0:
+            self.order_book_0[order_id] = {
+                'side' : order_side,
+                'price' : order_price,
+                'quantity' : order_quantity,
+                'time' : timestamp
+            }
+        elif stock_id == 1:
+            self.order_book_1[order_id] = {
+                'side' : order_side,
+                'price' : order_price,
+                'quantity' : order_quantity,
+                'time' : timestamp
+            }
+        elif stock_id == 2:
+            self.order_book_2[order_id] = {
+                'side' : order_side,
+                'price' : order_price,
+                'quantity' : order_quantity,
+                'time' : timestamp
+            }
+        elif stock_id == 3:
+            self.order_book_3[order_id] = {
+                'side' : order_side,
+                'price' : order_price,
+                'quantity' : order_quantity,
+                'time' : timestamp
+            }
+        else:
+            raise ValueError(f"Invalid stock id: {stock_id}, expected 0-3")
+        
+        tracking_numbers[order_id] = generate_tracking_number()
+        return timestamp, order_id, order_price, order_quantity, order_side
+        # pass
