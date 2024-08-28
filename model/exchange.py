@@ -37,6 +37,171 @@ def generate_order_price(stock_id):
 def generate_order_quantity():
     return random.randint(100, 200)
 
+locate_codes = []
+
+def generate_locate_codes():
+    for _ in range(4):
+        locate_codes.append(random.randint(0, 65536))
+
+existing_tracking_numbers = []
+tracking_numbers = {}
+
+def generate_tracking_number():
+    while True:
+        number = random.randint(1, 65536)
+        if number not in existing_tracking_numbers:
+            existing_tracking_numbers.append(number)
+            return number
+
+def convert_to_hex (number, bits):
+    if number < 0:
+        raise ValueError("Number must be non-negative")
+
+    max_value = (1 << bits) - 1
+
+    if number > max_value:
+        raise ValueError(f"Number exceeds the maximum value for {bits}-bit representation")
+    
+    hex_string = f"{number:0{bits // 4}X}"
+    
+    return hex_string
+
+
+def convert_to_int_list(order_list):
+    # Output a list of 9 32 bit numbers - one for each register
+    # input: [order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price]
+    if len(order_list) != 7:
+        raise ValueError(f"Invalid order list length : {len(order_list)}, expected 7 items only")
+    
+    stock_ids = [4702127773838221344, 4705516477264961568, 5138412867491471392, 5571874491117608992] # AAPL, AMZN, GOOGL, MSFT in that order
+
+    order_type = order_list[0]
+    input_time = order_list[1]
+    order_id = order_list[2]
+    order_side = order_list[3]
+
+    if order_side == 'buy':
+        order_side = 0
+    elif order_side == 'sell':
+        order_side = 1
+    else:
+        order_side = None
+
+    order_quantity = order_list[4]
+    stock_id = order_list[5]
+    order_price = order_list[6]
+
+    if order_type == "ADD":
+        '''     
+        ADD Order Format:
+        Bytes:      Bits:       Message:
+        1           0-7:        "A" for add order
+        2           8-23:       Locate code identifying the security - a random number associated with a specific stock, new every day - TODO: function for this
+        2           24-39:      Internal tracking number - TODO: write a function to generate this
+        6           40-87:      Timestamp - nanoseconds since midnight - we will just do seconds since start of trading day
+        8           88-151:     Order ID
+        1           152-159:    Buy or sell indicator - 0 or 1
+        4           160-191:    Number of shares / order quantity
+        8           192-255:    Stock ID
+        4           255-287:    Price
+        '''
+        hex_message = convert_to_hex(65, 8)
+        hex_locate_code = convert_to_hex((locate_codes[stock_id]), 16)
+        hex_tracking_number = convert_to_hex((tracking_numbers[order_id]), 16)
+        hex_timestamp = convert_to_hex(input_time, 48)
+        hex_order_id = convert_to_hex(order_id, 64)
+        hex_buy_or_sell = convert_to_hex(order_side, 8)
+        hex_quantity = convert_to_hex(order_quantity, 32)
+        hex_stock_id = convert_to_hex(stock_ids[stock_id], 64)
+        hex_price = convert_to_hex(order_price, 32)
+
+        output_list = [hex_price, hex_stock_id, hex_quantity, hex_buy_or_sell, hex_order_id, hex_timestamp, hex_tracking_number, hex_locate_code, hex_message]
+        # print(output_list)
+        joined = ''.join(output_list)
+        # print(joined)
+        register_length = 8
+        order_length = len(joined)
+        hex_parts = [joined[i:i+register_length] for i in range(0, order_length, register_length)]
+        # print(hex_parts)
+        integer_parts = [int(h, 16) for h in hex_parts]
+        # print(integer_parts)
+        return integer_parts
+
+        
+        
+    elif order_type == "CANCEL":
+        '''
+        CANCEL Order Format - It's actually DELETE that we are doing according to documentation
+        Bytes:      Bits:       Message:
+        1           0-7:        "D" for delete order
+        2           8-23:       Locate Code for the Stock
+        2           24-39:      Internal tracking number 
+        6           40-87:      Timestamp
+        8           88-151:     Order ID
+        8           152-215:    Stock ID - Not part of documentation, but we need this because of how we implemented the order book cancel function
+                    216-287:    0s for 32 bit register allignment
+        '''
+        hex_message = convert_to_hex(68, 8)
+        hex_locate_code = convert_to_hex((locate_codes[stock_id]), 16)
+        hex_tracking_number = convert_to_hex((tracking_numbers[order_id]), 16)
+        hex_timestamp = convert_to_hex(input_time, 48)
+        hex_order_id = convert_to_hex(order_id, 64)
+        hex_buy_or_sell = convert_to_hex(0, 8)
+        hex_quantity = convert_to_hex(0, 32)
+        hex_stock_id = convert_to_hex(stock_ids[stock_id], 64)
+        hex_price = convert_to_hex(0, 32)
+
+        output_list = [hex_price, hex_buy_or_sell, hex_quantity, hex_stock_id, hex_order_id, hex_timestamp, hex_tracking_number, hex_locate_code, hex_message]
+        # print(output_list)
+        joined = ''.join(output_list)
+        # print(joined)
+        register_length = 8
+        order_length = len(joined)
+        hex_parts = [joined[i:i+register_length] for i in range(0, order_length, register_length)]
+        # print(hex_parts)
+        integer_parts = [int(h, 16) for h in hex_parts]
+        # print(integer_parts)
+        return integer_parts
+
+    elif order_type == "EXECUTE":
+        '''
+        EXECUTE Order Format - 
+        Bytes:      Bits:       Message:
+        1           0-7:        "E" for execute order
+        2           8-23:       Locate Code for the Stock
+        2           24-39:      Internal tracking number 
+        6           40-87:      Timestamp
+        8           88-151:     Order ID
+        4           152-183:    Number of shares
+        8           184-247:    Stock ID - Not part of documentation, but we need this because of how we implemented the order book execute function
+                    248-287:    0s for 32 bit register allignment
+        '''
+        hex_message = convert_to_hex(68, 8)
+        hex_locate_code = convert_to_hex((locate_codes[stock_id]), 16)
+        hex_tracking_number = convert_to_hex((tracking_numbers[order_id]), 16)
+        hex_timestamp = convert_to_hex(input_time, 48)
+        hex_order_id = convert_to_hex(order_id, 64)
+        hex_buy_or_sell = convert_to_hex(0, 8)
+        hex_quantity = convert_to_hex(order_quantity, 32)
+        hex_stock_id = convert_to_hex(stock_ids[stock_id], 64)
+        hex_price = convert_to_hex(0, 32)
+
+        output_list = [hex_price, hex_buy_or_sell, hex_stock_id, hex_quantity, hex_order_id, hex_timestamp, hex_tracking_number, hex_locate_code, hex_message]
+        # print(output_list)
+        joined = ''.join(output_list)
+        # print(joined)
+        register_length = 8
+        order_length = len(joined)
+        hex_parts = [joined[i:i+register_length] for i in range(0, order_length, register_length)]
+        # print(hex_parts)
+        integer_parts = [int(h, 16) for h in hex_parts]
+        # print(integer_parts)
+        return integer_parts
+
+    else:
+        raise ValueError(f"Inavlid order type: {order_type}, expected add, cancel or execute only")
+
+
 
 class Exchange:
     NUM_STOCKS = 4
@@ -46,9 +211,10 @@ class Exchange:
         self.order_book_1 = {}
         self.order_book_2 = {}
         self.order_book_3 = {}
+        generate_locate_codes()
     
 
-    def generate_ITCH_order(self, stock_id):
+    def generate_ITCH_order(self, stock_id, integer_output = False, printing = True):
         order_type = self.generate_order_type(stock_id)
         if order_type == "ADD":
             timestamp, order_id, order_price, order_quantity, order_side = self.create_add_order(stock_id)
@@ -58,9 +224,17 @@ class Exchange:
             timestamp, order_id, order_price, order_quantity, order_side = self.create_execute_order(stock_id)
         else:
             raise ValueError(f"Invalid order_type: {order_type}. Expected: 'ADD', 'CANCEL' or 'EXECUTE'")
-       
-        print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
-        return order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price
+        
+        if not integer_output:
+            if printing:
+                print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+            return ([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+        else:
+            hex_format = convert_to_int_list([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+            if printing:
+                print(hex_format)
+                # print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+            return hex_format
     
 
     # TODO: def insert_order_to_exchange(self, stock_id):
@@ -130,6 +304,7 @@ class Exchange:
         else:
             raise ValueError(f"Invalid stock id: {stock_id}, expected 0-3")
         
+        tracking_numbers[order_id] = generate_tracking_number()
         return timestamp, order_id, order_price, order_quantity, order_side
 
 
