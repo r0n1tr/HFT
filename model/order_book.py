@@ -18,6 +18,7 @@ class OrderBook:
         self.sell_write_addresses = [0] * OrderBook.NUM_STOCKS
         self.buy_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
         self.sell_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
+        self.execute_order_side = None
 
     def generate_address(self, stock_id, order_side):
         if order_side == "buy":
@@ -73,10 +74,12 @@ class OrderBook:
             return
         else:
             if (book_side == 0):
+                self.execute_order_side = "buy"
                 self.buy_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] -= order_quantity
                 if (self.buy_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] == order_quantity):
                     self.shift_book(stock_id, "buy", execute_address)
             else:
+                self.execute_order_side = "sell"
                 self.sell_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] -= order_quantity
                 if (self.sell_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] == order_quantity):
                     self.shift_book(stock_id, "sell", execute_address)
