@@ -60,7 +60,7 @@ def parse(ITCH_data):
         order_book_inputs.append(price)
         order_book_inputs.append(order_type)
         order_book_inputs.append(final_time)
-        
+
         # print(order_book_inputs)
 
         ### TESTING    
@@ -193,6 +193,11 @@ class Model:
         # Quote Price
         quote_bid = ref_price - spread
         quote_ask = ref_price + spread
+
+        if(quote_bid == 0):
+            quote_bid = quote_ask
+        elif(quote_ask == 0):
+            quote_ask = quote_bid
 
         return quote_bid, quote_ask
 
