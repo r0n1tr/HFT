@@ -252,7 +252,7 @@ class MarketMakingModel:
             quote_ask = curr_price
             quote_bid = curr_price
         else:
-            print(self.volatility_buffers[stock_id])
+            # print(self.volatility_buffers[stock_id])
             quote_bid = ref_price - spread
             quote_ask = ref_price + spread
 
