@@ -431,12 +431,12 @@ class Exchange:
     def insert_into_exchange(self, order_informaiton):
         # Need to know what format the order is going to be received in
         # afaik it order information needs to have the following in a list
-        stock_id = order_informaiton[]
+        stock_id = order_informaiton[0]
         timestamp = generate_timestamp()
-        order_id = order_informaiton[]
-        order_price = order_informaiton[]
-        order_quantity = order_informaiton[]
-        order_side = order_informaiton[]
+        order_id = order_informaiton[1]
+        order_price = order_informaiton[2]
+        order_quantity = order_informaiton[3]
+        order_side = order_informaiton[4]
 
         if stock_id == 0:
             self.order_book_0[order_id] = {
