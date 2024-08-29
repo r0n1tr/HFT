@@ -23,13 +23,13 @@ def generate_timestamp():
 
 def generate_order_price(stock_id):
     if stock_id == 0:
-        return round(random.normalvariate(1000000, 5000))
+        return round(random.normalvariate(1000000, 30))
     elif stock_id == 1:
-        return round(random.normalvariate(2000000, 7500))
+        return round(random.normalvariate(2000000, 40))
     elif stock_id == 2:
-        return round(random.normalvariate(3000000, 10000))
+        return round(random.normalvariate(3000000, 50))
     elif stock_id == 3:
-        return round(random.normalvariate(4000000, 12500))
+        return round(random.normalvariate(4000000, 60))
     else:
         raise ValueError(f"Unexpected stock_id valud: {stock_id}, expected values between 0-3")
 
@@ -239,22 +239,22 @@ class Exchange:
     def generate_order_type(self, stock_id):
         order_types = ["ADD", "EXECUTE", "CANCEL"]
         if stock_id == 0:
-            if(len(self.order_book_0) == 0):
+            if(len(self.order_book_0) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)
         elif stock_id == 1:
-            if(len(self.order_book_1) == 0):
+            if(len(self.order_book_1) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)
         elif stock_id == 2:
-            if(len(self.order_book_2) == 0):
+            if(len(self.order_book_2) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)
         elif stock_id == 3:
-            if(len(self.order_book_3) == 0):
+            if(len(self.order_book_3) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)

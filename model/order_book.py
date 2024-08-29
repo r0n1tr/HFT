@@ -48,7 +48,7 @@ class OrderBook:
         else:
             raise ValueError(f"Invalid order_side: {order_side}. Expected 'buy' or 'sell'.")
         
-    def execute_order(self, stock_id, order_side, order_quantity, order_id, order_type = "execute"):
+    def execute_order(self, stock_id, order_quantity, order_id, order_type = "execute"):
         # find the corresponding order id 
         execute_address = 0
         book_side = 0
@@ -75,17 +75,21 @@ class OrderBook:
         else:
             if (book_side == 0):
                 self.execute_order_side = "buy"
+                # print(f"HELP:{self.buy_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG]}")
+                # print(f"RECEIVED QTY: {order_quantity}")
                 self.buy_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] -= order_quantity
                 if (self.buy_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] == order_quantity):
                     self.shift_book(stock_id, "buy", execute_address)
             else:
                 self.execute_order_side = "sell"
+                # print(f"HELP SELL: {self.sell_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG]}")
+                # print(f"RECEIVED QTY: {order_quantity}")
                 self.sell_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] -= order_quantity
                 if (self.sell_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] == order_quantity):
                     self.shift_book(stock_id, "sell", execute_address)
             return
 
-    def cancel_order(self, stock_id, order_side, order_id, order_type = "cancel"):
+    def cancel_order(self, stock_id, order_id, order_type = "cancel"):
         execute_address = 0
         book_side = 0
         found = 0
@@ -96,35 +100,44 @@ class OrderBook:
             # print(type(i))
             if (self.buy_orders[stock_id][(i*OrderBook.NUM_REGISTERS) + OrderBook.ORDER_ID_REG] == order_id):
                 execute_address = (i*OrderBook.NUM_REGISTERS)
-                book_side = 0
+                book_side = "buy"
                 found = True
                 break
             elif (self.sell_orders[stock_id][(i*OrderBook.NUM_REGISTERS) + OrderBook.ORDER_ID_REG] == order_id):
                 execute_address = (i*OrderBook.NUM_REGISTERS) 
-                book_side = 1
+                book_side = "sell"
                 found = True
                 break
             else:
                 pass
 
         if(found):
-            if (book_side == 0):
+            if (book_side == "buy"):
                 self.shift_book(stock_id, "buy", execute_address)
             else:
                 self.shift_book(stock_id, "sell", execute_address)
-
-        self.update_cache(stock_id, order_id, order_side, order_quantity=0, order_price=0, order_type="cancel")
-
+            self.update_cache(stock_id, order_id, book_side, order_quantity=0, order_price=0, order_type="cancel")
+        else:
+            if(self.buy_cache[stock_id][OrderBook.ORDER_ID_REG] == order_id):
+                self.update_cache(stock_id, order_id, order_side='buy', order_quantity=0, order_price=0, order_type="cancel")
+            elif(self.sell_cache[stock_id][OrderBook.ORDER_ID_REG] == order_id):
+                self.update_cache(stock_id, order_id, order_side='sell', order_quantity=0, order_price=0, order_type="cancel")
+            else:
+                return
 
     def shift_book(self, stock_id, order_side, execute_address):
         if (order_side == "buy"):
             if 0 <= execute_address < len(self.buy_orders[stock_id]):
+                # print(f"LENGTH: {len(self.buy_orders[stock_id])}")
+                # print(f"Index: {execute_address}")
                 arr = self.buy_orders[stock_id]
-                arr.pop(execute_address + OrderBook.STOCK_ID_REG)
-                arr.pop(execute_address + OrderBook.ORDER_TYPE_REG)
-                arr.pop(execute_address + OrderBook.ORDER_QUANTITY_REG)
-                arr.pop(execute_address + OrderBook.ORDER_PRICE_REG)
-                arr.pop(execute_address + OrderBook.ORDER_ID_REG)
+                # arr.pop(execute_address + OrderBook.STOCK_ID_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_TYPE_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_QUANTITY_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_PRICE_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_ID_REG)
+                for _ in range(OrderBook.NUM_REGISTERS):
+                    arr.pop(execute_address)
                 for _ in range(OrderBook.NUM_REGISTERS):
                     arr.append(0)
             else:
@@ -132,12 +145,16 @@ class OrderBook:
 
         elif(order_side == "sell"):
             if 0 <= execute_address < len(self.sell_orders[stock_id]):
+                # print(f"LENGTH: {len(self.sell_orders[stock_id])}")
+                # print(f"Index: {execute_address}")
                 arr = self.sell_orders[stock_id]
-                arr.pop(execute_address + OrderBook.STOCK_ID_REG)
-                arr.pop(execute_address + OrderBook.ORDER_TYPE_REG)
-                arr.pop(execute_address + OrderBook.ORDER_QUANTITY_REG)
-                arr.pop(execute_address + OrderBook.ORDER_PRICE_REG)
-                arr.pop(execute_address + OrderBook.ORDER_ID_REG)
+                # arr.pop(execute_address + OrderBook.STOCK_ID_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_TYPE_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_QUANTITY_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_PRICE_REG)
+                # arr.pop(execute_address + OrderBook.ORDER_ID_REG)
+                for _ in range(OrderBook.NUM_REGISTERS):
+                    arr.pop(execute_address)
                 for _ in range(OrderBook.NUM_REGISTERS):
                     arr.append(0)
             else:
@@ -179,7 +196,7 @@ class OrderBook:
                     tmp_max = self.buy_orders[stock_id][OrderBook.ORDER_PRICE_REG]
                     base_address = 0
                     for i in range(OrderBook.BUFFER_SIZE):
-                        if(self.buy_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] > tmp_max):
+                        if(self.buy_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] >= tmp_max):
                             tmp_max = self.buy_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG]
                             base_address = i * OrderBook.NUM_REGISTERS
                     arr = self.buy_orders[stock_id]
@@ -194,7 +211,7 @@ class OrderBook:
                     tmp_min = self.sell_orders[stock_id][OrderBook.ORDER_PRICE_REG]
                     base_address = 0
                     for i in range(OrderBook.BUFFER_SIZE):
-                        if(self.sell_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] < tmp_min):
+                        if(self.sell_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] <= tmp_min):
                             tmp_min = self.sell_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG]
                             base_address = i * OrderBook.NUM_REGISTERS
                     arr = self.sell_orders[stock_id]

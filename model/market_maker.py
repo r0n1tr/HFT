@@ -36,6 +36,9 @@ def parse(ITCH_data):
             68: "CANCEL",
             69: "EXECUTE"
         }
+
+        # bits 0 to 151 is the same for all
+
         order_type = order_type_dict[order_type]
         # print(order_type)
 
@@ -47,22 +50,36 @@ def parse(ITCH_data):
 
         timestamp_1 = (reg_1 >> 8) & 0xFFFFFF
         timestamp_2 = (reg_2) & 0xFFFFFF
-        final_time = (timestamp_1 << 25 ) | timestamp_2
+        final_time = (timestamp_2 << 24 ) +  timestamp_1    
         
         order_id_1 = (reg_2 >> 24) & 0xFF
         order_id_2 = reg_3
         order_id_3 = (reg_4) & 0xFFF
         order_id = (order_id_1 << 56) | (order_id_2 << 32) | order_id_3
 
-        buy_or_sell = (reg_4 >> 24) & 0xFF
-        if buy_or_sell == 0:
-            buy_or_sell = "buy"
+        if order_type == "ADD":
+            buy_or_sell = (reg_4 >> 24) & 0xFF
+            if buy_or_sell == 0:
+                buy_or_sell = "buy"
+            else:
+                buy_or_sell = "sell"
         else:
-            buy_or_sell = "sell"
+            buy_or_sell = None
         # print(buy_or_sell)
 
-        shares = reg_5
-        stock_id = (reg_7 << 32) + reg_6
+        if order_type == "ADD":
+            shares = reg_5
+        elif order_type == "EXECUTE":
+            shares = ((reg_4 >> 24) & 0xFF) + ((reg_5 & 0xFFFFFF) << 8)
+        else:
+            shares = None
+        
+        if order_type == "ADD":
+            stock_id = (reg_7 << 32) + reg_6
+        elif order_type == "EXECUTE":
+            stock_id = (reg_6 << 8) + ((reg_5 >> 24) & 0xFF) + ((reg_7 & 0xFFFFFF) << 40)
+        else:
+            stock_id = (reg_5 << 8) + ((reg_4 >> 24) & 0xFF) + ((reg_6 & 0xFFFFFF) << 40) 
         stock_dict = {
             4702127773838221344 : 0, 
             4705516477264961568 : 1, 
@@ -72,7 +89,10 @@ def parse(ITCH_data):
         stock_id = stock_dict[stock_id]
 
         # print(stock_id)
-        price = reg_8
+        if order_type == "ADD":
+            price = reg_8
+        else:
+            price = None
 
         order_book_inputs.append(stock_id)
         order_book_inputs.append(order_id)
@@ -149,13 +169,14 @@ class MarketMakingModel:
         quantity = order_book_inputs[3]
         price = order_book_inputs[4]
         order_type = order_book_inputs[5]
-        timestamp = order_book_inputs[6]    
+        timestamp = order_book_inputs[6]  
+        # print(f"trade_type: {trade_type}")  
 
         # load it into the order book
         if order_type.upper() == "ADD":
             self.ob.add_order(stock_id, order_id, trade_type, quantity, price)
         elif order_type.upper() == "CANCEL":
-            self.ob.cancel_order(stock_id, trade_type, order_id)
+            self.ob.cancel_order(stock_id, order_id)
         elif order_type.upper() == "EXECUTE":
             self.ob.execute_order(stock_id, quantity, order_id)
             # in the order book, we need to see what side the execute trade is.
@@ -167,6 +188,8 @@ class MarketMakingModel:
 
         best_bid = self.ob.return_best_bid(stock_id)
         best_ask = self.ob.return_best_ask(stock_id)
+        # print(f"BID: {best_bid} ")
+        # print(f"ASK: {best_ask} ")
 
 
         # trading logic stuff
@@ -186,6 +209,7 @@ class MarketMakingModel:
 
     def update_buffer(self, stock_id, element):
         if 0 <= stock_id <= 3:
+            # print(f"element: {element}")
             self.volatility_buffers[stock_id][self.volatility_indexes[stock_id]] = element
             self.volatility_indexes[stock_id] = (self.volatility_indexes[stock_id] + 1) % 32
         else:
@@ -210,20 +234,25 @@ class MarketMakingModel:
         else:
             curr_price = (best_ask + best_bid) / 2
 
+        # print(f"curr_price {curr_price}")
         self.update_buffer(stock_id, curr_price)
         volatility = self.buffer_var(stock_id)
 
         # Spread
-        spread = 0.125 * volatility * timestamp 
+        # print(f"timestamp: {timestamp}")
+        spread = 0.125 * volatility * timestamp
+        # print(f"volatilty: {volatility}" ) 
 
         # Ref Price 
         ref_price = curr_price - (inventory_state * 0.125 * volatility * timestamp)
 
         # Quote Price
         if self.volatility_buffers[stock_id][-1] == 0:
+            # print(f"last element: {self.volatility_buffers[stock_id][-1]}")
             quote_ask = curr_price
             quote_bid = curr_price
         else:
+            print(self.volatility_buffers[stock_id])
             quote_bid = ref_price - spread
             quote_ask = ref_price + spread
 
