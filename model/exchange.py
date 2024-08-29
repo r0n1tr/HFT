@@ -41,14 +41,14 @@ locate_codes = []
 
 def generate_locate_codes():
     for _ in range(4):
-        locate_codes.append(random.randint(0, 65536))
+        locate_codes.append(random.randint(0, 45536))
 
 existing_tracking_numbers = []
 tracking_numbers = {}
 
 def generate_tracking_number():
     while True:
-        number = random.randint(1, 65536)
+        number = random.randint(1, 45536)
         if number not in existing_tracking_numbers:
             existing_tracking_numbers.append(number)
             return number
@@ -176,7 +176,7 @@ def convert_to_int_list(order_list):
         8           184-247:    Stock ID - Not part of documentation, but we need this because of how we implemented the order book execute function
                     248-287:    0s for 32 bit register allignment
         '''
-        hex_message = convert_to_hex(68, 8)
+        hex_message = convert_to_hex(69, 8)
         hex_locate_code = convert_to_hex((locate_codes[stock_id]), 16)
         hex_tracking_number = convert_to_hex((tracking_numbers[order_id]), 16)
         hex_timestamp = convert_to_hex(input_time, 48)
@@ -213,7 +213,7 @@ class Exchange:
         generate_locate_codes()
     
 
-    def generate_ITCH_order(self, stock_id, integer_output = False, printing = True):
+    def generate_ITCH_order(self, stock_id, integer_output = True, printing = False):
         order_type = self.generate_order_type(stock_id)
         if order_type == "ADD":
             timestamp, order_id, order_price, order_quantity, order_side = self.create_add_order(stock_id)

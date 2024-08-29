@@ -90,10 +90,10 @@ class OrderBook:
         book_side = 0
         found = 0
         # print(type(i))
-        print(type(OrderBook.NUM_REGISTERS))
-        print(type(OrderBook.ORDER_ID_REG))
+        # print(type(OrderBook.NUM_REGISTERS))
+        # print(type(OrderBook.ORDER_ID_REG))
         for i in range(OrderBook.BUFFER_SIZE):
-            print(type(i))
+            # print(type(i))
             if (self.buy_orders[stock_id][(i*OrderBook.NUM_REGISTERS) + OrderBook.ORDER_ID_REG] == order_id):
                 execute_address = (i*OrderBook.NUM_REGISTERS)
                 book_side = 0
@@ -154,21 +154,21 @@ class OrderBook:
 
     def update_cache(self, stock_id, order_id, order_side, order_quantity, order_price, order_type):
         if(order_type == "add"):
-            print("updating from add order")
-            print(str(order_price))
-            print(order_side)
+            # print("updating from add order")
+            # print(str(order_price))
+            # print(order_side)
             if (order_side == "buy"):
                 if (self.buy_cache[stock_id][OrderBook.ORDER_PRICE_REG] < order_price):
                     order_data = [stock_id, order_type, order_quantity, order_price, order_id]
                     self.buy_cache[stock_id][0:OrderBook.NUM_REGISTERS] = order_data
-                    print("100% update")
+                    # print("100% update")
                 else:
                     return
             elif(order_side == "sell"):
                 if (self.sell_cache[stock_id][OrderBook.ORDER_PRICE_REG] > order_price or self.sell_cache[stock_id][OrderBook.ORDER_PRICE_REG] == 0):
                     order_data = [stock_id, order_type, order_quantity, order_price, order_id]
                     self.sell_cache[stock_id][0:OrderBook.NUM_REGISTERS] = order_data
-                    print("100% update")
+                    # print("100% update")
                 else:
                     return
             else:

@@ -1,7 +1,5 @@
 from order_book import OrderBook
-import string
-import numpy as np
-from exchange import convert_to_hex
+import math
 SHAPE_PARAMETER = 0.005 
 # Bytes:      Bits:       reg:                                Bitreglength    Message:
 #     1       0-7:        reg0[7:0]                           8               "A" for add order 
@@ -18,6 +16,8 @@ SHAPE_PARAMETER = 0.005
 
 def parse(ITCH_data):
         # return a list of the parsed data
+        # print("Parsing...")
+        # print(ITCH_data)
         reg_0 = ITCH_data[8]
         reg_1 = ITCH_data[7]
         reg_2 = ITCH_data[6]
@@ -31,6 +31,13 @@ def parse(ITCH_data):
         order_book_inputs = []
 
         order_type = reg_0 & 0xff
+        order_type_dict = {
+            65: "ADD",
+            68: "CANCEL",
+            69: "EXECUTE"
+        }
+        order_type = order_type_dict[order_type]
+        # print(order_type)
 
         locate_code = (reg_0 >> 8) & 0xFFFF
 
@@ -48,9 +55,23 @@ def parse(ITCH_data):
         order_id = (order_id_1 << 56) | (order_id_2 << 32) | order_id_3
 
         buy_or_sell = (reg_4 >> 24) & 0xFF
+        if buy_or_sell == 0:
+            buy_or_sell = "buy"
+        else:
+            buy_or_sell = "sell"
+        # print(buy_or_sell)
 
         shares = reg_5
-        stock_id = (reg_6 << 32) | reg_7
+        stock_id = (reg_7 << 32) + reg_6
+        stock_dict = {
+            4702127773838221344 : 0, 
+            4705516477264961568 : 1, 
+            5138412867491471392 : 2, 
+            5571874491117608992 : 3
+        }
+        stock_id = stock_dict[stock_id]
+
+        # print(stock_id)
         price = reg_8
 
         order_book_inputs.append(stock_id)
@@ -60,6 +81,8 @@ def parse(ITCH_data):
         order_book_inputs.append(price)
         order_book_inputs.append(order_type)
         order_book_inputs.append(final_time)
+
+        return order_book_inputs
 
         # print(order_book_inputs)
 
@@ -107,11 +130,13 @@ def parse(ITCH_data):
         # print(f"Buy/Sell Indicator: {bin(buy_sell_indicator)}")
         # print(f"Order Quantity: {bin(order_quantity)}")
 
-class Model:
+class MarketMakingModel:
 
     def __init__(self):
         self.ob = OrderBook()
         self.inventory = [0, 0, 0, 0]
+        self.volatility_buffers = [[0]*32  for _ in range(4)]
+        self.volatility_indexes = [0, 0, 0, 0]
 
     
     def quote_orders(self, ITCH_data):
@@ -130,10 +155,9 @@ class Model:
         if order_type.upper() == "ADD":
             self.ob.add_order(stock_id, order_id, trade_type, quantity, price)
         elif order_type.upper() == "CANCEL":
-            self.order_book.cancel_order(stock_id, trade_type, order_id)
+            self.ob.cancel_order(stock_id, trade_type, order_id)
         elif order_type.upper() == "EXECUTE":
-            self.order_book.execute_order(stock_id, quantity, order_id)
-
+            self.ob.execute_order(stock_id, quantity, order_id)
             # in the order book, we need to see what side the execute trade is.
             # inventory stuff - need to pass in order id too to check if the order from the exchange is one of ours that has been executed.
             trade_type = self.ob.execute_order_side
@@ -141,46 +165,51 @@ class Model:
         else:
              raise ValueError("Invalid order type")
 
-        best_bid = self.order_book.return_best_bid(stock_id)
-        best_ask = self.order_book.return_best_ask(stock_id)
+        best_bid = self.ob.return_best_bid(stock_id)
+        best_ask = self.ob.return_best_ask(stock_id)
 
 
         # trading logic stuff
-        quote_bid, quote_ask = self.calculate_bid_and_ask_prices(timestamp, best_bid, best_ask)
+        quote_bid, quote_ask = self.calculate_bid_and_ask_prices(timestamp, best_bid, best_ask, stock_id, self.inventory[stock_id])
 
 
         # order size 
         # Order Quantity Estimation
-        order_quantity = 100 * (SHAPE_PARAMETER * self.update_inventory(order_id, stock_id, quantity, trade_type)) # where do we get inventory_state from?
+        # order_quantity = 100 * (SHAPE_PARAMETER * self.update_inventory(order_id, stock_id, quantity, trade_type)) # where do we get inventory_state from?
+        order_quantity = math.floor(100 * math.exp(SHAPE_PARAMETER * self.inventory[stock_id]))
         
         # output orders
-        if(trade_type):
-            return order_quantity, quote_bid
-        else:
-            return order_quantity, quote_ask
+        
+        buy_order_info = [stock_id, order_quantity, quote_bid]
+        sell_order_info = [stock_id, order_quantity, quote_ask]
+        return buy_order_info, sell_order_info
 
     def update_buffer(self, stock_id, element):
         if 0 <= stock_id <= 3:
-            self.volatility_buffer[stock_id].append(element)
+            self.volatility_buffers[stock_id][self.volatility_indexes[stock_id]] = element
+            self.volatility_indexes[stock_id] = (self.volatility_indexes[stock_id] + 1) % 32
         else:
-            print("Index out of range. Please use an index between 0 and 3.")
+            raise ValueError("Index out of range. Please use an index between 0 and 3.")
 
     def buffer_var(self, stock_id):
-        temp = self.volatility_buffer[stock_id]
-        mean = np.mean(temp)
-        # Calculate the variance
-        variance = np.mean([(x - mean) ** 2 for x in temp])
+        BUFFER_SIZE = 32
+        sum = 0 
+        square_sum = 0
+        for i in range(BUFFER_SIZE):
+            sum = sum + self.volatility_buffers[stock_id][i]
+            square_sum = square_sum + (self.volatility_buffers[stock_id][i]*self.volatility_buffers[stock_id][i])
+        
+        variance = square_sum/BUFFER_SIZE - ((sum/BUFFER_SIZE)*(sum/BUFFER_SIZE))
         return variance
     
     def calculate_bid_and_ask_prices(self, timestamp, best_bid, best_ask, stock_id, inventory_state):
-        # volatility + is full logic
-        # zero protection logic
-        # spread
-        # ref price
-        # maths
+        if best_ask == 0:
+            curr_price = best_bid
+        elif best_bid == 0:
+            curr_price = best_ask
+        else:
+            curr_price = (best_ask + best_bid) / 2
 
-        # Volatility
-        curr_price = (best_ask + best_bid) / 2
         self.update_buffer(stock_id, curr_price)
         volatility = self.buffer_var(stock_id)
 
@@ -191,13 +220,12 @@ class Model:
         ref_price = curr_price - (inventory_state * 0.125 * volatility * timestamp)
 
         # Quote Price
-        quote_bid = ref_price - spread
-        quote_ask = ref_price + spread
-
-        if(quote_bid == 0):
-            quote_bid = quote_ask
-        elif(quote_ask == 0):
-            quote_ask = quote_bid
+        if self.volatility_buffers[stock_id][-1] == 0:
+            quote_ask = curr_price
+            quote_bid = curr_price
+        else:
+            quote_bid = ref_price - spread
+            quote_ask = ref_price + spread
 
         return quote_bid, quote_ask
 
