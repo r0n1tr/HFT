@@ -1,5 +1,7 @@
 from order_book import OrderBook
 import string
+import numpy as np
+SHAPE_PARAMETER = 0.005 
 
 def parse(ITCH_data):
         # return a list of the parsed data
@@ -58,16 +60,50 @@ class Model:
 
 
         # order size 
-            
-
+        # Order Quantity Estimation
+        order_quantity = 100 * (SHAPE_PARAMETER * self.update_inventory(order_id, stock_id, quantity, trade_type)) # where do we get inventory_state from?
+        
         # output orders
+        if(trade_type):
+            return order_quantity, quote_bid
+        else:
+            return order_quantity, quote_ask
+
+    def update_buffer(self, stock_id, element):
+        if 0 <= stock_id <= 3:
+            self.volatility_buffer[stock_id].append(element)
+        else:
+            print("Index out of range. Please use an index between 0 and 3.")
+
+    def buffer_var(self, stock_id):
+        temp = self.volatility_buffer[stock_id]
+        mean = np.mean(temp)
+        # Calculate the variance
+        variance = np.mean([(x - mean) ** 2 for x in temp])
+        return variance
     
-    def calculate_bid_and_ask_prices(self, timestamp, best_bid, best_ask):
+    def calculate_bid_and_ask_prices(self, timestamp, best_bid, best_ask, stock_id, inventory_state):
         # volatility + is full logic
         # zero protection logic
         # spread
         # ref price
         # maths
+
+        # Volatility
+        curr_price = (best_ask + best_bid) / 2
+        self.update_buffer(stock_id, curr_price)
+        volatility = self.buffer_var(stock_id)
+
+        # Spread
+        spread = 0.125 * volatility * timestamp 
+
+        # Ref Price 
+        ref_price = curr_price - (inventory_state * 0.125 * volatility * timestamp)
+
+        # Quote Price
+        quote_bid = ref_price - spread
+        quote_ask = ref_price + spread
+
         return quote_bid, quote_ask
 
     
@@ -85,5 +121,7 @@ class Model:
                 multiplier = 0
 
             self.inventory[stock_id] = self.inventory[stock_id] + (multiplier*quantity)/MAX_INVENTORY_SIZE
+
+        return self.inventory[stock_id]
 
     
