@@ -6,10 +6,17 @@ order_ids = []
 
 def generate_order_id():
     while True:
-        number = random.randint(536870911, 4294967295)
+        number = random.randint(536870912, 4294967295)
         if number not in order_ids:
             order_ids.append(number)
             return number
+
+own_order_ids = []
+def generate_own_order_id():
+    while True:
+        number = random.randint(0, 536870911)
+        own_order_ids.append(number)
+        return number
 
 
 def generate_timestamp():
@@ -213,28 +220,38 @@ class Exchange:
         generate_locate_codes()
     
 
-    def generate_ITCH_order(self, stock_id, integer_output = True, printing = False):
-        order_type = self.generate_order_type(stock_id)
-        if order_type == "ADD":
-            timestamp, order_id, order_price, order_quantity, order_side = self.create_add_order(stock_id)
-        elif order_type == "CANCEL":
-            timestamp, order_id, order_price, order_quantity, order_side = self.create_cancel_order(stock_id)
-        elif order_type == "EXECUTE":
-            timestamp, order_id, order_price, order_quantity, order_side = self.create_execute_order(stock_id)
-        else:
-            raise ValueError(f"Invalid order_type: {order_type}. Expected: 'ADD', 'CANCEL' or 'EXECUTE'")
-        
-        if not integer_output:
-            if printing:
-                print(f"Order from Exchange: {[order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price]}")
-            return ([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
-        else:
-            hex_format = convert_to_int_list([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
-            if printing:
+    def generate_ITCH_order(self, stock_id, order_id=None, order_price=None, order_quantity=None, order_side=None, integer_output=True, printing=False):
+        if order_id is not None and order_price is not None and order_quantity is not None and order_side is not None:
+            # print(f"Arguments received: order_id={order_id}, order_price={order_price}, order_quantity={order_quantity}, order_side={order_side}")
+            # The second variant of generate_ITCH_order
+            timestamp = generate_timestamp()
+            tracking_numbers[order_id] = generate_tracking_number()
+            var = "EXECUTE"
+            hex_format = convert_to_int_list([var, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+            if(printing):
                 print(f"Order From Exchange: {hex_format}")
-                # print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
             return hex_format
-
+        else:
+            # The first variant of generate_ITCH_order
+            order_type = self.generate_order_type(stock_id)
+            if order_type == "ADD":
+                timestamp, order_id, order_price, order_quantity, order_side = self.create_add_order(stock_id)
+            elif order_type == "CANCEL":
+                timestamp, order_id, order_price, order_quantity, order_side = self.create_cancel_order(stock_id)
+            elif order_type == "EXECUTE":
+                timestamp, order_id, order_price, order_quantity, order_side = self.create_execute_order(stock_id)
+            else:
+                raise ValueError(f"Invalid order_type: {order_type}. Expected: 'ADD', 'CANCEL' or 'EXECUTE'")
+            
+            if not integer_output:
+                if printing:
+                    # print(f"Order from Exchange: {[order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price]}")
+                    return [order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price]
+            else:
+                hex_format = convert_to_int_list([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+                if printing:
+                    print(f"Order From Exchange: {hex_format}")
+                return hex_format
 
     def generate_order_type(self, stock_id):
         order_types = ["ADD", "EXECUTE", "CANCEL"]
@@ -423,9 +440,13 @@ class Exchange:
         
         order_ids = list(weights.keys())
         weight_values = list(weights.values())
-        
-        selected_order_id = random.choices(order_ids, weights=weight_values, k=1)[0]
-        return selected_order_id
+
+        if not order_ids or not weight_values:
+            raise ValueError("No valid orders found or weights are empty.")
+        else:
+            selected_order_id = random.choices(order_ids, weights=weight_values, k=1)[0]
+            return selected_order_id
+            
     
 
     def insert_into_exchange(self, order_information):
@@ -434,10 +455,10 @@ class Exchange:
         stock_id = order_information[0] 
         timestamp = generate_timestamp()
         order_id = order_information[1] 
-        order_price = order_information[2] 
-        order_quantity = order_information[3] 
+        order_price = order_information[3] 
+        order_quantity = order_information[2] 
         order_side = order_information[4]
-
+        # print(f"Arguments received: order_id={order_id}, order_price={order_price}, order_quantity={order_quantity}, order_side={order_side}")
         if stock_id == 0:
             self.order_book_0[order_id] = {
                 'side' : order_side,
@@ -468,7 +489,9 @@ class Exchange:
             }
         else:
             raise ValueError(f"Invalid stock id: {stock_id}, expected 0-3")
-        
-        tracking_numbers[order_id] = generate_tracking_number()
+        # print("i am in intertechange")
+        self.generate_ITCH_order(stock_id=stock_id, order_id=order_information[1], order_price=order_price, order_quantity=order_quantity, order_side=order_side, printing=False)
+        # tracking_numbers[order_id] = generate_tracking_number()
+        # print("after")
         return timestamp, order_id, order_price, order_quantity, order_side
         # pass

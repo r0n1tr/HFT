@@ -10,7 +10,7 @@ my_model = MarketMakingModel()
 #     # print(len(my_exchange.generate_ITCH_order(num, hex_output=True, printing=True)))
 #     num = random.randint(0,3)
 #     (my_exchange.generate_ITCH_order(num, integer_output=True, printing=True))
-for _ in range (10):
+for _ in range (100):
     num = random.randint(0,3)
     input_vector = my_exchange.generate_ITCH_order(num, printing=True, integer_output=True)
     # print(my_exchange.generate_ITCH_order(num, printing=False, integer_output=False))
@@ -19,9 +19,9 @@ for _ in range (10):
     order_information_buy.append(1)
     order_information_sell = sell_order
     order_information_sell.append(0)
+    # print(f"Exchange: {input_vector}")
     print(f"Market Maker Sell Order: {sell_order}")
     print(f"Market Maker Buy Order: {buy_order}")
     print("Orders Inserted")
     my_exchange.insert_into_exchange(order_information_buy)
     my_exchange.insert_into_exchange(order_information_sell)
-    # print(input_vector)

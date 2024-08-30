@@ -1,6 +1,6 @@
 from order_book import OrderBook
 import math
-from exchange import generate_order_id
+from exchange import generate_own_order_id
 SHAPE_PARAMETER = 0.005 
 # Bytes:      Bits:       reg:                                Bitreglength    Message:
 #     1       0-7:        reg0[7:0]                           8               "A" for add order 
@@ -105,52 +105,6 @@ def parse(ITCH_data):
 
         return order_book_inputs
 
-        # print(order_book_inputs)
-
-        ### TESTING    
-        # # Print extracted values
-        # print(f"reg_0: {bin(reg_0)}")
-        # print(f"Add Order: {bin(add_order)}")
-        # print(f"Locate Code: {bin(locate_code)}")
-        # print("\n")
-
-        # print(f"reg_0: {bin(reg_0)}")
-        # print(f"reg_1: {bin(reg_1)}")
-        # print(f"Tracking Number: {bin(internal_tracking_number_half_1)}")
-        # print(f"Tracking Number: {bin(internal_tracking_number_half_2)}")
-        # print(f"Final Tracking Number: {bin(internal_tracking_number)}")
-        # print("\n")
-
-        # print(f"reg_1: {bin(reg_1)}")
-        # print(f"reg_2 {bin(reg_2)}")
-        # print(f"Timestamp 1: {bin(timestamp_1)}")
-        # print(f"Timestamp 2: {bin(timestamp_2)}")
-        # print(f"Final timestamp: {bin(final_time)}")
-        # print("\n")
-
-        # print(f"reg_2 {bin(reg_2)}")
-        # print(f"reg_3 {bin(reg_3)}")
-        # print(f"reg_4 {bin(reg_4)}")
-        # print(f"order_id_1: {bin(order_id_1)}")
-        # print(f"order_id_2: {bin(order_id_2)}")
-        # print(f"order_id_3: {bin(order_id_3)}")
-        # print(f"order_id: {bin(order_id)}")
-        # print("\n")
-
-        # print(f"reg_4 {bin(reg_4)}")
-        # print(f"Buy/Sell Indicator: {bin(buy_or_sell)}")
-
-        # print(f"shares: {bin(reg_5)}")
-        # print(f"stock_id: {bin(reg_6)} and {bin(reg_7)}")
-        # print(f"shares: {bin(reg_8)}")
-    
-        # 0b 0000 0001 0000 0000 0000 0000 0000 0000
-        
-        # print(f"Timestamp: {bin(timestamp)}")
-        # print(f"Order ID: {bin(order_id)}")
-        # print(f"Buy/Sell Indicator: {bin(buy_sell_indicator)}")
-        # print(f"Order Quantity: {bin(order_quantity)}")
-
 class MarketMakingModel:
 
     def __init__(self):
@@ -189,23 +143,19 @@ class MarketMakingModel:
 
         best_bid = self.ob.return_best_bid(stock_id)
         best_ask = self.ob.return_best_ask(stock_id)
-        # print(f"BID: {best_bid} ")
-        # print(f"ASK: {best_ask} ")
-
 
         # trading logic stuff
         quote_bid, quote_ask = self.calculate_bid_and_ask_prices(timestamp, best_bid, best_ask, stock_id, self.inventory[stock_id])
 
 
-        # order size 
         # Order Quantity Estimation
         # order_quantity = 100 * (SHAPE_PARAMETER * self.update_inventory(order_id, stock_id, quantity, trade_type)) # where do we get inventory_state from?
         order_quantity = math.floor(100 * math.exp(SHAPE_PARAMETER * self.inventory[stock_id]))
         
         
         # output orders
-        unique_id = generate_order_id()
-        unique_id_2 = generate_order_id()
+        unique_id = generate_own_order_id()
+        unique_id_2 = generate_own_order_id()
         # print(unique_id)    
         buy_order_info = [stock_id, unique_id, order_quantity, quote_bid] # unique buy order_id
         sell_order_info = [ stock_id, unique_id_2, order_quantity, quote_ask] # unique sell order_id
