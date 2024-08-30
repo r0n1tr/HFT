@@ -226,12 +226,12 @@ class Exchange:
         
         if not integer_output:
             if printing:
-                print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+                print(f"Order from Exchange: {[order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price]}")
             return ([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
         else:
             hex_format = convert_to_int_list([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
             if printing:
-                print(hex_format)
+                print(f"Order From Exchange: {hex_format}")
                 # print([order_type, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
             return hex_format
 
