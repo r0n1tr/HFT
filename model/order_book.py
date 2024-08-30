@@ -87,6 +87,7 @@ class OrderBook:
                 self.sell_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] -= order_quantity
                 if (self.sell_orders[stock_id][execute_address + OrderBook.ORDER_QUANTITY_REG] == order_quantity):
                     self.shift_book(stock_id, "sell", execute_address)
+            self.update_cache(stock_id, order_id, self.execute_order_side, order_quantity, order_price=0, order_type='execute')
             return
 
     def cancel_order(self, stock_id, order_id, order_type = "cancel"):
@@ -223,6 +224,45 @@ class OrderBook:
                     cache[OrderBook.ORDER_ID_REG] = arr[base_address + OrderBook.ORDER_ID_REG]
             else:
                 raise ValueError(f"Invalid order_side: {order_side}. Expected 'buy' or 'sell'.")
+        
+        elif order_type == 'execute':
+            if (order_side == "buy"):
+                if(order_id == self.buy_cache[stock_id][OrderBook.ORDER_ID_REG]):
+                    self.buy_cache[stock_id][OrderBook.ORDER_QUANTITY_REG] -= order_quantity
+                    if self.buy_cache[stock_id][OrderBook.ORDER_QUANTITY_REG] == 0:
+                        tmp_max = self.buy_orders[stock_id][OrderBook.ORDER_PRICE_REG]
+                        base_address = 0
+                        for i in range(OrderBook.BUFFER_SIZE):
+                            if(self.buy_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] >= tmp_max):
+                                tmp_max = self.buy_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG]
+                                base_address = i * OrderBook.NUM_REGISTERS
+                        arr = self.buy_orders[stock_id]
+                        cache = self.buy_cache[stock_id]
+                        cache[OrderBook.STOCK_ID_REG] = arr[base_address + OrderBook.STOCK_ID_REG]
+                        cache[OrderBook.ORDER_TYPE_REG] = arr[base_address + OrderBook.ORDER_TYPE_REG]
+                        cache[OrderBook.ORDER_QUANTITY_REG] = arr[base_address + OrderBook.ORDER_QUANTITY_REG]
+                        cache[OrderBook.ORDER_PRICE_REG] = arr[base_address + OrderBook.ORDER_PRICE_REG]
+                        cache[OrderBook.ORDER_ID_REG] = arr[base_address + OrderBook.ORDER_ID_REG]
+            elif(order_side == "sell"):
+                if(order_id == self.sell_cache[stock_id][OrderBook.ORDER_ID_REG]):
+                    self.sell_cache[stock_id][OrderBook.ORDER_QUANTITY_REG] -= order_quantity
+                    if self.sell_cache[stock_id][OrderBook.ORDER_QUANTITY_REG] == 0:
+                        tmp_min = self.sell_orders[stock_id][OrderBook.ORDER_PRICE_REG]
+                        base_address = 0
+                        for i in range(OrderBook.BUFFER_SIZE):
+                            if(self.sell_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG] <= tmp_min):
+                                tmp_min = self.sell_orders[stock_id][OrderBook.NUM_REGISTERS*i + OrderBook.ORDER_PRICE_REG]
+                                base_address = i * OrderBook.NUM_REGISTERS
+                        arr = self.sell_orders[stock_id]
+                        cache = self.sell_cache[stock_id]
+                        cache[OrderBook.STOCK_ID_REG] = arr[base_address + OrderBook.STOCK_ID_REG]
+                        cache[OrderBook.ORDER_TYPE_REG] = arr[base_address + OrderBook.ORDER_TYPE_REG]
+                        cache[OrderBook.ORDER_QUANTITY_REG] = arr[base_address + OrderBook.ORDER_QUANTITY_REG]
+                        cache[OrderBook.ORDER_PRICE_REG] = arr[base_address + OrderBook.ORDER_PRICE_REG]
+                        cache[OrderBook.ORDER_ID_REG] = arr[base_address + OrderBook.ORDER_ID_REG]
+            else:
+                raise ValueError(f"Invalid order_side: {order_side}. Expected 'buy' or 'sell'.")
+            
         else:
-            raise ValueError(f"Invalid order_type: {order_type}. Expected 'add', or 'cancel'")
+            raise ValueError(f"Invalid order_type: {order_type}. Expected 'add', or 'cancel' or 'execute")
 
