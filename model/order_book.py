@@ -18,7 +18,7 @@ class OrderBook:
         self.sell_write_addresses = [0] * OrderBook.NUM_STOCKS
         self.buy_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
         self.sell_cache = [[0] * OrderBook.NUM_REGISTERS for _ in range(OrderBook.NUM_STOCKS)]
-        self.execute_order_side = None
+        self.execute_order_side = "buy" # TODO: HARDCODED - when the order we are looking to execute has been overwrritten, so we can't find it.
 
     def generate_address(self, stock_id, order_side):
         if order_side == "buy":

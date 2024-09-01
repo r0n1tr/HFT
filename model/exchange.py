@@ -1,6 +1,7 @@
 import random
 import datetime
 import time
+import math
 
 order_ids = []
 
@@ -226,8 +227,15 @@ class Exchange:
             # The second variant of generate_ITCH_order
             timestamp = generate_timestamp()
             # tracking_numbers[order_id] = generate_tracking_number()
-            var = "EXECUTE"
-            hex_format = convert_to_int_list([var, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
+            var = "ADD"
+            # print(f"ORDER PRICE: {order_price}")
+            if order_price < 0:
+                order_price = 0
+            elif order_price > 4294967294:
+                order_price = 4294967294
+            else:
+                order_price = order_price
+            hex_format = convert_to_int_list([var, timestamp, order_id, order_side, order_quantity, stock_id, math.floor(order_price)])
             if(printing):
                 print(f"Order From Exchanges: {hex_format}")
             return hex_format
@@ -258,27 +266,35 @@ class Exchange:
         if stock_id == 0:
             print(f"LENGTH0: {len(self.order_book_0)}")
             if(len(self.order_book_0) < 10):
-                return "ADD"
+                order_type = "ADD"
             else:
-                return random.choice(order_types)
+                order_type = random.choice(order_types)
+            print(order_type)
+            return order_type
         elif stock_id == 1:
             print(f"LENGTH1: {len(self.order_book_1)}")
             if(len(self.order_book_1) < 10):
-                return "ADD"
+                order_type = "ADD"
             else:
-                return random.choice(order_types)
+                order_type = random.choice(order_types)
+            print(order_type)
+            return order_type
         elif stock_id == 2:
             print(f"LENGTH2: {len(self.order_book_2)}")
             if(len(self.order_book_2) < 10):
-                return "ADD"
+                order_type = "ADD"
             else:
-                return random.choice(order_types)
+                order_type = random.choice(order_types)
+            print(order_type)
+            return order_type
         elif stock_id == 3:
             print(f"LENGTH3: {len(self.order_book_3)}")
             if(len(self.order_book_3) < 10):
-                return "ADD"
+                order_type = "ADD"
             else:
-                return random.choice(order_types)
+                order_type = random.choice(order_types)
+            print(order_type)
+            return order_type
         else:
             raise ValueError(f"Unexpected stock_id value: {stock_id}, expected values between 0-3")
         
@@ -360,7 +376,7 @@ class Exchange:
 
     def create_our_order(self, stock_id, order_id, order_quantity):
         if stock_id == 0:
-                order_book = self.order_book_0
+            order_book = self.order_book_0
         elif stock_id == 1:
             order_book = self.order_book_1
         elif stock_id == 2:
@@ -426,9 +442,11 @@ class Exchange:
             side = order['side']
             price = order['price']
             if side == 'buy':
+                # print("******")
                 if best_bid is None or price > best_bid:
                     best_bid = price
             elif side == 'sell':
+                # print("******")
                 if best_sell is None or price < best_sell:
                     best_sell = price
        
@@ -447,28 +465,38 @@ class Exchange:
             order_book = self.order_book_3
         else:
             raise ValueError(f"Unexpected stock_id value: {stock_id}, expected values between 0-3")
+        
+        # print(f"LENGTH OF BOOK: {len(order_book)}")
+        # print(f"{order_book}")
 
         weights = {}
-        
+        # i = 0
         for order_id, order in order_book.items():
+            # i += 1 
             price = order['price']
             side = order['side']
             
             if side == 'buy':
+                # print("********************")
                 distance = abs(best_bid - price) if best_bid is not None else float('inf')
             elif side == 'sell':
+                # print("********************")
                 distance = abs(best_sell - price) if best_sell is not None else float('inf')
             else:
                 continue
             
             weight = 1 / (5 + distance)  # Adding 1 to avoid division by zero
             weights[order_id] = weight
+
+        # print(f"i: {i}")
         
         order_ids = list(weights.keys())
         weight_values = list(weights.values())
 
-        if not order_ids or not weight_values:
+        if not order_ids:
             raise ValueError("No valid orders found or weights are empty.")
+        elif not weight_values:
+            raise ValueError("NO WEIGHTS")
         else:
             selected_order_id = random.choices(order_ids, weights=weight_values, k=1)[0]
             return selected_order_id
@@ -517,6 +545,7 @@ class Exchange:
             raise ValueError(f"Invalid stock id: {stock_id}, expected 0-3")
         # print("i am in intertechange")
         tracking_numbers[order_id] = generate_tracking_number()
+        print(f"ORDER PRICE = {order_price}")
         self.generate_ITCH_order(stock_id=stock_id, order_id=order_information[1], order_price=order_price, order_quantity=order_quantity, order_side=order_side, printing=False)
         # print("after")
         return [stock_id, order_id, order_side, order_quantity, order_price, "EXECUTE", timestamp]

@@ -158,8 +158,8 @@ class MarketMakingModel:
         unique_id = generate_own_order_id()
         unique_id_2 = generate_own_order_id()
         # print(unique_id)    
-        buy_order_info = [ timestamp, unique_id, stock_id, 1, order_quantity, quote_bid] # unique buy order_id
-        sell_order_info = [ timestamp, unique_id_2, stock_id, 0,  order_quantity, quote_ask] # unique sell order_id
+        buy_order_info = [ timestamp, unique_id, stock_id, "buy", order_quantity, quote_bid] # unique buy order_id
+        sell_order_info = [ timestamp, unique_id_2, stock_id, "sell",  order_quantity, quote_ask] # unique sell order_id
         return buy_order_info, sell_order_info
 
     def update_buffer(self, stock_id, element):

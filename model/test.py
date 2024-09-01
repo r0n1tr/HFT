@@ -11,7 +11,7 @@ my_model = MarketMakingModel()
 #     num = random.randint(0,3)
 #     (my_exchange.generate_ITCH_order(num, integer_output=True, printing=True))
 for _ in range (100):
-    num = random.randint(0,3)
+    num = random.randint(0,0)
     input_vector = my_exchange.generate_ITCH_order(num, printing=True, integer_output=True)
     # print(len(input_vector))
     # print(my_exchange.generate_ITCH_order(num, printing=False, integer_output=False))
