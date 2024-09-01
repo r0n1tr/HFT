@@ -225,7 +225,7 @@ class Exchange:
             # print(f"Arguments received: order_id={order_id}, order_price={order_price}, order_quantity={order_quantity}, order_side={order_side}")
             # The second variant of generate_ITCH_order
             timestamp = generate_timestamp()
-            tracking_numbers[order_id] = generate_tracking_number()
+            # tracking_numbers[order_id] = generate_tracking_number()
             var = "EXECUTE"
             hex_format = convert_to_int_list([var, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
             if(printing):
@@ -354,6 +354,28 @@ class Exchange:
         
         return timestamp, order_id, order_price, order_quantity, order_side
 
+    def create_our_order(self, stock_id, order_id, order_quantity):
+        if stock_id == 0:
+                order_book = self.order_book_0
+        elif stock_id == 1:
+            order_book = self.order_book_1
+        elif stock_id == 2:
+            order_book = self.order_book_2
+        elif stock_id == 3:
+            order_book = self.order_book_3
+        else:
+            raise ValueError(f"Unexpected stock_id value: {stock_id}, expected values between 0-3")
+        
+        
+        order_price = None
+        order_side = None
+        # order_id = self.select_order_id_closest_to_best_price(stock_id)
+        # order_quantity = min(generate_order_quantity(), order_book[order_id]['quantity'])
+        order_book[order_id]['quantity'] -= order_quantity
+        if (order_book[order_id]['quantity'] == 0):
+            self.remove_order_from_book(stock_id, order_id)
+
+        return order_id, order_price, order_quantity, order_side
 
     def pick_random_id(self, stock_id):
         if stock_id == 0:
@@ -452,12 +474,12 @@ class Exchange:
     def insert_into_exchange(self, order_information):
         # Need to know what format the order is going to be received in
         # afaik it order information needs to have the following in a list
-        stock_id = order_information[0] 
-        timestamp = generate_timestamp()
+        timestamp = order_information[0]
         order_id = order_information[1] 
-        order_price = order_information[3] 
-        order_quantity = order_information[2] 
-        order_side = order_information[4]
+        order_side = order_information[3]
+        order_quantity = order_information[4] 
+        stock_id = order_information[2] 
+        order_price = order_information[5] 
         # print(f"Arguments received: order_id={order_id}, order_price={order_price}, order_quantity={order_quantity}, order_side={order_side}")
         if stock_id == 0:
             self.order_book_0[order_id] = {
@@ -490,8 +512,8 @@ class Exchange:
         else:
             raise ValueError(f"Invalid stock id: {stock_id}, expected 0-3")
         # print("i am in intertechange")
+        tracking_numbers[order_id] = generate_tracking_number()
         self.generate_ITCH_order(stock_id=stock_id, order_id=order_information[1], order_price=order_price, order_quantity=order_quantity, order_side=order_side, printing=False)
-        # tracking_numbers[order_id] = generate_tracking_number()
         # print("after")
-        return timestamp, order_id, order_price, order_quantity, order_side
+        return [stock_id, order_id, order_side, order_quantity, order_price, "EXECUTE", timestamp]
         # pass

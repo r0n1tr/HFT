@@ -1,6 +1,6 @@
 from order_book import OrderBook
 import math
-from exchange import generate_own_order_id
+from exchange import generate_own_order_id, generate_timestamp
 SHAPE_PARAMETER = 0.005 
 # Bytes:      Bits:       reg:                                Bitreglength    Message:
 #     1       0-7:        reg0[7:0]                           8               "A" for add order 
@@ -125,6 +125,7 @@ class MarketMakingModel:
         price = order_book_inputs[4]
         order_type = order_book_inputs[5]
         timestamp = order_book_inputs[6]  
+        print(f"Arguments received in Market Maker: order_id={order_id}, order_price={price}, order_quantity={quantity}, order_side={trade_type}")
         # print(f"trade_type: {trade_type}")  
 
         # load it into the order book
@@ -152,13 +153,13 @@ class MarketMakingModel:
         # order_quantity = 100 * (SHAPE_PARAMETER * self.update_inventory(order_id, stock_id, quantity, trade_type)) # where do we get inventory_state from?
         order_quantity = math.floor(100 * math.exp(SHAPE_PARAMETER * self.inventory[stock_id]))
         
-        
+        timestamp = generate_timestamp()
         # output orders
         unique_id = generate_own_order_id()
         unique_id_2 = generate_own_order_id()
         # print(unique_id)    
-        buy_order_info = [stock_id, unique_id, order_quantity, quote_bid] # unique buy order_id
-        sell_order_info = [ stock_id, unique_id_2, order_quantity, quote_ask] # unique sell order_id
+        buy_order_info = [ timestamp, unique_id, stock_id, 1, order_quantity, quote_bid] # unique buy order_id
+        sell_order_info = [ timestamp, unique_id_2, stock_id, 0,  order_quantity, quote_ask] # unique sell order_id
         return buy_order_info, sell_order_info
 
     def update_buffer(self, stock_id, element):
