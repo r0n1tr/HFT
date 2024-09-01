@@ -256,27 +256,31 @@ class Exchange:
     def generate_order_type(self, stock_id):
         order_types = ["ADD", "EXECUTE", "CANCEL"]
         if stock_id == 0:
+            print(f"LENGTH0: {len(self.order_book_0)}")
             if(len(self.order_book_0) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)
         elif stock_id == 1:
+            print(f"LENGTH1: {len(self.order_book_1)}")
             if(len(self.order_book_1) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)
         elif stock_id == 2:
+            print(f"LENGTH2: {len(self.order_book_2)}")
             if(len(self.order_book_2) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)
         elif stock_id == 3:
+            print(f"LENGTH3: {len(self.order_book_3)}")
             if(len(self.order_book_3) < 10):
                 return "ADD"
             else:
                 return random.choice(order_types)
         else:
-            raise ValueError(f"Unexpected stock_id valud: {stock_id}, expected values between 0-3")
+            raise ValueError(f"Unexpected stock_id value: {stock_id}, expected values between 0-3")
         
 
     def create_add_order(self, stock_id):
@@ -457,7 +461,7 @@ class Exchange:
             else:
                 continue
             
-            weight = 1 / (1 + distance)  # Adding 1 to avoid division by zero
+            weight = 1 / (5 + distance)  # Adding 1 to avoid division by zero
             weights[order_id] = weight
         
         order_ids = list(weights.keys())

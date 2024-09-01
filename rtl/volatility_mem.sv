@@ -76,7 +76,15 @@ module volatility_mem
                 moving_sum[i_stock_id] <= moving_sum[i_stock_id] - remove_reg[i_stock_id] + ((i_best_ask+i_best_bid) >>> 1);
                 moving_square_sum[i_stock_id] <= moving_square_sum[i_stock_id] - (remove_reg[i_stock_id]**2) + (((i_best_ask+i_best_bid) >>> 1)**2);
                 o_data_valid <= 1;
-                o_curr_price <= ((i_best_ask+i_best_bid) >>> 1);
+                if (i_best_ask == 0) begin
+                    o_curr_price <= i_best_bid;
+                end 
+                else if (i_best_bid == 0) begin
+                    o_curr_price <= i_best_bid;
+                end
+                else begin
+                    o_curr_price <= ((i_best_ask+i_best_bid) >>> 1);
+                end
                 term1 <= i_write_address - BUFFER_SIZE + 1;
                 if(((i_write_address-BUFFER_SIZE+1) % BUFFER_SIZE) == 0) begin
                     // buffer is full
