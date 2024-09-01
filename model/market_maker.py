@@ -1,7 +1,7 @@
 from order_book import OrderBook
 import math
 from exchange import generate_own_order_id, generate_timestamp
-SHAPE_PARAMETER = 0.005 
+SHAPE_PARAMETER = 0.05 
 # Bytes:      Bits:       reg:                                Bitreglength    Message:
 #     1       0-7:        reg0[7:0]                           8               "A" for add order 
 #     2       8-23:       reg0[23:8]                          16              Locate code identifying the security - a random number associated with a specific stock, new every day
@@ -216,7 +216,7 @@ class MarketMakingModel:
     
     def update_inventory(self, order_id, stock_id, quantity, order_side):
         MAX_INVENTORY_SIZE = 10000
-        if(order_id >= 536870912):
+        if(order_id <= 536870912):
             return
         else:
             if order_side.upper() == "BUY":

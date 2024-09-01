@@ -229,7 +229,7 @@ class Exchange:
             var = "EXECUTE"
             hex_format = convert_to_int_list([var, timestamp, order_id, order_side, order_quantity, stock_id, order_price])
             if(printing):
-                print(f"Order From Exchange: {hex_format}")
+                print(f"Order From Exchanges: {hex_format}")
             return hex_format
         else:
             # The first variant of generate_ITCH_order

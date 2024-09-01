@@ -10,10 +10,10 @@ my_model = MarketMakingModel()
 #     # print(len(my_exchange.generate_ITCH_order(num, hex_output=True, printing=True)))
 #     num = random.randint(0,3)
 #     (my_exchange.generate_ITCH_order(num, integer_output=True, printing=True))
-for _ in range (8000):
+for _ in range (100):
     num = random.randint(0,3)
     input_vector = my_exchange.generate_ITCH_order(num, printing=True, integer_output=True)
-    print(len(input_vector))
+    # print(len(input_vector))
     # print(my_exchange.generate_ITCH_order(num, printing=False, integer_output=False))
     sell_order, buy_order = my_model.quote_orders(input_vector)
     # print(f"Exchange: {input_vector}")
@@ -23,15 +23,8 @@ for _ in range (8000):
     temp_vector_b = my_exchange.insert_into_exchange(buy_order)
     temp_vector_s = my_exchange.insert_into_exchange(sell_order)
     print("Orders Inserted")
-    print(temp_vector_b)
+    # print(temp_vector_b)
     # quote_order require -> stock_id, order_id, trade_type, quantity, price, order_type, timestamp
-
-    sell_order, buy_order = my_model.quote_orders(temp_vector_b)
-    print(f"Market Maker Sell Order: {sell_order}")
-    print(f"Market Maker Buy Order: {buy_order}")
-    sell_order, buy_order = my_model.quote_orders(temp_vector_s)
-    print(f"Market Maker Sell Order: {sell_order}")
-    print(f"Market Maker Buy Order: {buy_order}")
 
     print("Cycle Complete. \n")
     # generate itch for own order produces stock_id, unique_id, order_quantity, price
