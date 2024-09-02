@@ -2,6 +2,7 @@ import random
 import datetime
 import time
 import math
+from converter import readable_to_ITCH
 
 order_ids = []
 
@@ -50,6 +51,7 @@ locate_codes = []
 def generate_locate_codes():
     for _ in range(4):
         locate_codes.append(random.randint(0, 45536))
+    
 
 existing_tracking_numbers = []
 tracking_numbers = {}
@@ -508,9 +510,9 @@ class Exchange:
         # afaik it order information needs to have the following in a list
         timestamp = order_information[0]
         order_id = order_information[1] 
+        stock_id = order_information[2] 
         order_side = order_information[3]
         order_quantity = order_information[4] 
-        stock_id = order_information[2] 
         order_price = order_information[5] 
         # print(f"Arguments received: order_id={order_id}, order_price={order_price}, order_quantity={order_quantity}, order_side={order_side}")
         if stock_id == 0:
@@ -545,8 +547,12 @@ class Exchange:
             raise ValueError(f"Invalid stock id: {stock_id}, expected 0-3")
         # print("i am in intertechange")
         tracking_numbers[order_id] = generate_tracking_number()
-        print(f"ORDER PRICE = {order_price}")
+        # print(f"ORDER PRICE = {order_price}")
         self.generate_ITCH_order(stock_id=stock_id, order_id=order_information[1], order_price=order_price, order_quantity=order_quantity, order_side=order_side, printing=False)
         # print("after")
+        locate_code = locate_codes[stock_id]
+        # print(locate_code)
+        tracking = generate_tracking_number()
+        return_var = readable_to_ITCH([stock_id, order_id, order_side, order_quantity, order_price, "EXECUTE", timestamp], locate_code, tracking)
         return [stock_id, order_id, order_side, order_quantity, order_price, "EXECUTE", timestamp]
         # pass

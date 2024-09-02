@@ -1,6 +1,7 @@
 from order_book import OrderBook
 import math
 from exchange import generate_own_order_id, generate_timestamp
+from converter import itch_to_readable
 SHAPE_PARAMETER = 0.05 
 # Bytes:      Bits:       reg:                                Bitreglength    Message:
 #     1       0-7:        reg0[7:0]                           8               "A" for add order 
@@ -117,7 +118,7 @@ class MarketMakingModel:
     
     def quote_orders(self, ITCH_data):
         # parse the order
-        order_book_inputs = parse(ITCH_data)
+        order_book_inputs, temp2, temp3 = itch_to_readable(ITCH_data)
         # TODO: not complete
         stock_id = order_book_inputs[0]
         order_id = order_book_inputs[1]
