@@ -118,7 +118,7 @@ class MarketMakingModel:
     
     def quote_orders(self, ITCH_data):
         # parse the order
-        order_book_inputs, temp2, temp3 = itch_to_readable(ITCH_data)
+        order_book_inputs, temp2, temp3= itch_to_readable(ITCH_data)
         # TODO: not complete
         stock_id = order_book_inputs[0]
         order_id = order_book_inputs[1]

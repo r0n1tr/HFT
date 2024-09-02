@@ -548,11 +548,15 @@ class Exchange:
         # print("i am in intertechange")
         tracking_numbers[order_id] = generate_tracking_number()
         # print(f"ORDER PRICE = {order_price}")
-        self.generate_ITCH_order(stock_id=stock_id, order_id=order_information[1], order_price=order_price, order_quantity=order_quantity, order_side=order_side, printing=False)
+        self.generate_ITCH_order(stock_id=stock_id, order_id= order_id, order_price=order_price, order_quantity=order_quantity, order_side=order_side, printing=False)
         # print("after")
         locate_code = locate_codes[stock_id]
         # print(locate_code)
         tracking = generate_tracking_number()
-        return_var = readable_to_ITCH([stock_id, order_id, order_side, order_quantity, order_price, "EXECUTE", timestamp], locate_code, tracking)
-        return [stock_id, order_id, order_side, order_quantity, order_price, "EXECUTE", timestamp]
+        # print(f"STOCK_ID FROM INSERT: {stock_id} \n")
+        order_inputs = [stock_id, order_id, order_side, order_quantity, order_price, "ADD", timestamp]
+        # print(f"orderinput: {order_inputs} \n")
+        return_var = readable_to_ITCH(order_inputs, locate_code, tracking)
+        # print(f"return_var from exch: {return_var} \n")
+        return return_var
         # pass
