@@ -6,10 +6,10 @@ SHAPE_PARAMETER = 0.05
 # Bytes:      Bits:       reg:                                Bitreglength    Message:
 #     1       0-7:        reg0[7:0]                           8               "A" for add order 
 #     2       8-23:       reg0[23:8]                          16              Locate code identifying the security - a random number associated with a specific stock, new every day
-#     2       24-39:      reg0[31:24] reg1[7:0]               16              Internal tracking number
-#     6       40-87:      reg1[31:8] reg2[23:0]               48              Timestamp - nanoseconds since midnight - we will just do seconds since start of trading day
+#     2       24-39:      reg1[7:0] reg0[31:24]               16              Internal tracking number
+#     6       40-87:      reg2[23:0] reg1[31:8]               48              Timestamp - nanoseconds since midnight - we will just do seconds since start of trading day
 
-#     8       88-151:     reg2[31:24] reg3[31:0] reg4[23:0]   64              Order ID
+#     8       88-151:     reg4[23:0] reg3[31:0] reg2[31:24]   64              Order ID
 #     1       152-159:    reg4[31:24]                         8               Buy or sell indicator - 0 or 1
 #     4       160-191:    reg5[31:0]                          32              Number of shares / order quantity
 #     8       192-255:    reg6[31:0] reg7[31:0]               64              Stock ID
@@ -105,7 +105,7 @@ def parse(ITCH_data):
         order_book_inputs.append(final_time)
         print(f"order_id: {bin(order_id)}")
 
-        return order_book_inputs, locate_code, internal_tracking_number_half_1, internal_tracking_number_half_2
+        return order_book_inputs, locate_code, final_time
 
 class MarketMakingModel:
 
@@ -126,8 +126,10 @@ class MarketMakingModel:
         quantity = order_book_inputs[3]
         price = order_book_inputs[4]
         order_type = order_book_inputs[5]
-        timestamp = order_book_inputs[6]  
-        print(f"Arguments received in Market Maker: order_id={order_id}, order_price={price}, order_quantity={quantity}, order_side={trade_type}")
+        timestamp = order_book_inputs[6] 
+
+        # print(f"timestamp from quote_orders: {timestamp}") 
+        # print(f"Arguments received in Market Maker: order_id={order_id}, order_price={price}, order_quantity={quantity}, order_side={trade_type}")
         # print(f"trade_type: {trade_type}")  
 
         # load it into the order book
@@ -155,13 +157,13 @@ class MarketMakingModel:
         # order_quantity = 100 * (SHAPE_PARAMETER * self.update_inventory(order_id, stock_id, quantity, trade_type)) # where do we get inventory_state from?
         order_quantity = math.floor(100 * math.exp(SHAPE_PARAMETER * self.inventory[stock_id]))
         
-        timestamp = generate_timestamp()
+        timestamp_new = generate_timestamp()
         # output orders
         unique_id = generate_own_order_id()
         unique_id_2 = generate_own_order_id()
         # print(unique_id)    
-        buy_order_info = [ timestamp, unique_id, stock_id, "buy", order_quantity, quote_bid] # unique buy order_id
-        sell_order_info = [ timestamp, unique_id_2, stock_id, "sell",  order_quantity, quote_ask] # unique sell order_id
+        buy_order_info = [ timestamp_new, unique_id, stock_id, "buy", order_quantity, quote_bid] # unique buy order_id
+        sell_order_info = [ timestamp_new, unique_id_2, stock_id, "sell",  order_quantity, quote_ask] # unique sell order_id
         return buy_order_info, sell_order_info
 
     def update_buffer(self, stock_id, element):
@@ -194,7 +196,7 @@ class MarketMakingModel:
         # print(f"curr_price {curr_price}")
         self.update_buffer(stock_id, curr_price)
         volatility = self.buffer_var(stock_id)
-
+        # print(f"VOLATILITY FROM MARKET_MAKER: {volatility}")
         # Spread
         # print(f"timestamp: {timestamp}")
         spread = 0.125 * volatility * timestamp
@@ -202,7 +204,8 @@ class MarketMakingModel:
 
         # Ref Price 
         ref_price = curr_price - (inventory_state * 0.125 * volatility * timestamp)
-
+        # print(f"inventory_state: {inventory_state}")
+        # print(f"timestamp: {timestamp}")
         # Quote Price
         if self.volatility_buffers[stock_id][-1] == 0:
             # print(f"last element: {self.volatility_buffers[stock_id][-1]}")
