@@ -30,7 +30,7 @@ def parse(ITCH_data):
         reg_8 = ITCH_data[0]
 
         order_book_inputs = []
-
+        
         order_type = reg_0 & 0xff
         order_type_dict = {
             65: "ADD",
@@ -51,12 +51,12 @@ def parse(ITCH_data):
 
         timestamp_1 = (reg_1 >> 8) & 0xFFFFFF
         timestamp_2 = (reg_2) & 0xFFFFFF
-        final_time = (timestamp_2 << 24 ) +  timestamp_1    
-        
+        final_time = (timestamp_1 << 24 ) +  timestamp_2  
+       
         order_id_1 = (reg_2 >> 24) & 0xFF
         order_id_2 = reg_3
         order_id_3 = (reg_4) & 0xFFF
-        order_id = (order_id_1 << 56) | (order_id_2 << 32) | order_id_3
+        order_id = (order_id_1 << 56) | (order_id_2 << 24) | order_id_3
 
         if order_type == "ADD":
             buy_or_sell = (reg_4 >> 24) & 0xFF
@@ -102,8 +102,9 @@ def parse(ITCH_data):
         order_book_inputs.append(price)
         order_book_inputs.append(order_type)
         order_book_inputs.append(final_time)
+        print(f"order_id: {bin(order_id)}")
 
-        return order_book_inputs
+        return order_book_inputs, locate_code, internal_tracking_number_half_1, internal_tracking_number_half_2
 
 class MarketMakingModel:
 
