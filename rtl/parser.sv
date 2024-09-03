@@ -54,7 +54,7 @@ module parser
     output logic [1:0]                  o_stock_symbol,
     output logic [REG_WIDTH - 1 : 0]    o_order_id,
     output logic [REG_WIDTH - 1 : 0]    o_price,
-    output logic [15:0]                 o_quantity,
+    output logic [REG_WIDTH - 1 : 0]                 o_quantity,
     output logic [1:0]                  o_order_type,
     output logic                        o_trade_type,
     output logic [48 - 1 : 0] o_curr_time,

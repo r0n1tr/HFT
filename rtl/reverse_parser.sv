@@ -9,14 +9,17 @@ module reverse_parser
     //input logic [REG_WIDTH - 1 : 0]    i_order_id,
     input logic [REG_WIDTH - 1 : 0]    i_buy_price,
     input logic [REG_WIDTH - 1 : 0]    i_sell_price, // 
-    input logic [15:0]                 i_quantity, // from quantity estimation module
+    input logic [REG_WIDTH - 1 : 0]    i_quantity, // from quantity estimation module
     //input logic [1:0]                  i_order_type,
     input logic                        i_trade_type,
     input logic                        i_book_is_busy,
     // input logic [63:0]                 i_stock_id,
     input logic                        i_data_valid,
+    input logic [15:0]                 i_locate_code,
+    input logic [15:0]                 i_tracking_number,
+    input logic [47:0]                 i_timestamp,
 
-    
+    output logic [REG_WIDTH - 1 : 0]     o_reg_0,
     output logic [REG_WIDTH - 1 : 0]     o_reg_1,
     output logic [REG_WIDTH - 1 : 0]     o_reg_2,
     output logic [REG_WIDTH - 1 : 0]     o_reg_3,
@@ -24,6 +27,7 @@ module reverse_parser
     output logic [REG_WIDTH - 1 : 0]     o_reg_5,
     output logic [REG_WIDTH - 1 : 0]     o_reg_6,
     output logic [REG_WIDTH - 1 : 0]     o_reg_7,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_8,
     output logic                         o_valid
 
 );
@@ -54,44 +58,26 @@ module reverse_parser
 
     always_ff @(posedge i_clk) begin
 
-        if(i_data_valid) begin
-            o_valid <= 1;
+        if(!i_data_valid) begin
+            o_valid <= 0;
+            // order_type
+            o_reg_0 <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
+
             //o_order_type <= ADD;
             // add order
-            o_reg_1 <= {{8'hA}, i_trade_type};
+            o_reg_1 <= {i_timestamp[24:0], i_tracking_number[15:8]};
 
             //timestamp -- need to figure out how to do realtime 
-            o_reg_2 <= 32'h0300; // insert realtime but for now hardcoded
-
+            o_reg_2 <= {i_order_id[7:0], i_timestamp[47:24]}; 
             //order number
-            o_reg_3 <= 32'h03BA; //again have to figure out how to randomly generate unique ref
+            o_reg_3 <= i_order_id[39:8]; 
 
             // quantity/shares
-            o_reg_4 <= {{15'b0}, i_quantity};
+            o_reg_4 <= {{i_trade_type}, i_order_id[63:40]};
 
             //stock symbol
-            case (i_stock_symbol)
-                00: begin
-                    o_reg_5 <= 32'h4141504c;
-                    o_reg_6 <= 32'h20202020;
-                end 
-                01: begin
-                    o_reg_5 <= 32'h414d5a4e;
-                    o_reg_6 <= 32'h20202020;
-                end    
-                10: begin
-                    o_reg_5 <= 32'h474f4f47;
-                    o_reg_6 <= 32'h4c202020;
-                end
-                11: begin
-                    o_reg_5 <= 32'h4d534654;
-                    o_reg_6 <= 32'h20202020;
-                end
-            default: begin
-                    o_reg_5 <= 32'h0;
-                    o_reg_6 <= 32'h0;
-            end
-            endcase
+            o_reg_5 <= i_quantity;
+            o_reg_6 <= i_stock_id[]
 
             // price from quote price module
             o_reg_7 <= i_trade_type ? i_buy_price : i_sell_price;
@@ -107,14 +93,14 @@ module reverse_parser
             o_reg_7 <= 0;
         end
     end
-
-    // always_comb begin
-    //     case(i_stock_id)
-    //         64'h4141504c20202020 : stock_id = AAPL;
-    //         64'h414d5a4e20202020 : stock_id = AMZN;
-    //         64'h474f4f474c202020 : stock_id = GOOGL;
-    //         64'h4d53465420202020 : stock_id = MSFT;
-    //     endcase
-    // end
+    //may need to add real stock id for output, not too sure yet.
+    always_comb begin
+        case(i_stock_id)
+            64'h4141504c20202020 : stock_id = AAPL;
+            64'h414d5a4e20202020 : stock_id = AMZN;
+            64'h474f4f474c202020 : stock_id = GOOGL;
+            64'h4d53465420202020 : stock_id = MSFT;
+        endcase
+    end
 
 endmodule
