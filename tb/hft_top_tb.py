@@ -58,8 +58,10 @@ async def hft_top_test(dut):
         stock = random.randint(0,3)
         input_order = my_exchange.generate_ITCH_order(stock, printing=False, integer_output=True)
         buy_order, sell_order = my_market_maker.quote_orders(input_order)
-
-        dut._log.info("Input ITCH order:: %s", input_order)
+        
+        dut._log.info("Order number: %s", i)
+        dut._log.info("Input ITCH order: %s", input_order)
+        dut._log.info("Converted: %s", itch_to_readable(input_order))
         cocotb.start_soon(initialize_inputs(dut, input_order))
         for _ in range(8):
             await RisingEdge(dut.i_clk)
