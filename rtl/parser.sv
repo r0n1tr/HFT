@@ -1,15 +1,39 @@
-/*
-ITCH Format:
-Data Type           Byte Size       Type            Value Meaning                               Register Number
-Message             1               8’hA            Add order                                   1
-Timestamp           4               32’h0300        Time that order happened                    8
-Order number        4               32’h03BA        Unique value to distinguish order           3
-Buy or sell         1/8             1’b1            A Buy order                                 1
-Shares              4               32’h01BB        The total number of shares                  4
-Stock Symbol        8               64'h0AAB        2341 Which stock the order concerns         5, 6    
-Price               4               32’hBABB        The price offered to buy                    7
-*/
+// ADD
+// # Bytes:      Bits:       reg:                                Bitreglength    Message:
+// #     1       0-7:        reg0[7:0]                           8               "A" for add order 
+// #     2       8-23:       reg0[23:8]                          16              Locate code identifying the security - a random number associated with a specific stock, new every day
+// #     2       24-39:      reg1[7:0] reg0[31:24]               16              Internal tracking number
+// #     6       40-87:      reg2[23:0] reg1[31:8]               48              Timestamp - nanoseconds since midnight - we will just do seconds since start of trading day
+// #     8       88-151:     reg4[23:0] reg3[31:0] reg2[31:24]   64              Order ID
+// #     1       152-159:    reg4[31:24]                         8               Buy or sell indicator - 0 or 1
+// #     4       160-191:    reg5[31:0]                          32              Number of shares / order quantity
+// #     8       192-255:    reg7[31:0] reg6[31:0]               64              Stock ID
+// #     4       255-287:    reg8[31:0]                          32              Price
+
+// CANCEL Order Format - It's actually DELETE that we are doing according to documentation
+//         Bytes:     Bits:          reg:                                       Message:
+//         1           0-7:          reg0[7:0]                                   "D" for delete order
+//         2           8-23:         reg0[23:8]                                  Locate Code for the Stock
+//         2           24-39:        reg1[7:0] reg0[31:24]                       Internal tracking number 
+//         6           40-87:        reg2[23:0] reg1[31:8]                       Timestamp
+//         8           88-151:       reg4[23:0] reg3[31:0] reg2[31:24]           Order ID
+//         8           152-215:      reg6[23:0], reg5[31:0], reg4[31:24]         Stock ID - Not part of documentation, but we need this because of how we implemented the order book cancel function
+//                     216-287:                                                  0s for 32 bit register allignment
+
+
+// EXECUTE Order Format - 
+//         Bytes:      Bits:    REG:                                             Message:
+//         1           0-7:     reg0[7:0]                                        "E" for execute order
+//         2           8-23:      reg0[23:8]                                     Locate Code for the Stock
+//         2           24-39:     reg1[7:0] reg0[31:24]                          Internal tracking number 
+//         6           40-87:     reg2[23:0] reg1[31:8]                          Timestamp
+//         8           88-151:    reg4[23:0] reg3[31:0] reg2[31:24]              Order ID
+//         4           152-183:   reg5[23:0], reg4[31:24]                        Number of shares
+//         8           184-247:   reg7[23:0], reg6[31:0], reg5[31:24]            Stock ID - Not part of documentation, but we need this because of how we implemented the order book execute function
+//                     248-287:                                                  0s for 32 bit register allignment
+ 
 module parser
+
 #(
     parameter REG_WIDTH = 32,
     parameter FP_WORD_SIZE = 64
@@ -17,7 +41,8 @@ module parser
 (
     input logic                         i_clk, 
     input logic                         i_book_is_busy,
-    input logic [REG_WIDTH - 1 : 0]     i_reg_1, // order type - add cancel etc.
+    input logic [REG_WIDTH - 1 : 0]     i_reg_0, // order type - add cancel etc.
+    input logic [REG_WIDTH - 1 : 0]     i_reg_1,
     input logic [REG_WIDTH - 1 : 0]     i_reg_2,
     input logic [REG_WIDTH - 1 : 0]     i_reg_3,
     input logic [REG_WIDTH - 1 : 0]     i_reg_4,
@@ -32,7 +57,9 @@ module parser
     output logic [15:0]                 o_quantity,
     output logic [1:0]                  o_order_type,
     output logic                        o_trade_type,
-    output logic [FP_WORD_SIZE - 1 : 0] o_curr_time,
+    output logic [48 - 1 : 0] o_curr_time,
+    output logic [15:0]                 o_locate_code,
+    output logic [15:0]                 o_tracking_number,
     output logic                        o_valid
 );
 
@@ -57,7 +84,18 @@ module parser
     logic [63:0] i_stock_id;
 
     always_comb begin
-        i_stock_id = {i_reg_4[15:0], i_reg_5, i_reg_6[31:16]};
+        case(i_reg_0[7:0])
+            8'h41:
+                i_stock_id <= {i_reg_7, i_reg_6};
+            8'h58:
+                i_stock_id <= {i_reg_6[23:0], i_reg_5, i_reg_4[31:24]};
+            8'h45:
+                i_stock_id <= {i_reg_7[23:0], i_reg_6[31:0], i_reg_5[31:24]};
+            default:
+                i_stock_id <= 0
+        endcase
+        o_locate_code = i_reg_0[23:8];
+        o_tracking_number = {i_reg_1[7:0], i_reg_0[31:24]}
     end
 
     logic [1:0] stock_id;
@@ -66,33 +104,36 @@ module parser
 
         if(!i_book_is_busy) begin
             o_valid <= 1;
-            case(i_reg_1[31:24])
+            case(i_reg_0[7:0])
                 8'h41: begin
                     o_order_type <= ADD;
-                    o_stock_symbol <= stock_id;
-                    o_order_id <= {i_reg_2[23:0], i_reg_3[31:24]};
-                    o_price <= {i_reg_6[15:0], i_reg_7[31:16]};
-                    o_quantity <= i_reg_4[31:16];
-                    o_trade_type <= i_reg_3[16] ? BUY : SELL;
-                    o_curr_time <= {i_reg_8, 32'b0};
+                    o_stock_symbol <= stock_id; 
+                    o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
+                    o_order_id <= {i_reg_4[23:0], i_reg_3, i_reg_2[31:24]};
+
+                    o_trade_type <= i_reg_4[31:24] ? BUY : SELL;
+                    o_quantity <= i_reg_5;
+                    o_price <= {i_reg_8};
                 end
                 8'h58: begin
                     o_order_type <= CANCEL;
-                    o_stock_symbol <= 0;
-                    o_order_id <= {i_reg_2[23:0], i_reg_3[31:24]};
+                    o_stock_symbol <= stock_id;
+                    o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
+                    o_order_id <= {i_reg_4[23:0], i_reg_3, i_reg_2[31:24]};
+                    
                     o_price <= 0;
                     o_quantity <= 0;
                     o_trade_type <= 0;
-                    o_curr_time <= {i_reg_8, 32'b0};
                 end
                 8'h45: begin 
                     o_order_type <= EXECUTE;
-                    o_stock_symbol <= 0;
-                    o_order_id <= {i_reg_2[23:0], i_reg_3[31:24]};
-                    o_price <= 0;
-                    o_quantity <= {i_reg_3[7:0], i_reg_4[31:24]};
+                    o_stock_symbol <= stock_id;
+                    o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
+                    o_order_id <= {i_reg_4[23:0], i_reg_3, i_reg_2[31:24]};
+                    o_quantity <= {i_reg_5[23:0], i_reg_4[31:24]};
+
                     o_trade_type <= 0;
-                    o_curr_time <= {i_reg_8, 32'b0};
+                    o_price <= 0
                 end
                 default: begin 
                     o_order_type <= 0;
@@ -101,7 +142,7 @@ module parser
                     o_price <= 0;
                     o_quantity <= 0;
                     o_trade_type <= 0;
-                    o_curr_time <= {i_reg_8, 32'b0};
+                    o_curr_time <= {i_reg_7, 32'b0};
                 end
             endcase
         end

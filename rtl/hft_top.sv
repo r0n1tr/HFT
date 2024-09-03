@@ -18,6 +18,7 @@ module hft_top
     input logic                          i_clk,
     input logic                          i_reset_n,
     input logic                          i_book_is_busy,
+    input logic [REG_WIDTH - 1 : 0]      i_reg_0,
     input logic [REG_WIDTH - 1 : 0]      i_reg_1,
     input logic [REG_WIDTH - 1 : 0]      i_reg_2,
     input logic [REG_WIDTH - 1 : 0]      i_reg_3,
@@ -48,11 +49,14 @@ module hft_top
     logic                                itnl_trade_type;
     logic [FP_WORD_SIZE - 1 : 0]         itnl_curr_time;
     logic                                itnl_valid;
+
             
     logic [31:0]                         itnl_best_bid;
     logic [31:0]                         itnl_best_ask;
     logic                                itnl_book_is_busy; // can only read from the book (from trading logic) when book is not busy
     logic                                itnl_data_valid;
+    logic                                itnl_locate_code;
+    logic                                itnl_tracking_number;
             
             
     // trading logic internal signals
@@ -76,6 +80,7 @@ module hft_top
     parser parser (
         .i_clk(i_clk),
         .i_book_is_busy(),
+        .i_reg_0(i_reg_0),
         .i_reg_1(i_reg_1),
         .i_reg_2(i_reg_2),
         .i_reg_3(i_reg_3),
@@ -92,6 +97,8 @@ module hft_top
         .o_order_type(itnl_order_type),
         .o_trade_type(itnl_trade_type),
         .o_curr_time(intl_parser_curr_time),
+        .o_locate_code(itnl_locate_code),
+        .o_tracking_number(itnl_tracking_number),
         .o_valid(itnl_valid)
     );
 
