@@ -183,8 +183,12 @@ module hft_top
         .i_order_id(itnl_order_id),
         .i_quantity(itnl_order_filter), // floored quantity value 
         .i_trade_type(itnl_trade_type),
+        .i_locate_code(itnl_locate_code),
+        .i_tracking_number(itnl_tracking_number),
+        .i_timestamp(itnl_curr_time),
         .i_book_is_busy(itnl_book_is_busy),
         .i_data_valid(itnl_data_valid),
+
 
         .o_reg_0_b(o_reg_0_b),
         .o_reg_1_b(o_reg_1_b),
