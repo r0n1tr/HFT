@@ -35,6 +35,7 @@ module trading_logic
     logic [FP_WORD_SIZE - 1 : 0]                    w_ref_price;
     logic                                           w_ref_price_valid;
 
+
     volatility 
     #(
         .DATA_WIDTH(DATA_WIDTH),

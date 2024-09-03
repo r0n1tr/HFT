@@ -40,7 +40,7 @@ module reverse_parser
 
 );
 
-    logic [29:0] counter;
+    logic [61:0] counter = 0; 
     logic [63:0] stock_id;
 
     typedef enum logic [1:0] { 
@@ -81,17 +81,17 @@ module reverse_parser
             o_reg_1_s <= {i_timestamp[24:0], i_tracking_number[15:8]};
 
             //timestamp -- need to figure out how to do realtime 
-            o_reg_2_b <= {{i_order_id[7:0]}, {i_timestamp[47:24]}};
-            o_reg_2_s <= {{i_order_id[7:0]}, {i_timestamp[47:24]}}; 
+            o_reg_2_b <= {{counter[7:0]}, {i_timestamp[47:24]}};
+            o_reg_2_s <= {{counter[7:0]}, {i_timestamp[47:24]}}; 
             //order number
-            o_reg_3_b <= {2'b00, counter};
-            o_reg_3_s <= {2'b01, counter};
-            counter <= counter + 1; 
+            o_reg_3_b <= {counter[39:8]};
+            o_reg_3_s <= {counter[39:8]};
 
             // quantity/shares
-            o_reg_4_b <= {{i_trade_type}, i_order_id[63:40]};
-            o_reg_4_s <= {{i_trade_type}, i_order_id[63:40]};
+            o_reg_4_b <= {7'b0, i_trade_type, 2'b00, counter[61:40]};
+            o_reg_4_s <= {7'b0, i_trade_type, 2'b01, counter[61:40]};
 
+            counter <= counter + 1; 
             //stock symbol
             o_reg_5_b <= i_quantity;
             o_reg_5_s <= i_quantity;

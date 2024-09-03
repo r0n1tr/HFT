@@ -48,6 +48,7 @@ module hft_top_wrapper
 
     hft_top hft_top (
         .i_clk(i_clk),
+        .i_reset_n(i_reset_n),
         .i_reg_0(i_reg_0),
         .i_reg_1(i_reg_1),
         .i_reg_2(i_reg_2),

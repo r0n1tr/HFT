@@ -516,6 +516,7 @@ module order_book
         // curr_state <= next_state;
         curr_state <= IDLE;
         found <= 0;
+        which_book <= 0;
         case(curr_state)
             IDLE: begin //0
                 if(i_data_valid) begin
@@ -575,7 +576,7 @@ module order_book
                     /* verilator lint_off WIDTH */
                     cancel_register <= (i_stock_id * BOOK_DEPTH) + ((search_pointer));
                     /* verilator lint_on WIDTH */
-                    which_book <= 1;
+                    which_book <= 0;
                     curr_state <= SHIFT_BOOK;
                     search_pointer <= 0;
                     num_trades_bid[i_stock_id] <= (num_trades_bid[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_bid[i_stock_id] - 1);
@@ -585,7 +586,7 @@ module order_book
                     /* verilator lint_off WIDTH */
                     cancel_register <= (i_stock_id * BOOK_DEPTH) + ((search_pointer));
                     /* verilator lint_on WIDTH */
-                    which_book <= 0;
+                    which_book <= 1;
                     curr_state <= SHIFT_BOOK;
                     search_pointer <= 0;
                     num_trades_ask[i_stock_id] <= (num_trades_ask[i_stock_id] == 0) ? (BOOK_DEPTH - 1) : (num_trades_ask[i_stock_id] - 1);
@@ -617,7 +618,7 @@ module order_book
                 if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
                     order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] - i_quantity;                    
                     if(order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] == i_quantity) begin
-                        which_book <= 1;
+                        which_book <= 0;
                         /* verilator lint_off WIDTH */
                         cancel_register <= (i_stock_id * BOOK_DEPTH) + search_pointer;
                         /* verilator lint_on WIDTH */
@@ -632,7 +633,7 @@ module order_book
                 if (order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
                     order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] <= order_book_memory_ask[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] - i_quantity;
                     if(order_book_memory_ask[(i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] == i_quantity) begin
-                        which_book <= 0;
+                        which_book <= 1;
                         /* verilator lint_off WIDTH */
                         cancel_register <= (i_stock_id * BOOK_DEPTH) + search_pointer;
                         /* verilator lint_on WIDTH */
@@ -656,7 +657,7 @@ module order_book
             end
             SHIFT_BOOK: begin //4
 
-                if(which_book) begin
+                if(~which_book) begin
                     if ((cancel_register-(i_stock_id*BOOK_DEPTH)) < BOOK_DEPTH-1) begin // counter = cancelled trade number 
                         order_book_memory_bid[3*cancel_register] <= order_book_memory_bid[(3*cancel_register)+3];
                         order_book_memory_bid[(3*cancel_register)+1] <= order_book_memory_bid[(3*cancel_register)+4];
@@ -793,18 +794,24 @@ module order_book
             FINISH: begin
                 o_data_valid <= 1;
                 o_book_is_busy <= 0;
-                curr_state <= i_trading_logic_ready ? IDLE : FINISH;
+                // curr_state <= i_trading_logic_ready ? IDLE : FINISH;
+                curr_state <= IDLE;
                 search_pointer <= 0;
                 temp_min_price <= 32'b11111111111111111111111111111111;
                 o_execute_order <= reg_execute_order ? 1 : 0;
                 reg_execute_order <= 0;
                 o_curr_time <= i_curr_time;
-                o_trade_type <= ~which_book;
+                o_trade_type <= which_book;
             end 
             // default: next_state <= curr_state; 
         endcase
      end
 
+    logic [31:0] tmp;
+
+    always_comb begin 
+        tmp = best_bid_cache[0];
+    end
     always_ff @(posedge i_clk) begin
         o_best_bid <= best_bid_cache[(i_stock_id*3)+1];
         o_best_ask <= best_ask_cache[(i_stock_id*3)+1];

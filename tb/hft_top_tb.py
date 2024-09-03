@@ -54,6 +54,11 @@ async def hft_top_test(dut):
     dut._log.info("Input ITCH order:: %s", input)
     cocotb.start_soon(initialize_inputs(dut, input))
 
+    await RisingEdge(dut.i_clk)
+    await RisingEdge(dut.i_clk)
+    cocotb.start_soon(toggle_reset(dut))
+    await RisingEdge(dut.i_clk)
+
     hardware_outputs = [
         dut.o_reg_0_b.value,
         dut.o_reg_1_b.value,
