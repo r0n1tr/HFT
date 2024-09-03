@@ -12,7 +12,7 @@ SHAPE_PARAMETER = 0.05
 #     8       88-151:     reg4[23:0] reg3[31:0] reg2[31:24]   64              Order ID
 #     1       152-159:    reg4[31:24]                         8               Buy or sell indicator - 0 or 1
 #     4       160-191:    reg5[31:0]                          32              Number of shares / order quantity
-#     8       192-255:    reg6[31:0] reg7[31:0]               64              Stock ID
+#     8       192-255:    reg7[31:0] reg6[31:0]               64              Stock ID
 #     4       255-287:    reg8[31:0]                          32              Price
 
 
@@ -103,7 +103,7 @@ def parse(ITCH_data):
         order_book_inputs.append(price)
         order_book_inputs.append(order_type)
         order_book_inputs.append(final_time)
-        print(f"order_id: {bin(order_id)}")
+        # print(f"order_id: {bin(order_id)}")
 
         return order_book_inputs, locate_code, final_time
 
@@ -182,8 +182,10 @@ class MarketMakingModel:
             sum = sum + self.volatility_buffers[stock_id][i]
             square_sum = square_sum + (self.volatility_buffers[stock_id][i]*self.volatility_buffers[stock_id][i])
         
+        # print(f"volatility buffer: {self.volatility_buffers[stock_id]}")
         variance = square_sum/BUFFER_SIZE - ((sum/BUFFER_SIZE)*(sum/BUFFER_SIZE))
-        return variance
+        
+        return max(0, variance)
     
     def calculate_bid_and_ask_prices(self, timestamp, best_bid, best_ask, stock_id, inventory_state):
         if best_ask == 0:
@@ -199,11 +201,16 @@ class MarketMakingModel:
         # print(f"VOLATILITY FROM MARKET_MAKER: {volatility}")
         # Spread
         # print(f"timestamp: {timestamp}")
+        volatility = volatility * 0.001
         spread = 0.125 * volatility * timestamp
+        # print(f"spread: {spread}")
         # print(f"volatilty: {volatility}" ) 
 
-        # Ref Price 
+        # Ref Price
+        # print(f"current price: {curr_price}")
+        # print(f"inventory_state: {inventory_state}")
         ref_price = curr_price - (inventory_state * 0.125 * volatility * timestamp)
+        # print(f"ref_price: {ref_price}")
         # print(f"inventory_state: {inventory_state}")
         # print(f"timestamp: {timestamp}")
         # Quote Price

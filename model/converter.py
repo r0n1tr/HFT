@@ -34,16 +34,16 @@ def itch_to_readable(ITCH_data):
 
         internal_tracking_number_half_1 = (reg_0 >> 24) & 0xFF
         internal_tracking_number_half_2 = reg_1 & 0xFF
-        internal_tracking_number = (internal_tracking_number_half_1 << 8) | internal_tracking_number_half_2
+        internal_tracking_number = (internal_tracking_number_half_2 << 8) | internal_tracking_number_half_1
 
         timestamp_1 = (reg_1 >> 8) & 0xFFFFFF
         timestamp_2 = (reg_2) & 0xFFFFFF
-        final_time = (timestamp_2 << 24 ) +  timestamp_1 
+        final_time = (timestamp_2 << 24 ) | timestamp_1 
        
         order_id_1 = (reg_2 >> 24) & 0xFF
         order_id_2 = reg_3
-        order_id_3 = (reg_4) & 0xFFF
-        order_id = (order_id_1 << 56) | (order_id_2 << 24) | order_id_3
+        order_id_3 = (reg_4) & 0xFFFFFF
+        order_id = (order_id_3 << 40) | (order_id_2 << 8) | (order_id_1)
 
         if order_type == "ADD":
             buy_or_sell = (reg_4 >> 24) & 0xFF
@@ -63,7 +63,7 @@ def itch_to_readable(ITCH_data):
             shares = None
         
         if order_type == "ADD":
-            stock_id = (reg_7 << 32) + reg_6
+            stock_id = (reg_7 << 32) | reg_6
         elif order_type == "EXECUTE":
             stock_id = (reg_6 << 8) + ((reg_5 >> 24) & 0xFF) + ((reg_7 & 0xFFFFFF) << 40)
         else:
@@ -123,26 +123,26 @@ def readable_to_ITCH(order_book_inputs, locate_code, internal_tracking_number):
     # Extract locate_code from order_id (similar to original function)
     
 
-    internal_tracking_number_half_2 = internal_tracking_number & 0xFF
-    internal_tracking_number_half_1 = (internal_tracking_number >> 8) & 0xFFFF
+    internal_tracking_number_half_1 = internal_tracking_number & 0xFF
+    internal_tracking_number_half_2 = (internal_tracking_number >> 8) & 0xFF
     # Handle locate_code and internal_tracking_number
     # print(type(locate_code))
     reg_0 = ((internal_tracking_number_half_1 & 0xFF) << 24) | ((locate_code & 0xFFFF) << 8) | (order_type_value & 0xFF)
     # reg_0 = (internal_tracking_number_half_1 << 24) | (locate_code << 8) | order_type_value
     temp = (final_time) & 0xFFFFFF
-    reg_1 = ((internal_tracking_number_half_1) & 0xFF) | (temp << 8)
-    reg_2 = (final_time & 0xFFFFFF) | ((order_id >> 56) << 24)
+    reg_1 = ((internal_tracking_number_half_2) & 0xFF) | (temp << 8)
+    reg_2 = ((final_time >> 24) & 0xFFFFFF) | ((order_id & 0xFF) << 24)
     
-    reg_3 = (order_id >> 24) & 0xFFFFFFFF
+    reg_3 = (order_id >> 8) & 0xFFFFFFFF
     # print(f"order_id: {bin(order_id)}")
     # print(f"reg_3: {bin(reg_3)}")
-    buffer = order_id & 0xFFFFFF
-    reg_4 = 0
+    buffer = (order_id >> 40) & 0xFFFFFF
+    
     if order_type == "ADD":
         if(buy_or_sell == "buy"):
-            reg_4 = (0 << 24) | buffer
+            reg_4 = ((0 << 24)) | buffer
         else:
-            reg_4 = ((1 << 24) - 1) | buffer
+            reg_4 = ((1 << 24)) | buffer
     
         reg_5 = shares
         reg_6 = stock_id & 0xFFFFFFFF
@@ -180,3 +180,4 @@ def readable_to_ITCH(order_book_inputs, locate_code, internal_tracking_number):
 # print(f"final: {final_vector}")
 
 
+# print(bin(0 << 24))

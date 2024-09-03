@@ -266,36 +266,36 @@ class Exchange:
     def generate_order_type(self, stock_id):
         order_types = ["ADD", "EXECUTE", "CANCEL"]
         if stock_id == 0:
-            print(f"LENGTH0: {len(self.order_book_0)}")
+            # print(f"LENGTH0: {len(self.order_book_0)}")
             if(len(self.order_book_0) < 10):
                 order_type = "ADD"
             else:
                 order_type = random.choice(order_types)
-            print(order_type)
+            # print(order_type)
             return order_type
         elif stock_id == 1:
-            print(f"LENGTH1: {len(self.order_book_1)}")
+            # print(f"LENGTH1: {len(self.order_book_1)}")
             if(len(self.order_book_1) < 10):
                 order_type = "ADD"
             else:
                 order_type = random.choice(order_types)
-            print(order_type)
+            # print(order_type)
             return order_type
         elif stock_id == 2:
-            print(f"LENGTH2: {len(self.order_book_2)}")
+            # print(f"LENGTH2: {len(self.order_book_2)}")
             if(len(self.order_book_2) < 10):
                 order_type = "ADD"
             else:
                 order_type = random.choice(order_types)
-            print(order_type)
+            # print(order_type)
             return order_type
         elif stock_id == 3:
-            print(f"LENGTH3: {len(self.order_book_3)}")
+            # print(f"LENGTH3: {len(self.order_book_3)}")
             if(len(self.order_book_3) < 10):
                 order_type = "ADD"
             else:
                 order_type = random.choice(order_types)
-            print(order_type)
+            # print(order_type)
             return order_type
         else:
             raise ValueError(f"Unexpected stock_id value: {stock_id}, expected values between 0-3")
