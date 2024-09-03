@@ -47,12 +47,12 @@ def gen_order():
     num = random.randint(0,3)
     return (my_exchange.generate_ITCH_order(num, printing=False, integer_output=True))
 
-def test():
+def test(input_vector):
 
     for i in range (15000):
         print(f"\nCounter: {i}")
         
-        input_vector = gen_order()
+        # input_vector = gen_order()
         print(f"{input_vector}")
         
         buy_order, sell_order = my_model.quote_orders(input_vector)

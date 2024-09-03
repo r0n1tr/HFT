@@ -9,20 +9,19 @@ import math
 from cocotb.triggers import Timer, RisingEdge
 from cocotb.clock import Clock
 from exchange import Exchange
-from test import test
+from market_maker import MarketMakingModel
+from converter import itch_to_readable
 
 my_exchange = Exchange()
+my_market_maker = MarketMakingModel()
 def generate_orders():
     num = random.randint(0,3)
     input_vector = (my_exchange.generate_ITCH_order(num, printing=False, integer_output=True))
     # print(f"{input_vector}")
     return input_vector
 
-def verify_outputs(dut, hardware_outputs):
-    expected_outputs_b, expected_outputs_s = test()
-    print(f"Simulated Outputs for Buy: {expected_outputs_b}")
-    print(f"Simulated Outputs for Sell: {expected_outputs_s}")
-    print(f"Hardware Outputs:  {hardware_outputs}")
+
+
 
 async def initialize_inputs(dut, inputs):
     dut.i_reg_0.value = inputs[8]
@@ -44,44 +43,65 @@ async def toggle_reset(dut):
 
 @cocotb.test()
 async def hft_top_test(dut):
-    
 
-    # Clock Generation
     dut.i_reset_n.value = 1
     cocotb.start_soon(Clock(dut.i_clk, 10, "ns").start())
     cocotb.start_soon(toggle_reset(dut))
-    input = generate_orders()
-    dut._log.info("Input ITCH order:: %s", input)
-    cocotb.start_soon(initialize_inputs(dut, input))
 
     await RisingEdge(dut.i_clk)
     await RisingEdge(dut.i_clk)
     cocotb.start_soon(toggle_reset(dut))
     await RisingEdge(dut.i_clk)
+    dut._log.info(type(dut.o_valid.value))
 
-    hardware_outputs = [
-        dut.o_reg_0_b.value,
-        dut.o_reg_1_b.value,
-        dut.o_reg_2_b.value,
-        dut.o_reg_3_b.value,
-        dut.o_reg_4_b.value,
-        dut.o_reg_5_b.value,
-        dut.o_reg_6_b.value,
-        dut.o_reg_7_b.value,
-        dut.o_reg_8_b.value,
-        dut.o_reg_0_s.value,
-        dut.o_reg_1_s.value,
-        dut.o_reg_2_s.value,
-        dut.o_reg_3_s.value,
-        dut.o_reg_4_s.value,
-        dut.o_reg_5_s.value,
-        dut.o_reg_6_s.value,
-        dut.o_reg_7_s.value,
-        dut.o_reg_8_s.value,
-    ]
-    # verify_outputs(dut, hardware_outputs)
-    for _ in range(20):
-        await RisingEdge(dut.i_clk)
+    for i in range(300):
+        stock = random.randint(0,3)
+        input_order = my_exchange.generate_ITCH_order(stock, printing=False, integer_output=True)
+        buy_order, sell_order = my_market_maker.quote_orders(input_order)
+
+        dut._log.info("Input ITCH order:: %s", input_order)
+        cocotb.start_soon(initialize_inputs(dut, input_order))
+        for _ in range(8):
+            await RisingEdge(dut.i_clk)
+
+        await Timer(0.1, units="ns")
+
+        hardware_outputs = [
+            dut.o_reg_8_b.value,
+            dut.o_reg_7_b.value,
+            dut.o_reg_6_b.value,
+            dut.o_reg_5_b.value,
+            dut.o_reg_4_b.value,
+            dut.o_reg_3_b.value,
+            dut.o_reg_2_b.value,
+            dut.o_reg_1_b.value,
+            dut.o_reg_0_b.value,
+
+            dut.o_reg_8_s.value,
+            dut.o_reg_7_s.value,
+            dut.o_reg_6_s.value,
+            dut.o_reg_5_s.value,
+            dut.o_reg_4_s.value,
+            dut.o_reg_3_s.value,
+            dut.o_reg_2_s.value,
+            dut.o_reg_1_s.value,
+            dut.o_reg_0_s.value,
+        ]
+        # dut._log.info("BUY ORDER RECEIVED: %s", hardware_outputs[:9])
+        dut._log.info("BUY ORDER EXPECTED: %s", buy_order)
+        dut._log.info(f"Buy Readable: {itch_to_readable(hardware_outputs[:9])}")
+        
+        # dut._log.info("SELL ORDER RECEIVED: %s", hardware_outputs[-9:])
+        dut._log.info("SELL ORDER EXPECTED: %s", sell_order)
+        dut._log.info(f"Sell Readable: {itch_to_readable(hardware_outputs[-9:])}\n")
+
+
+        for _ in range(20):
+            await RisingEdge(dut.i_clk)
+    
+
+    # Clock Generation
+    
 
     
 

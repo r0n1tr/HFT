@@ -72,7 +72,7 @@ module trading_logic
         .i_volatility(w_volatility),
         .i_data_valid(w_volatility_valid),
         .i_logarithm(64'b0),
-        .i_risk_factor(64'h0000_0000_2000_0000), // 0.125
+        .i_risk_factor(64'd536871), // 0.125 * 0.001
         .o_spread(w_spread),
         .o_data_valid(w_spread_valid)
     );

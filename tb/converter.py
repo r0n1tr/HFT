@@ -11,10 +11,10 @@ def itch_to_readable(ITCH_data):
         reg_2 = ITCH_data[6]
         reg_3 = ITCH_data[5]
         reg_4 = ITCH_data[4]
-        reg_5 = ITCH_data[3]
+        reg_5 = int(ITCH_data[3])
         reg_6 = ITCH_data[2]
         reg_7 = ITCH_data[1]
-        reg_8 = ITCH_data[0]
+        reg_8 = int(ITCH_data[0])
 
         order_book_inputs = []
         
