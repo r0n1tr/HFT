@@ -75,7 +75,7 @@ module hft_top
             
     // trading logic internal signals
     logic                                itnl_trading_logic_ready;
-    logic [FP_WORD_SIZE - 1 : 0]         itnl_inventory_state;
+    // logic [FP_WORD_SIZE - 1 : 0]         itnl_inventory_state;
     logic [DATA_WIDTH - 1 : 0]           itnl_buy_price;
     logic [DATA_WIDTH - 1 : 0]           itnl_sell_price;
 
@@ -146,7 +146,7 @@ module hft_top
         .i_best_ask(itnl_best_ask),
         .i_best_bid(itnl_best_bid),
         .i_curr_time(itnl_curr_time),
-        .i_inventory_state(itnl_inventory_state),
+        .i_inventory_state(itnl_norm_inventory),
         .i_data_valid(order_book_itnl_data_valid),
         .i_stock_id(itnl_stock_id),
 

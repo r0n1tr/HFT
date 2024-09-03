@@ -190,7 +190,7 @@ module order_book
     logic [31:0] test_index;
     logic found;
 
-    logic reg_execute_order;
+    logic reg_execute_order = 0;
 
     logic [1:0] reg_order_type;
 
