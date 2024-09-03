@@ -70,6 +70,13 @@ class OrderBook:
             else:
                 pass
         
+        if(0 <= order_id <= 1073741823):
+            self.execute_order_side = "buy"
+        elif(1073741824 <= order_id <= 2147483647):
+            self.execute_order_side = "sell"
+        else:
+            self.execute_order_side = None
+
         if (not found):
             return
         else:

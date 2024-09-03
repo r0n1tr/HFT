@@ -8,17 +8,21 @@ order_ids = []
 
 def generate_order_id():
     while True:
-        number = random.randint(536870912, 4294967295)
+        number = random.randint(2147483648, 4294967295)
         if number not in order_ids:
             order_ids.append(number)
             return number
 
 own_order_ids = []
-def generate_own_order_id():
-    while True:
-        number = random.randint(0, 536870911)
-        own_order_ids.append(number)
-        return number
+def generate_own_order_id(trade_type):
+    while True: 
+        if(trade_type == "buy"):
+            number = random.randint(0, 1073741823)
+        else:
+            number = random.randint(1073741824, 2147483647)
+        if number not in own_order_ids:
+            own_order_ids.append(number)
+            return number
 
 
 def generate_timestamp():

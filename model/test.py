@@ -46,7 +46,7 @@ def update_order_counts(stock_id, buy_count_map, sell_count_map, buy_state):
 #     # print(len(my_exchange.generate_ITCH_order(num, hex_output=True, printing=True)))
 #     num = random.randint(0,3)
 #     (my_exchange.generate_ITCH_order(num, integer_output=True, printing=True))
-for i in range (1500):
+for i in range (15000):
     print(f"\nCounter: {i}")
     num = random.randint(0,3)
     input_vector = (my_exchange.generate_ITCH_order(num, printing=False, integer_output=True))

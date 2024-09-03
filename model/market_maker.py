@@ -2,7 +2,7 @@ from order_book import OrderBook
 import math
 from exchange import generate_own_order_id, generate_timestamp
 from converter import itch_to_readable
-SHAPE_PARAMETER = 0.05 
+SHAPE_PARAMETER = 0.5 
 # Bytes:      Bits:       reg:                                Bitreglength    Message:
 #     1       0-7:        reg0[7:0]                           8               "A" for add order 
 #     2       8-23:       reg0[23:8]                          16              Locate code identifying the security - a random number associated with a specific stock, new every day
@@ -159,8 +159,8 @@ class MarketMakingModel:
         
         timestamp_new = generate_timestamp()
         # output orders
-        unique_id = generate_own_order_id()
-        unique_id_2 = generate_own_order_id()
+        unique_id = generate_own_order_id(trade_type)
+        unique_id_2 = generate_own_order_id(trade_type)
         # print(unique_id)    
         buy_order_info = [ timestamp_new, unique_id, stock_id, "buy", order_quantity, quote_bid] # unique buy order_id
         sell_order_info = [ timestamp_new, unique_id_2, stock_id, "sell",  order_quantity, quote_ask] # unique sell order_id
@@ -228,7 +228,7 @@ class MarketMakingModel:
     
     def update_inventory(self, order_id, stock_id, quantity, order_side):
         MAX_INVENTORY_SIZE = 10000
-        if(order_id <= 536870912):
+        if order_side == None:
             return
         else:
             if order_side.upper() == "BUY":
@@ -236,10 +236,9 @@ class MarketMakingModel:
             elif order_side.upper() == "SELL":
                 multiplier = -1
             else:
-                # didn't find the order - do nothing to inventory
                 multiplier = 0
 
-            self.inventory[stock_id] = self.inventory[stock_id] + (multiplier*quantity)/MAX_INVENTORY_SIZE
+        self.inventory[stock_id] = self.inventory[stock_id] + (multiplier*quantity)/MAX_INVENTORY_SIZE
 
         return self.inventory[stock_id]
 
