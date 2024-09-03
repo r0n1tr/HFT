@@ -1,4 +1,5 @@
 `include "../rtl/hft_top.sv"
+
 `timescale 1ns/1ps
 
 module hft_top_wrapper

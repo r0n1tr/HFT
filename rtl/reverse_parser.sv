@@ -69,8 +69,8 @@ module reverse_parser
 
     always_ff @(posedge i_clk) begin
 
-        if(!i_data_valid) begin
-            o_valid <= 0;
+        if(i_data_valid) begin
+            o_valid <= 1;
             // order_type
             o_reg_0_b <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
             o_reg_0_s <=  {i_tracking_number[7:0], i_locate_code, 8'h41};

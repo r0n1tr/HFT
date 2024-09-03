@@ -514,6 +514,7 @@ module order_book
         o_book_is_busy <= 1; 
         o_execute_order <= 0;
         // curr_state <= next_state;
+        curr_state <= IDLE;
         found <= 0;
         case(curr_state)
             IDLE: begin //0
