@@ -6,7 +6,7 @@ module order_quantity
    input logic signed [63:0] i_inventory_state,
    
    output logic [63:0] o_order_out,
-   output logic [32:0] o_order_filter
+   output logic [31:0] o_order_filter
 );
 
    localparam shape_parameter = 0.005;

@@ -28,13 +28,26 @@ module hft_top
     input logic [REG_WIDTH - 1 : 0]      i_reg_7,
     input logic [REG_WIDTH - 1 : 0]      i_reg_8,
 
-    output logic [REG_WIDTH - 1 : 0]     o_reg_1,
-    output logic [REG_WIDTH - 1 : 0]     o_reg_2,
-    output logic [REG_WIDTH - 1 : 0]     o_reg_3,
-    output logic [REG_WIDTH - 1 : 0]     o_reg_4,
-    output logic [REG_WIDTH - 1 : 0]     o_reg_5,
-    output logic [REG_WIDTH - 1 : 0]     o_reg_6,
-    output logic [REG_WIDTH - 1 : 0]     o_reg_7,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_0_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_1_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_2_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_3_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_4_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_5_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_6_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_7_b,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_8_b,
+
+     
+    output logic [REG_WIDTH - 1 : 0]     o_reg_0_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_1_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_2_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_3_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_4_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_5_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_6_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_7_s,
+    output logic [REG_WIDTH - 1 : 0]     o_reg_8_s,
     output logic                         o_valid
 
 
@@ -49,14 +62,15 @@ module hft_top
     logic                                itnl_trade_type;
     logic [FP_WORD_SIZE - 1 : 0]         itnl_curr_time;
     logic                                itnl_valid;
+    logic [1:0]                          itnl_stock_id;
 
             
     logic [31:0]                         itnl_best_bid;
     logic [31:0]                         itnl_best_ask;
     logic                                itnl_book_is_busy; // can only read from the book (from trading logic) when book is not busy
     logic                                itnl_data_valid;
-    logic                                itnl_locate_code;
-    logic                                itnl_tracking_number;
+    logic [15:0]                               itnl_locate_code;
+    logic [15:0]                               itnl_tracking_number;
             
             
     // trading logic internal signals
@@ -75,11 +89,11 @@ module hft_top
 
     // order_quantity internal signals
     logic [63:0] itnl_order_out;
-    logic [32:0] itnl_order_filter;
+    logic [31:0] itnl_order_filter;
 
     parser parser (
         .i_clk(i_clk),
-        .i_book_is_busy(),
+        .i_book_is_busy(itnl_book_is_busy),
         .i_reg_0(i_reg_0),
         .i_reg_1(i_reg_1),
         .i_reg_2(i_reg_2),
@@ -166,19 +180,31 @@ module hft_top
         .i_stock_symbol(itnl_stock_id),
         .i_buy_price(itnl_buy_price),
         .i_sell_price(itnl_sell_price),
+        .i_order_id(itnl_order_id),
         .i_quantity(itnl_order_filter), // floored quantity value 
         .i_trade_type(itnl_trade_type),
         .i_book_is_busy(itnl_book_is_busy),
         .i_data_valid(itnl_data_valid),
 
-        .o_reg_1(o_reg_1),
-        .o_reg_2(o_reg_2),
-        .o_reg_3(o_reg_3),
-        .o_reg_4(o_reg_4),
-        .o_reg_5(o_reg_5),
-        .o_reg_6(o_reg_6),
-        .o_reg_7(o_reg_7),
-        // .o_reg_8(o_reg_8),
+        .o_reg_0_b(o_reg_0_b),
+        .o_reg_1_b(o_reg_1_b),
+        .o_reg_2_b(o_reg_2_b),
+        .o_reg_3_b(o_reg_3_b),
+        .o_reg_4_b(o_reg_4_b),
+        .o_reg_5_b(o_reg_5_b),
+        .o_reg_6_b(o_reg_6_b),
+        .o_reg_7_b(o_reg_7_b),
+        .o_reg_8_b(o_reg_8_b),
+
+        .o_reg_0_s(o_reg_0_s),
+        .o_reg_1_s(o_reg_1_s),
+        .o_reg_2_s(o_reg_2_s),
+        .o_reg_3_s(o_reg_3_s),
+        .o_reg_4_s(o_reg_4_s),
+        .o_reg_5_s(o_reg_5_s),
+        .o_reg_6_s(o_reg_6_s),
+        .o_reg_7_s(o_reg_7_s),
+        .o_reg_8_s(o_reg_8_s),
         .o_valid(o_valid)
     );
 

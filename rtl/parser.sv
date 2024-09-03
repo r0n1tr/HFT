@@ -54,10 +54,10 @@ module parser
     output logic [1:0]                  o_stock_symbol,
     output logic [REG_WIDTH - 1 : 0]    o_order_id,
     output logic [REG_WIDTH - 1 : 0]    o_price,
-    output logic [REG_WIDTH - 1 : 0]                 o_quantity,
+    output logic [REG_WIDTH - 1 : 0]    o_quantity,
     output logic [1:0]                  o_order_type,
     output logic                        o_trade_type,
-    output logic [48 - 1 : 0] o_curr_time,
+    output logic [63 : 0]               o_curr_time,
     output logic [15:0]                 o_locate_code,
     output logic [15:0]                 o_tracking_number,
     output logic                        o_valid
@@ -86,16 +86,16 @@ module parser
     always_comb begin
         case(i_reg_0[7:0])
             8'h41:
-                i_stock_id <= {i_reg_7, i_reg_6};
+                i_stock_id = {i_reg_7, i_reg_6};
             8'h58:
-                i_stock_id <= {i_reg_6[23:0], i_reg_5, i_reg_4[31:24]};
+                i_stock_id = {i_reg_6[23:0], i_reg_5, i_reg_4[31:24]};
             8'h45:
-                i_stock_id <= {i_reg_7[23:0], i_reg_6[31:0], i_reg_5[31:24]};
+                i_stock_id = {i_reg_7[23:0], i_reg_6[31:0], i_reg_5[31:24]};
             default:
-                i_stock_id <= 0
+                i_stock_id = 64'b0;
         endcase
         o_locate_code = i_reg_0[23:8];
-        o_tracking_number = {i_reg_1[7:0], i_reg_0[31:24]}
+        o_tracking_number = {i_reg_1[7:0], i_reg_0[31:24]};
     end
 
     logic [1:0] stock_id;
@@ -133,7 +133,7 @@ module parser
                     o_quantity <= {i_reg_5[23:0], i_reg_4[31:24]};
 
                     o_trade_type <= 0;
-                    o_price <= 0
+                    o_price <= 0;
                 end
                 default: begin 
                     o_order_type <= 0;
@@ -142,7 +142,7 @@ module parser
                     o_price <= 0;
                     o_quantity <= 0;
                     o_trade_type <= 0;
-                    o_curr_time <= {i_reg_7, 32'b0};
+                    o_curr_time <= 48'b0;
                 end
             endcase
         end
