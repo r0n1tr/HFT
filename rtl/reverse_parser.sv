@@ -77,10 +77,10 @@ module reverse_parser
 
             //stock symbol
             o_reg_5 <= i_quantity;
-            o_reg_6 <= i_stock_id[]
-
+            o_reg_6 <= stock_id[31:0]
+            o_reg_7 <= stock_id[63:32]
             // price from quote price module
-            o_reg_7 <= i_trade_type ? i_buy_price : i_sell_price;
+            o_reg_ <= i_trade_type ? i_buy_price : i_sell_price;
         end
         else begin
             o_valid <= 0;
@@ -95,11 +95,11 @@ module reverse_parser
     end
     //may need to add real stock id for output, not too sure yet.
     always_comb begin
-        case(i_stock_id)
-            64'h4141504c20202020 : stock_id = AAPL;
-            64'h414d5a4e20202020 : stock_id = AMZN;
-            64'h474f4f474c202020 : stock_id = GOOGL;
-            64'h4d53465420202020 : stock_id = MSFT;
+        case(i_stock_symbol)
+            AAPL : stock_id = 64'h4141504c20202020;
+            AMZN : stock_id = 64'h414d5a4e20202020;
+            GOOGL : stock_id = 64'h474f4f474c202020; 
+            MSFT : stock_id = 64'h4d53465420202020;
         endcase
     end
 
