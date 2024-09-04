@@ -312,7 +312,7 @@ int main(int argc, char **argv, char **env)
         }
 
         else if (((i-30)%40 == 0) && (i != 30)) {
-            top->i_trading_logic_ready = 1;
+            // top->i_trading_logic_ready = 1;
             if (verifyOrderBook(top, tests[test_count].expectedOrderBook, tests[test_count].name) && verifyOutputs(top, tests[test_count].expectedOutputs, tests[test_count].name)) {
                 std::cout << GREEN << tests[test_count].name << ": passed" << RESET << std::endl;
                 pass_count++;
@@ -329,7 +329,7 @@ int main(int argc, char **argv, char **env)
         }
         else
         {
-            top->i_trading_logic_ready = 0;
+            // top->i_trading_logic_ready = 0;
             top->i_data_valid = 0;
         }
 
