@@ -108,6 +108,7 @@ module reverse_parser
         end
         else begin
             o_valid <= 0;
+            o_reg_0_b <= 0;
             o_reg_1_b <= 0;
             o_reg_2_b <= 0;
             o_reg_3_b <= 0;
@@ -115,7 +116,9 @@ module reverse_parser
             o_reg_5_b <= 0;
             o_reg_6_b <= 0;
             o_reg_7_b <= 0;
+            o_reg_8_b <= 0;
 
+            o_reg_0_s <= 0;
             o_reg_1_s <= 0;
             o_reg_2_s <= 0;
             o_reg_3_s <= 0;
@@ -123,6 +126,7 @@ module reverse_parser
             o_reg_5_s <= 0;
             o_reg_6_s <= 0;
             o_reg_7_s <= 0;
+            o_reg_8_s <= 0;
         end
     end
     //may need to add real stock id for output, not too sure yet.

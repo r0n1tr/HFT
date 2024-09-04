@@ -186,7 +186,7 @@ module order_book
     logic [REG_WIDTH - 1 : 0] temp_min_price;
     logic [REG_WIDTH - 1 : 0] temp_min_order_id; 
 
-    logic [31:0] test_index;
+    logic [31:0] test_index = 0;
     logic found;
 
     logic reg_execute_order = 0;
