@@ -9,7 +9,7 @@ module order_quantity
    output logic [31:0] o_order_filter
 );
 
-   localparam shape_parameter = 0.005;
+   logic [63:0] shape_parameter = 64'b1010001111010111000010100;
    
    logic [63:0] temp;
    logic [127:0] mult; 
