@@ -103,7 +103,7 @@ module parser
 
     always_ff @(posedge i_clk) begin
 
-        if(!i_book_is_busy && i_data_valid) begin
+        if(i_data_valid) begin
             o_valid <= 1;
             case(i_reg_0[7:0])
                 8'h41: begin
