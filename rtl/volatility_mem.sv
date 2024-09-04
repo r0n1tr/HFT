@@ -57,7 +57,7 @@ module volatility_mem
     always_ff @(posedge i_clk) begin
         if(!i_reset_n) begin
             for(int i = 0; i < NUM_STOCKS*BUFFER_SIZE; i++) begin
-                buffer[i] = 0;
+                buffer[i] <= 0;
             end
             for (int j = 0; j < NUM_STOCKS; j++) begin
                 moving_sum[j] <= 0;

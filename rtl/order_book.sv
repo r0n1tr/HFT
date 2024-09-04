@@ -487,8 +487,8 @@ module order_book
         if (!i_reset_n) begin
             temp_min_price <= 32'b11111111111111111111111111111111;
             for (int i = 0; i < BOOK_DEPTH*NUM_STOCKS*3; i++) begin
-               order_book_memory_bid[i] = 32'b0;
-               order_book_memory_ask[i] = 32'b0;
+               order_book_memory_bid[i] <= 32'b0;
+               order_book_memory_ask[i] <= 32'b0;
             end
             for(int j = 0; j < CACHE_DEPTH*NUM_STOCKS*3; j++) begin
                 best_bid_cache[j] <= 32'b0;

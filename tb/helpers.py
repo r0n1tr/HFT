@@ -33,3 +33,5 @@ def convert_fixed_point_output(fixed_point):
         decimal_value -= (1 << 32)  # Adjust for negative numbers
     
     return decimal_value
+
+print(make_fixed_point_input(0.5))

@@ -77,8 +77,8 @@ module reverse_parser
 
             //o_order_type <= ADD;
             // add order
-            o_reg_1_b <= {i_timestamp[24:0], i_tracking_number[15:8]};
-            o_reg_1_s <= {i_timestamp[24:0], i_tracking_number[15:8]};
+            o_reg_1_b <= {i_timestamp[23:0], i_tracking_number[15:8]};
+            o_reg_1_s <= {i_timestamp[23:0], i_tracking_number[15:8]};
 
             //timestamp -- need to figure out how to do realtime 
             o_reg_2_b <= {{counter[7:0]}, {i_timestamp[47:24]}};

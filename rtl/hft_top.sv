@@ -5,6 +5,7 @@
 `include "../rtl/order_quantity.sv"
 `include "../rtl/reverse_parser.sv"
 
+// verilator lint_off UNUSED
 
 module hft_top
 #(
@@ -70,9 +71,11 @@ module hft_top
     logic [31:0]                         itnl_best_ask;
     logic                                itnl_book_is_busy; // can only read from the book (from trading logic) when book is not busy
     logic                                itnl_data_valid;
-    logic [15:0]                               itnl_locate_code;
-    logic [15:0]                               itnl_tracking_number;
-            
+    logic [15:0]                         itnl_locate_code;
+    logic [15:0]                         itnl_tracking_number;
+    
+    // order book internal signals
+    logic order_book_itnl_data_valid;
             
     // trading logic internal signals
     // logic [FP_WORD_SIZE - 1 : 0]         itnl_inventory_state;
