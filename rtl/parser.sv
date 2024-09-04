@@ -88,7 +88,7 @@ module parser
         case(i_reg_0[7:0])
             8'h41:
                 i_stock_id = {i_reg_7, i_reg_6};
-            8'h58:
+            8'h44:
                 i_stock_id = {i_reg_6[23:0], i_reg_5, i_reg_4[31:24]};
             8'h45:
                 i_stock_id = {i_reg_7[23:0], i_reg_6[31:0], i_reg_5[31:24]};
@@ -116,7 +116,7 @@ module parser
                     o_quantity <= i_reg_5;
                     o_price <= {i_reg_8};
                 end
-                8'h58: begin
+                8'h44: begin
                     o_order_type <= CANCEL;
                     o_stock_symbol <= stock_id;
                     o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
