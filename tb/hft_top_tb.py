@@ -120,25 +120,59 @@ async def test_1(dut):
 
     for _ in range(8):
         await RisingEdge(dut.i_clk)
+
+    for i in range(300):
+        stock = random.randint(0,3)
+        input_order = my_exchange.generate_ITCH_order(stock, printing=False, integer_output=True)
+        buy_order, sell_order = my_market_maker.quote_orders(input_order)
+        dut.i_data_valid.value = 1
+        cocotb.start_soon(initialize_inputs(dut, input_order))
+
+        await RisingEdge(dut.i_clk)
+        dut.i_data_valid.value = 0
+
+        while True:
+            await Timer(0.1, units="ns")
+            if dut.o_valid.value == 1:
+                hardware_outputs = [
+                    dut.o_reg_8_b.value,
+                    dut.o_reg_7_b.value,
+                    dut.o_reg_6_b.value,
+                    dut.o_reg_5_b.value,
+                    dut.o_reg_4_b.value,
+                    dut.o_reg_3_b.value,
+                    dut.o_reg_2_b.value,
+                    dut.o_reg_1_b.value,
+                    dut.o_reg_0_b.value,
+
+                    dut.o_reg_8_s.value,
+                    dut.o_reg_7_s.value,
+                    dut.o_reg_6_s.value,
+                    dut.o_reg_5_s.value,
+                    dut.o_reg_4_s.value,
+                    dut.o_reg_3_s.value,
+                    dut.o_reg_2_s.value,
+                    dut.o_reg_1_s.value,
+                    dut.o_reg_0_s.value,
+                ]
+                break
+            else:
+                await RisingEdge(dut.i_clk)
+        
+        dut._log.info("Order number: %s", i)
+        dut._log.info("Input ITCH order: %s", input_order)
+        dut._log.info("Converted: %s", itch_to_readable(input_order))
+
+        
+        # dut._log.info("BUY ORDER RECEIVED: %s", hardware_outputs[:9])
+        dut._log.info("BUY ORDER EXPECTED: %s", buy_order)
+        dut._log.info(f"Buy Readable: {itch_to_readable(hardware_outputs[:9])}")
+        
+        # dut._log.info("SELL ORDER RECEIVED: %s", hardware_outputs[-9:])
+        dut._log.info("SELL ORDER EXPECTED: %s", sell_order)
+        dut._log.info(f"Sell Readable: {itch_to_readable(hardware_outputs[-9:])}\n")
     
-    stock = random.randint(0,3)
-    input_order = my_exchange.generate_ITCH_order(stock, printing=False, integer_output=True)
-    dut._log.info("Input Order: %s", itch_to_readable(input_order))
-    dut.i_data_valid.value = 1
-    cocotb.start_soon(initialize_inputs(dut, input_order))
-
-    await RisingEdge(dut.i_clk)
-    dut.i_data_valid.value = 0
-
-    while True:
-        await Timer(0.1, units="ns")
-        if dut.o_valid.value == 1:
-            break
-        else:
-            await RisingEdge(dut.i_clk)
-
-    # for _ in range(30):
-    await RisingEdge(dut.i_clk)
+        await RisingEdge(dut.i_clk)
 
 
     
