@@ -12,6 +12,7 @@ module hft_top_wrapper
 )
 (
     input logic                          i_clk,
+    input logic                          i_data_valid,
     input logic                          i_reset_n,
     input logic                          i_book_is_busy,
     input logic [REG_WIDTH - 1 : 0]      i_reg_0,
@@ -48,6 +49,7 @@ module hft_top_wrapper
 
     hft_top hft_top (
         .i_clk(i_clk),
+        .i_data_valid(i_data_valid),
         .i_reset_n(i_reset_n),
         .i_reg_0(i_reg_0),
         .i_reg_1(i_reg_1),

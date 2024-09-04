@@ -16,6 +16,7 @@ module hft_top
 )
 (
     input logic                          i_clk,
+    input logic                          i_data_valid,
     input logic                          i_reset_n,
     input logic                          i_book_is_busy,
     input logic [REG_WIDTH - 1 : 0]      i_reg_0,
@@ -93,6 +94,7 @@ module hft_top
 
     parser parser (
         .i_clk(i_clk),
+        .i_data_valid(i_data_valid),
         .i_book_is_busy(itnl_book_is_busy),
         .i_reg_0(i_reg_0),
         .i_reg_1(i_reg_1),

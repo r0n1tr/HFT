@@ -713,7 +713,7 @@ module order_book
                         end
                     end
                    
-                    o_data_valid <= 1;
+                    // o_data_valid <= 1;
                     curr_state <= FINISH;
                     o_book_is_busy <= 0;
                 end
@@ -802,6 +802,9 @@ module order_book
                 reg_execute_order <= 0;
                 o_curr_time <= i_curr_time;
                 o_trade_type <= i_order_id[30];
+                o_best_bid <= best_bid_cache[(i_stock_id*3)+1];
+                o_best_ask <= best_ask_cache[(i_stock_id*3)+1];
+                o_quantity <= i_execute_order_quantity;
             end 
             // default: next_state <= curr_state; 
         endcase
@@ -813,9 +816,9 @@ module order_book
         tmp = best_bid_cache[0];
     end
     always_ff @(posedge i_clk) begin
-        o_best_bid <= best_bid_cache[(i_stock_id*3)+1];
-        o_best_ask <= best_ask_cache[(i_stock_id*3)+1];
-        o_quantity <= i_execute_order_quantity;
+        // o_best_bid <= best_bid_cache[(i_stock_id*3)+1];
+        // o_best_ask <= best_ask_cache[(i_stock_id*3)+1];
+        // o_quantity <= i_execute_order_quantity;
     end 
 
 endmodule

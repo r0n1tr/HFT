@@ -40,6 +40,7 @@ module parser
 )
 (
     input logic                         i_clk, 
+    input logic                         i_data_valid,
     input logic                         i_book_is_busy,
     input logic [REG_WIDTH - 1 : 0]     i_reg_0, // order type - add cancel etc.
     input logic [REG_WIDTH - 1 : 0]     i_reg_1,
@@ -102,7 +103,7 @@ module parser
 
     always_ff @(posedge i_clk) begin
 
-        if(!i_book_is_busy) begin
+        if(!i_book_is_busy && i_data_valid) begin
             o_valid <= 1;
             case(i_reg_0[7:0])
                 8'h41: begin
@@ -111,7 +112,7 @@ module parser
                     o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
                     o_order_id <= {i_reg_4[23:0], i_reg_3, i_reg_2[31:24]};
 
-                    o_trade_type <= i_reg_4[31:24] ? BUY : SELL;
+                    o_trade_type <= i_reg_4[31:24] ? SELL : BUY;
                     o_quantity <= i_reg_5;
                     o_price <= {i_reg_8};
                 end
