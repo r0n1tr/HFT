@@ -28,7 +28,7 @@ def generate_own_order_id(trade_type):
 def generate_timestamp():
     current_time = time.time()
     now = datetime.datetime.now()
-    nine_thirty_am = datetime.datetime(now.year, now.month, now.day, 9, 30)
+    nine_thirty_am = datetime.datetime(now.year, now.month, now.day, 8, 30)
     nine_thirty_am_timestamp = time.mktime(nine_thirty_am.timetuple())
     seconds_since_nine_thirty = current_time - nine_thirty_am_timestamp
     return round(seconds_since_nine_thirty)

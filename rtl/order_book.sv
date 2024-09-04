@@ -647,7 +647,7 @@ module order_book
 
                 search_pointer <= search_pointer + 1;
 
-                if (i_order_id[31:29] == 0) begin
+                if (i_order_id[31] == 0) begin
                     reg_execute_order <= 1;
                 end
                 else begin
@@ -801,7 +801,7 @@ module order_book
                 o_execute_order <= reg_execute_order ? 1 : 0;
                 reg_execute_order <= 0;
                 o_curr_time <= i_curr_time;
-                o_trade_type <= which_book;
+                o_trade_type <= i_order_id[30];
             end 
             // default: next_state <= curr_state; 
         endcase
