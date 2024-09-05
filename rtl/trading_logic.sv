@@ -72,7 +72,7 @@ module trading_logic
         .i_volatility(w_volatility),
         .i_data_valid(w_volatility_valid),
         .i_logarithm(64'b0),
-        .i_risk_factor(64'd5368709), // 0.125 * 0.01
+        .i_risk_factor(64'd2684355), // 0.125 * 0.01
         .o_spread(w_spread),
         .o_data_valid(w_spread_valid)
     );
@@ -91,7 +91,7 @@ module trading_logic
         .i_inventory_state(i_inventory_state),
         .i_curr_time(i_curr_time), 
         .i_volatility(w_volatility),
-        .i_risk_factor(64'd5368709),
+        .i_risk_factor(64'd2684355),
         .i_data_valid(w_volatility_valid),
         .o_ref_price(w_ref_price),
         .o_data_valid(w_ref_price_valid)
