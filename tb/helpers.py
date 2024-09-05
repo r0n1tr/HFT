@@ -34,4 +34,4 @@ def convert_fixed_point_output(fixed_point):
     
     return decimal_value
 
-print(make_fixed_point_input(0.125*0.005))
+print(make_fixed_point_input(0.5))
