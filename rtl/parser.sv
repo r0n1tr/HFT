@@ -109,7 +109,7 @@ module parser
                 8'h41: begin
                     o_order_type <= ADD;
                     o_stock_symbol <= stock_id; 
-                    o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
+                    o_curr_time <= {i_reg_2[7:0], i_reg_1[31:8], 32'b0};
                     o_order_id <= {i_reg_4[23:0], i_reg_3, i_reg_2[31:24]};
 
                     o_trade_type <= i_reg_4[31:24] ? SELL : BUY;
@@ -119,7 +119,7 @@ module parser
                 8'h44: begin
                     o_order_type <= CANCEL;
                     o_stock_symbol <= stock_id;
-                    o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
+                    o_curr_time <= {i_reg_2[7:0], i_reg_1[31:8], 32'b0};
                     o_order_id <= {i_reg_4[23:0], i_reg_3, i_reg_2[31:24]};
                     
                     o_price <= 0;
@@ -129,7 +129,7 @@ module parser
                 8'h45: begin 
                     o_order_type <= EXECUTE;
                     o_stock_symbol <= stock_id;
-                    o_curr_time <= {i_reg_2[23:0], i_reg_1[31:8]};
+                    o_curr_time <= {i_reg_2[7:0], i_reg_1[31:8], 32'b0};
                     o_order_id <= {i_reg_4[23:0], i_reg_3, i_reg_2[31:24]};
                     o_quantity <= {i_reg_5[23:0], i_reg_4[31:24]};
 
