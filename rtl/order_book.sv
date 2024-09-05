@@ -187,7 +187,7 @@ module order_book
     logic [REG_WIDTH - 1 : 0] temp_min_order_id; 
 
     logic [31:0] test_index = 0;
-    logic found;
+    // logic found;
 
     logic reg_execute_order = 0;
 
@@ -210,7 +210,7 @@ module order_book
         FINISH              //6
     } state_t; 
 
-    state_t curr_state, next_state;
+    state_t curr_state;
 
     always_comb begin
         if(!i_trade_type) begin
@@ -516,7 +516,7 @@ module order_book
         o_execute_order <= 0;
         // curr_state <= next_state;
         // curr_state <= curr_state;
-        found <= 0;
+        // found <= 0;
         which_book <= 0;
         case(curr_state)
             IDLE: begin //0
@@ -599,7 +599,7 @@ module order_book
                 if (search_pointer == BOOK_DEPTH - 1) begin
                     if(best_bid_cache[(3*(i_stock_id*CACHE_DEPTH))+2] == i_order_id) begin
                         // execute has cancelled this order from the order book, but we have still kept it in cache, so now we need to find next best
-                        found <= 1;
+                        // found <= 1;
                         curr_state <= UPDATE_CACHE; 
                         search_pointer <= 0;
                     end 
@@ -751,7 +751,7 @@ module order_book
                     else if ((i_trade_type && (i_order_id == best_ask_cache[(i_stock_id*3) + 2]))) begin
                         test_index <= (i_stock_id * BOOK_DEPTH) + (3*search_pointer);
                         if ((order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1] <= temp_min_price) && (order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1] != 0))begin
-                            found <= 1;
+                            // found <= 1;
                             temp_min_reg1 <= order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer))];
                             temp_min_price <= order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1];
                             temp_min_order_id <= order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 2];
@@ -822,7 +822,7 @@ module order_book
                 o_best_ask <= best_ask_cache[(i_stock_id*3)+1];
                 o_quantity <= i_execute_order_quantity;
             end 
-            // default: next_state <= curr_state; 
+            default: curr_state <= IDLE; 
         endcase
      end
 
