@@ -161,8 +161,8 @@ module order_book
     logic [REG_WIDTH - 1 : 0] best_bid_cache [CACHE_DEPTH*NUM_STOCKS*3 - 1 : 0];
     logic [REG_WIDTH - 1 : 0] best_ask_cache [CACHE_DEPTH*NUM_STOCKS*3 - 1 : 0];
     // 4 stores to store prev curr prices for each stock
-    logic [REG_WIDTH - 1 : 0] curr_bid_price_cache [BOOK_DEPTH*NUM_STOCKS - 1 : 0]; //to store the previous curr price on cancellation of order.
-    logic [REG_WIDTH - 1 : 0] curr_ask_price_cache [BOOK_DEPTH*NUM_STOCKS - 1 : 0];
+    // logic [REG_WIDTH - 1 : 0] curr_bid_price_cache [BOOK_DEPTH*NUM_STOCKS - 1 : 0]; //to store the previous curr price on cancellation of order.
+    // logic [REG_WIDTH - 1 : 0] curr_ask_price_cache [BOOK_DEPTH*NUM_STOCKS - 1 : 0];
 
     // internal pointer logic, to keep track of where to write a new trade into - we will just keep this as an array, which we can index via the stock id
     localparam ADDR_WIDTH = $clog2(BOOK_DEPTH*NUM_STOCKS*3);
@@ -185,7 +185,7 @@ module order_book
     logic [REG_WIDTH - 1 : 0] temp_min_price;
     logic [REG_WIDTH - 1 : 0] temp_min_order_id; 
 
-    logic [31:0] test_index = 0;
+    // logic [31:0] test_index = 0;
     // logic found;
 
     logic reg_execute_order = 0;
@@ -495,10 +495,6 @@ module order_book
                 best_bid_cache[j] <= 32'b0;
                 best_ask_cache[j] <= 32'b0;
             end
-            for(int l = 0; l < CACHE_DEPTH*NUM_STOCKS; l++) begin
-                curr_bid_price_cache[l] <= 32'b0;
-                curr_ask_price_cache[l] <= 32'b0;
-            end
             for(int k = 0; k < NUM_STOCKS; k++) begin
                 // write_pointer_array_bid[k] <= 0;
                 // write_pointer_array_ask[k] <= 0;
@@ -555,7 +551,7 @@ module order_book
                     order_book_memory_bid[write_pointer_array_bid[i_stock_id] + 2] <= i_order_id;
                     // for wrap around
                     num_trades_bid[i_stock_id] <= (num_trades_bid[i_stock_id] + 1) % BOOK_DEPTH;
-                    curr_bid_price_cache[i_stock_id] <= i_price;
+                    // curr_bid_price_cache[i_stock_id] <= i_price;
                     
                 end else begin
                     order_book_memory_ask[write_pointer_array_ask[i_stock_id]] <= reg1;
@@ -563,7 +559,7 @@ module order_book
                     order_book_memory_ask[write_pointer_array_ask[i_stock_id] + 2] <= i_order_id;
 
                     num_trades_ask[i_stock_id] <= (num_trades_ask[i_stock_id] + 1) % BOOK_DEPTH;
-                    curr_ask_price_cache[i_stock_id] <= i_price;
+                    // curr_ask_price_cache[i_stock_id] <= i_price;
                     
                 end
                 
@@ -616,7 +612,7 @@ module order_book
             end 
             EXECUTE_ORDER: begin //3
                 // o_book_is_busy <= 1;
-                test_index <= (3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2;
+                // test_index <= (3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2;
                 if (order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer) + 2] == i_order_id) begin
                     order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)] <= order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)] - i_quantity;                    
                     if(order_book_memory_bid[(3*i_stock_id * BOOK_DEPTH) + (3*search_pointer)][15:0] == i_quantity) begin
@@ -748,7 +744,7 @@ module order_book
                     end 
                     // ask
                     else if ((i_trade_type && (i_order_id == best_ask_cache[(i_stock_id*3) + 2]))) begin
-                        test_index <= (i_stock_id * BOOK_DEPTH) + (3*search_pointer);
+                        // test_index <= (i_stock_id * BOOK_DEPTH) + (3*search_pointer);
                         if ((order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1] <= temp_min_price) && (order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer)) + 1] != 0))begin
                             // found <= 1;
                             temp_min_reg1 <= order_book_memory_ask[3*((i_stock_id * BOOK_DEPTH) + (3*search_pointer))];
