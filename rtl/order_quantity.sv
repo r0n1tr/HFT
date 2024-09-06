@@ -17,7 +17,7 @@ module order_quantity
    // Instantiate exp_lut
    exp_lut my_exp_lut (
       // .i_clk(i_clk),
-      .input_value(i_inventory_state >> 1),
+      .input_value(i_inventory_state),
       .exp_value(temp)
    );
 

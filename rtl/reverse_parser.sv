@@ -88,8 +88,8 @@ module reverse_parser
             o_reg_3_s <= {counter[39:8]};
 
             // quantity/shares
-            o_reg_4_b <= {7'b0, i_trade_type, 2'b00, counter[61:40]};
-            o_reg_4_s <= {7'b0, i_trade_type, 2'b01, counter[61:40]};
+            o_reg_4_b <= {7'b0, 1'b0, 2'b00, counter[61:40]};
+            o_reg_4_s <= {7'b0, 1'b1, 2'b01, counter[61:40]};
 
             counter <= counter + 1; 
             //stock symbol

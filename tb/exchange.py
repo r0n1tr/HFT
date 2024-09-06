@@ -14,15 +14,22 @@ def generate_order_id():
             return number
 
 own_order_ids = []
+
+foo = 0
+
 def generate_own_order_id(trade_type):
-    while True: 
-        if(trade_type == "buy"):
-            number = random.randint(0, 1073741823)
-        else:
-            number = random.randint(1073741824, 2147483647)
-        if number not in own_order_ids:
-            own_order_ids.append(number)
-            return number
+    global foo
+ 
+    if(trade_type == "buy"):
+        # number = random.randint(0, 1073741823)
+        order_id = foo
+    else:
+        # number = random.randint(1073741824, 2147483647)
+        # counter = 1073741824
+        order_id = foo + 1073741824
+    foo += 1
+    return order_id
+       
 
 
 def generate_timestamp():
