@@ -143,8 +143,8 @@ async def test_1(dut):
             dut._log.info(f"Sell Readable: {itch_to_readable(hardware_outputs[-9:])}\n")
             break
         
-    
-        await RisingEdge(dut.i_clk)
+        for _ in range(8):
+            await RisingEdge(dut.i_clk)
 
 
     

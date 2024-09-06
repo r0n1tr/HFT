@@ -189,6 +189,7 @@ module hft_top
         .i_timestamp(itnl_curr_time),
         // .i_book_is_busy(itnl_book_is_busy),
         .i_data_valid(itnl_data_valid),
+        .i_top_input_valid(i_data_valid),
 
 
         .o_reg_0_b(o_reg_0_b),

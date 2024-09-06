@@ -17,6 +17,8 @@ module reverse_parser
     input logic [15:0]                 i_tracking_number,
     input logic [47:0]                 i_timestamp,
 
+    input logic                        i_top_input_valid,
+
     output logic [REG_WIDTH - 1 : 0]     o_reg_0_b,
     output logic [REG_WIDTH - 1 : 0]     o_reg_1_b,
     output logic [REG_WIDTH - 1 : 0]     o_reg_2_b,
@@ -69,65 +71,113 @@ module reverse_parser
 
     always_ff @(posedge i_clk) begin
 
-        if(i_data_valid) begin
-            o_valid <= 1;
-            // order_type
-            o_reg_0_b <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
-            o_reg_0_s <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
+        // order_type
+        o_reg_0_b <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
+        o_reg_0_s <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
 
-            //o_order_type <= ADD;
-            // add order
-            o_reg_1_b <= {i_timestamp[23:0], i_tracking_number[15:8]};
-            o_reg_1_s <= {i_timestamp[23:0], i_tracking_number[15:8]};
+        //o_order_type <= ADD;
+        // add order
+        o_reg_1_b <= {i_timestamp[23:0], i_tracking_number[15:8]};
+        o_reg_1_s <= {i_timestamp[23:0], i_tracking_number[15:8]};
 
-            //timestamp -- need to figure out how to do realtime 
-            o_reg_2_b <= {{counter[7:0]}, {i_timestamp[47:24]}};
-            o_reg_2_s <= {{counter[7:0]}, {i_timestamp[47:24]}}; 
-            //order number
-            o_reg_3_b <= {counter[39:8]};
-            o_reg_3_s <= {counter[39:8]};
+        //timestamp -- need to figure out how to do realtime 
+        o_reg_2_b <= {{counter[7:0]}, {i_timestamp[47:24]}};
+        o_reg_2_s <= {{counter[7:0]}, {i_timestamp[47:24]}}; 
+        //order number
+        o_reg_3_b <= {counter[39:8]};
+        o_reg_3_s <= {counter[39:8]};
 
-            // quantity/shares
-            o_reg_4_b <= {7'b0, 1'b0, 2'b00, counter[61:40]};
-            o_reg_4_s <= {7'b0, 1'b1, 2'b01, counter[61:40]};
+        // quantity/shares
+        o_reg_4_b <= {7'b0, 1'b0, 2'b00, counter[61:40]};
+        o_reg_4_s <= {7'b0, 1'b1, 2'b01, counter[61:40]};
 
-            counter <= counter + 1; 
-            //stock symbol
-            o_reg_5_b <= i_quantity;
-            o_reg_5_s <= i_quantity;
+        counter <= counter + 1; 
+        //stock symbol
+        o_reg_5_b <= i_quantity;
+        o_reg_5_s <= i_quantity;
 
-            o_reg_6_b <= stock_id[31:0];
-            o_reg_6_s <= stock_id[31:0];
+        o_reg_6_b <= stock_id[31:0];
+        o_reg_6_s <= stock_id[31:0];
 
-            o_reg_7_b <= stock_id[63:32];
-            o_reg_7_s <= stock_id[63:32];
+        o_reg_7_b <= stock_id[63:32];
+        o_reg_7_s <= stock_id[63:32];
 
-            // price from quote price module
-            o_reg_8_b <= i_buy_price;
-            o_reg_8_s <= i_sell_price;
+        // price from quote price module
+        o_reg_8_b <= i_buy_price;
+        o_reg_8_s <= i_sell_price;
+
+        if (i_top_input_valid) begin
+            o_valid <= 0;
         end
         else begin
-            o_valid <= 0;
-            o_reg_0_b <= 0;
-            o_reg_1_b <= 0;
-            o_reg_2_b <= 0;
-            o_reg_3_b <= 0;
-            o_reg_4_b <= 0;
-            o_reg_5_b <= 0;
-            o_reg_6_b <= 0;
-            o_reg_7_b <= 0;
-            o_reg_8_b <= 0;
-
-            o_reg_0_s <= 0;
-            o_reg_1_s <= 0;
-            o_reg_2_s <= 0;
-            o_reg_3_s <= 0;
-            o_reg_4_s <= 0;
-            o_reg_5_s <= 0;
-            o_reg_6_s <= 0;
-            o_reg_7_s <= 0;
-            o_reg_8_s <= 0;
+            if(i_data_valid) begin
+                o_valid <= 1;
+            end
+            else begin
+                o_valid <= o_valid;
+            end
         end
+
+
+        // if(i_data_valid) begin
+        //     o_valid <= 1;
+        //     // order_type
+        //     o_reg_0_b <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
+        //     o_reg_0_s <=  {i_tracking_number[7:0], i_locate_code, 8'h41};
+
+        //     //o_order_type <= ADD;
+        //     // add order
+        //     o_reg_1_b <= {i_timestamp[23:0], i_tracking_number[15:8]};
+        //     o_reg_1_s <= {i_timestamp[23:0], i_tracking_number[15:8]};
+
+        //     //timestamp -- need to figure out how to do realtime 
+        //     o_reg_2_b <= {{counter[7:0]}, {i_timestamp[47:24]}};
+        //     o_reg_2_s <= {{counter[7:0]}, {i_timestamp[47:24]}}; 
+        //     //order number
+        //     o_reg_3_b <= {counter[39:8]};
+        //     o_reg_3_s <= {counter[39:8]};
+
+        //     // quantity/shares
+        //     o_reg_4_b <= {7'b0, 1'b0, 2'b00, counter[61:40]};
+        //     o_reg_4_s <= {7'b0, 1'b1, 2'b01, counter[61:40]};
+
+        //     counter <= counter + 1; 
+        //     //stock symbol
+        //     o_reg_5_b <= i_quantity;
+        //     o_reg_5_s <= i_quantity;
+
+        //     o_reg_6_b <= stock_id[31:0];
+        //     o_reg_6_s <= stock_id[31:0];
+
+        //     o_reg_7_b <= stock_id[63:32];
+        //     o_reg_7_s <= stock_id[63:32];
+
+        //     // price from quote price module
+        //     o_reg_8_b <= i_buy_price;
+        //     o_reg_8_s <= i_sell_price;
+        // end
+        // else begin
+        //     o_valid <= 0;
+        //     o_reg_0_b <= 0;
+        //     o_reg_1_b <= 0;
+        //     o_reg_2_b <= 0;
+        //     o_reg_3_b <= 0;
+        //     o_reg_4_b <= 0;
+        //     o_reg_5_b <= 0;
+        //     o_reg_6_b <= 0;
+        //     o_reg_7_b <= 0;
+        //     o_reg_8_b <= 0;
+
+        //     o_reg_0_s <= 0;
+        //     o_reg_1_s <= 0;
+        //     o_reg_2_s <= 0;
+        //     o_reg_3_s <= 0;
+        //     o_reg_4_s <= 0;
+        //     o_reg_5_s <= 0;
+        //     o_reg_6_s <= 0;
+        //     o_reg_7_s <= 0;
+        //     o_reg_8_s <= 0;
+        // end
     end
     //may need to add real stock id for output, not too sure yet.
     always_comb begin
