@@ -97,7 +97,6 @@ module hft_top
     parser parser (
         .i_clk(i_clk),
         .i_data_valid(i_data_valid),
-        .i_book_is_busy(itnl_book_is_busy),
         .i_reg_0(i_reg_0),
         .i_reg_1(i_reg_1),
         .i_reg_2(i_reg_2),
@@ -135,7 +134,6 @@ module hft_top
 
         .o_best_bid(itnl_best_bid),
         .o_best_ask(itnl_best_ask),
-        .o_book_is_busy(itnl_book_is_busy),
         .o_execute_order(intl_execute_order),
         .o_quantity(itnl_order_book_quantity),
         .o_curr_time(itnl_curr_time),
