@@ -14,7 +14,7 @@ module volatility
     input logic                                 i_data_valid,
     input logic [DATA_WIDTH - 1 : 0]            i_best_ask,
     input logic [DATA_WIDTH - 1 : 0]            i_best_bid,
-    // input logic [DATA_WIDTH - 1 : 0]            i_buffer_size,
+    input logic [DATA_WIDTH - 1 : 0]            i_buffer_size,
     input logic [FP_WORD_SIZE - 1 : 0]          i_buffer_size_reciprocal,
     output logic [FP_WORD_SIZE - 1 : 0]         o_volatility,
     output logic [DATA_WIDTH - 1 : 0]           o_curr_price, // also output curr price, needed for reference price, 
