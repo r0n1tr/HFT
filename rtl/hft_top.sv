@@ -169,7 +169,7 @@ module hft_top
     );
 
     order_quantity order_quantity(
-        .i_clk(i_clk),
+        // .i_clk(i_clk),
         .i_inventory_state(itnl_norm_inventory),
 
         .o_order_out(itnl_order_out),
@@ -181,13 +181,13 @@ module hft_top
         .i_stock_symbol(itnl_stock_id),
         .i_buy_price(itnl_buy_price),
         .i_sell_price(itnl_sell_price),
-        .i_order_id(itnl_order_id),
+        // .i_order_id(itnl_order_id),
         .i_quantity(itnl_order_filter), // floored quantity value 
         .i_trade_type(itnl_trade_type),
         .i_locate_code(itnl_locate_code),
         .i_tracking_number(itnl_tracking_number),
         .i_timestamp(itnl_curr_time),
-        .i_book_is_busy(itnl_book_is_busy),
+        // .i_book_is_busy(itnl_book_is_busy),
         .i_data_valid(itnl_data_valid),
 
 

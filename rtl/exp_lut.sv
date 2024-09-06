@@ -6,7 +6,7 @@ module exp_lut #
     parameter array_size = 1_000_000
 )
 (
-    input logic i_clk,
+    // input logic i_clk,
     input logic signed [63:0] input_value, // q32.32 fixed-point input
     output logic [63:0] exp_value // Scaled exponential value output
 );
@@ -16,7 +16,7 @@ module exp_lut #
     logic [127:0] scaled_value;
     // Read the exponential values from the memory file
     initial begin
-        $readmemh("/home/snesamal/Documents/HFT/rtl/exp_values.mem", lut);
+        $readmemh("/home/ronit/Documents/HFT/HFT/rtl/exp_values.mem", lut);
     end
     // Calculate the index based on the input_value
     logic [19:0] index; // 20-bit index to cover array_size (log2(1000000) = ~20 bits)

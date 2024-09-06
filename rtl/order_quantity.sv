@@ -2,22 +2,22 @@
 
 module order_quantity 
 (
-   input logic i_clk,
+   // input logic i_clk,
    input logic signed [63:0] i_inventory_state,
    
    output logic [63:0] o_order_out,
    output logic [31:0] o_order_filter
 );
 
-   localparam shape_parameter = 0.5;
+   // localparam shape_parameter = 0.5;
    
    logic [63:0] temp;
    logic [127:0] mult; 
 
    // Instantiate exp_lut
    exp_lut my_exp_lut (
-      .i_clk(i_clk),
-      .input_value(shape_parameter * i_inventory_state),
+      // .i_clk(i_clk),
+      .input_value(i_inventory_state >> 1),
       .exp_value(temp)
    );
 
