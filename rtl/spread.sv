@@ -1,7 +1,6 @@
 module spread
 #(
-    parameter FP_WORD_SIZE = 64,
-    parameter DATA_WIDTH = 32
+    parameter FP_WORD_SIZE = 64
 )
 (
     input logic                                     i_clk,

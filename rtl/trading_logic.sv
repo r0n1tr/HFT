@@ -63,8 +63,7 @@ module trading_logic
 
     spread 
     #(
-        .FP_WORD_SIZE(FP_WORD_SIZE),
-        .DATA_WIDTH(DATA_WIDTH)
+        .FP_WORD_SIZE(FP_WORD_SIZE)
     ) spread
     (
         .i_clk(i_clk),      

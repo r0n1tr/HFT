@@ -33,26 +33,26 @@ module volatility_mem
     logic full_reg[NUM_STOCKS - 1 : 0];
 
 
-    logic [DATA_WIDTH - 1 : 0]  moving_sum_t;
-    logic [2*DATA_WIDTH - 1 : 0]  moving_square_sum_t;
-    logic [DATA_WIDTH - 1 : 0]  remove_reg_t;
-    logic [FP_WORD_SIZE - 1 : 0]  o_volatility_t;
+    // logic [DATA_WIDTH - 1 : 0]  moving_sum_t;
+    // logic [2*DATA_WIDTH - 1 : 0]  moving_square_sum_t;
+    // logic [DATA_WIDTH - 1 : 0]  remove_reg_t;
+    // logic [FP_WORD_SIZE - 1 : 0]  o_volatility_t;
     logic [3*FP_WORD_SIZE - 1 : 0]  mean_squared;
-    logic [FP_WORD_SIZE - 1 : 0]  mean;
+    // logic [FP_WORD_SIZE - 1 : 0]  mean;
     logic [6*FP_WORD_SIZE - 1 : 0]  squared_mean;
-    logic [FP_WORD_SIZE - 1 : 0]  term4;
-    logic [95: 0]  term5;
-    logic [FP_WORD_SIZE - 1 : 0]  term6;
-    logic [FP_WORD_SIZE - 1 : 0]  term7;
+    // logic [FP_WORD_SIZE - 1 : 0]  term4;
+    // logic [95: 0]  term5;
+    // logic [FP_WORD_SIZE - 1 : 0]  term6;
+    // logic [FP_WORD_SIZE - 1 : 0]  term7;
 
-    logic flag;
+    // logic flag;
 
-    logic [DATA_WIDTH-1:0]    term1;
-    logic [95:0]    term2;
-    logic [63:0]    term3;
+    // logic [DATA_WIDTH-1:0]    term1;
+    // logic [95:0]    term2;
+    // logic [63:0]    term3;
 
-    logic [95:0]    temp1;
-    logic [95:0]    temp2;
+    // logic [95:0]    temp1;
+    // logic [95:0]    temp2;
 
     always_ff @(posedge i_clk) begin
         if(!i_reset_n) begin
@@ -67,11 +67,11 @@ module volatility_mem
             end
             o_data_valid <= 0;
             o_curr_price <= 0;
-            flag <= 0;
+            // flag <= 0;
         end
         else begin
             if (i_valid) begin
-                flag <= 0;
+                // flag <= 0;
                 buffer[i_write_address] <= ((i_best_ask+i_best_bid) >>> 1);
                 moving_sum[i_stock_id] <= moving_sum[i_stock_id] - remove_reg[i_stock_id] + ((i_best_ask+i_best_bid) >>> 1);
                 moving_square_sum[i_stock_id] <= moving_square_sum[i_stock_id] - (remove_reg[i_stock_id]**2) + (((i_best_ask+i_best_bid) >>> 1)**2);
@@ -85,7 +85,7 @@ module volatility_mem
                 else begin
                     o_curr_price <= ((i_best_ask+i_best_bid) >>> 1);
                 end
-                term1 <= i_write_address - BUFFER_SIZE + 1;
+                // term1 <= i_write_address - BUFFER_SIZE + 1;
                 if(((i_write_address-BUFFER_SIZE+1) % BUFFER_SIZE) == 0) begin
                     // buffer is full
                     o_buffer_full <= 1;
@@ -97,7 +97,7 @@ module volatility_mem
             end
             else begin
                 o_data_valid <= 0;
-                flag <= 1;
+                // flag <= 1;
                 o_curr_price <= 0;
             end
         end
@@ -129,9 +129,9 @@ module volatility_mem
     end
 
     // assign term1 = buffer[95];
-    assign moving_square_sum_t = moving_square_sum[i_stock_id];
-    assign moving_sum_t = moving_sum[i_stock_id];
-    assign remove_reg_t = remove_reg[i_stock_id];
+    // assign moving_square_sum_t = moving_square_sum[i_stock_id];
+    // assign moving_sum_t = moving_sum[i_stock_id];
+    // assign remove_reg_t = remove_reg[i_stock_id];
     // assign term1 = mean_squared[127:32];
     // assign term2 = squared_mean[191:96];
     // assign term1 = moving_sum[i_stock_id];

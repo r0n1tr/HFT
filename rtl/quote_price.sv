@@ -18,11 +18,11 @@ module quote_price
 
     logic [FP_WORD_SIZE - 1 : 0]        reg_buy_price;
     logic [FP_WORD_SIZE - 1 : 0]        reg_ask_price;
-    logic tmp;
+    // logic tmp;
 
     always_ff @(posedge i_clk) begin
         if(i_data_valid) begin
-            tmp <= 0;
+            // tmp <= 0;
             o_data_valid <= 1;
 
             if (i_buffer_full) begin
@@ -36,7 +36,7 @@ module quote_price
                     reg_buy_price <=  {i_best_bid, 32'b0};
                 end
                 else if (i_best_bid == 32'b0) begin
-                    tmp <= 1;
+                    // tmp <= 1;
                     reg_buy_price <= {i_best_ask, 32'b0};
                     reg_ask_price <= {i_best_ask, 32'b0};
 

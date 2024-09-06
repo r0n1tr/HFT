@@ -19,4 +19,5 @@ verilator -Wall --cc --trace ../rtl/${MODULE_NAME}.sv --exe ${MODULE_NAME}_tb.cp
 make -j -C obj_dir/ -f V${MODULE_NAME}.mk V${MODULE_NAME}
 
 # run executable simulation file
+echo "done"
 obj_dir/V${MODULE_NAME}

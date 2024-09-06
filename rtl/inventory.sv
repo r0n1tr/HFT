@@ -18,10 +18,10 @@ module inventory
 );
 
     logic signed [2*FP_WORD_SIZE - 1 : 0]         norm_inventory [NUM_STOCKS - 1 : 0];
-    logic signed [FP_WORD_SIZE - 1 : 0]           temp1;
-    logic signed [FP_WORD_SIZE - 1 : 0]           temp2;
-    logic signed [FP_WORD_SIZE - 1 : 0]           temp3;
-    logic signed [FP_WORD_SIZE - 1 : 0]           temp4;
+    // logic signed [FP_WORD_SIZE - 1 : 0]           temp1;
+    // logic signed [FP_WORD_SIZE - 1 : 0]           temp2;
+    // logic signed [FP_WORD_SIZE - 1 : 0]           temp3;
+    // logic signed [FP_WORD_SIZE - 1 : 0]           temp4;
 
     always_ff @(posedge i_clk) begin
         if(!i_reset_n) begin
@@ -41,10 +41,10 @@ module inventory
     end
 
     assign o_norm_inventory = norm_inventory[i_stock_id][95:32];
-    assign temp1 = norm_inventory[0][95:32];
-    assign temp2 = norm_inventory[1][95:32];
-    assign temp3 = norm_inventory[2][95:32];
-    assign temp4 = norm_inventory[3][95:32];
+    // assign temp1 = norm_inventory[0][95:32];
+    // assign temp2 = norm_inventory[1][95:32];
+    // assign temp3 = norm_inventory[2][95:32];
+    // assign temp4 = norm_inventory[3][95:32];
 
     // always_ff @(posedge i_clk) begin
     //     o_norm_inventory <= i_ren ? norm_inventory[i_stock_id][95:32] : 0;
