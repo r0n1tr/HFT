@@ -148,6 +148,7 @@ module parser
         end
         else begin
             o_valid <= 0;
+            // o_stock_symbol <= 0;
         end
     end
 

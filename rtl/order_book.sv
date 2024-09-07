@@ -149,6 +149,7 @@ module order_book
     output logic            o_execute_order,
     output logic [31:0]     o_quantity,
     output logic [63:0]     o_curr_time,
+    output logic [1:0]      o_stock_id,
     output logic            o_trade_type,
     output logic            o_data_valid // data is valid when high
 );
@@ -502,6 +503,21 @@ module order_book
                 num_trades_ask[k] <= 0;
             end
             curr_state <= IDLE; 
+            o_quantity <= 0;
+            o_curr_time <= 0;
+            o_stock_id <= 0;
+            o_best_ask <= 0;
+            o_best_bid <= 0;
+            temp_max_price <= 0;
+            temp_max_order_id <= 0;
+            temp_max_reg1 <= 0;
+            temp_min_order_id <= 0;
+            temp_min_reg1 <= 0;
+            search_pointer <= 0;
+            o_trade_type <= 0;
+            cancel_register <= 0;
+            reg_order_type <= 0;
+            reg1 <= 0;
         end
     end
 
@@ -816,6 +832,7 @@ module order_book
                 o_best_bid <= best_bid_cache[(i_stock_id*3)+1];
                 o_best_ask <= best_ask_cache[(i_stock_id*3)+1];
                 o_quantity <= i_execute_order_quantity;
+                o_stock_id <= i_stock_id;
             end 
             default: curr_state <= IDLE; 
         endcase

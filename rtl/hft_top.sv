@@ -89,6 +89,7 @@ module hft_top
     logic [FP_WORD_SIZE - 1 : 0]         intl_parser_curr_time;
     logic                                intl_execute_order;
     logic                                itnl_execute_trade_type;
+    logic [1:0]                          order_book_stock_id;
 
     // order_quantity internal signals
     logic [63:0] itnl_order_out;
@@ -138,6 +139,7 @@ module hft_top
         .o_quantity(itnl_order_book_quantity),
         .o_curr_time(itnl_curr_time),
         .o_trade_type(itnl_execute_trade_type),
+        .o_stock_id(order_book_stock_id),
         .o_data_valid(order_book_itnl_data_valid)
     );
 
@@ -149,7 +151,7 @@ module hft_top
         .i_curr_time(itnl_curr_time),
         .i_inventory_state(itnl_norm_inventory),
         .i_data_valid(order_book_itnl_data_valid),
-        .i_stock_id(itnl_stock_id),
+        .i_stock_id(order_book_stock_id),
 
         .o_buy_price(itnl_buy_price),
         .o_sell_price(itnl_sell_price),
@@ -159,7 +161,7 @@ module hft_top
     inventory inventory (
         .i_clk(i_clk),
         .i_reset_n(i_reset_n),
-        .i_stock_id(itnl_stock_id),
+        .i_stock_id(order_book_stock_id),
         .i_max_inventory_reciprocal(64'd262144), // 1/16384 where 16384 is max inventory // again no idea
         .i_execute_order_quantity(itnl_quantity), // not sure if u want some volatility output here
         .i_execute_order(intl_execute_order),
@@ -178,12 +180,11 @@ module hft_top
 
     reverse_parser reverse_parser (
         .i_clk(i_clk),
-        .i_stock_symbol(itnl_stock_id),
+        .i_stock_symbol(order_book_stock_id),
         .i_buy_price(itnl_buy_price),
         .i_sell_price(itnl_sell_price),
         // .i_order_id(itnl_order_id),
         .i_quantity(itnl_order_filter), // floored quantity value 
-        .i_trade_type(itnl_trade_type),
         .i_locate_code(itnl_locate_code),
         .i_tracking_number(itnl_tracking_number),
         .i_timestamp(itnl_curr_time),
