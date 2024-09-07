@@ -86,17 +86,28 @@ module parser
 
     always_comb begin
         case(i_reg_0[7:0])
-            8'h41:
+            8'h41: begin
                 i_stock_id = {i_reg_7, i_reg_6};
-            8'h44:
+                o_tracking_number = {i_reg_1[7:0], i_reg_0[31:24]};
+                o_locate_code = i_reg_0[23:8];
+            end
+            8'h44: begin
                 i_stock_id = {i_reg_6[23:0], i_reg_5, i_reg_4[31:24]};
-            8'h45:
+                o_tracking_number = {i_reg_1[7:0], i_reg_0[31:24]};
+                o_locate_code = i_reg_0[23:8];
+            end
+            8'h45: begin
                 i_stock_id = {i_reg_7[23:0], i_reg_6[31:0], i_reg_5[31:24]};
-            default:
+                o_tracking_number = {i_reg_1[7:0], i_reg_0[31:24]};
+                o_locate_code = i_reg_0[23:8];
+            end
+            default: begin
                 i_stock_id = 64'b0;
+                o_tracking_number = 16'b0;
+                o_locate_code = 16'b0;
+            end
         endcase
-        o_locate_code = i_reg_0[23:8];
-        o_tracking_number = {i_reg_1[7:0], i_reg_0[31:24]};
+        
     end
 
     logic [1:0] stock_id;
