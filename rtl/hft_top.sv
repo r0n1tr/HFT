@@ -98,6 +98,7 @@ module hft_top
     parser parser (
         .i_clk(i_clk),
         .i_data_valid(i_data_valid),
+        .i_reset_n(i_reset_n),
         .i_reg_0(i_reg_0),
         .i_reg_1(i_reg_1),
         .i_reg_2(i_reg_2),
@@ -180,6 +181,7 @@ module hft_top
 
     reverse_parser reverse_parser (
         .i_clk(i_clk),
+        .i_reset_n(i_reset_n),
         .i_stock_symbol(order_book_stock_id),
         .i_buy_price(itnl_buy_price),
         .i_sell_price(itnl_sell_price),

@@ -107,6 +107,7 @@ module trading_logic
         .i_clk(i_clk),
         .i_ref_price(w_ref_price),
         .i_spread(w_spread),
+        .i_reset_n(i_reset_n),
         .i_buffer_full(w_buffer_full),
         .i_best_ask(i_best_ask),
         .i_best_bid(i_best_bid),

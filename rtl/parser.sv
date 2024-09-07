@@ -41,6 +41,7 @@ module parser
 (
     input logic                         i_clk, 
     input logic                         i_data_valid,
+    input logic                         i_reset_n,
     input logic [REG_WIDTH - 1 : 0]     i_reg_0, // order type - add cancel etc.
     input logic [REG_WIDTH - 1 : 0]     i_reg_1,
     input logic [REG_WIDTH - 1 : 0]     i_reg_2,
@@ -101,6 +102,13 @@ module parser
     logic [1:0] stock_id;
 
     always_ff @(posedge i_clk) begin
+        if(!i_reset_n) begin
+            o_tracking_number <= 0;
+            o_locate_code <= 0;
+        end
+    end
+
+    always_ff @(posedge i_clk) begin
 
         if(i_data_valid) begin
             o_valid <= 1;
@@ -148,6 +156,15 @@ module parser
         end
         else begin
             o_valid <= 0;
+            // o_order_type <= 0;
+            // o_stock_symbol <= 0;
+            // o_order_id <= 0;
+            // o_price <= 0;
+            // o_quantity <= 0;
+            // o_trade_type <= 0;
+            // o_curr_time <= 48'b0;
+            o_tracking_number <= 0;
+            o_locate_code <= 0;
             // o_stock_symbol <= 0;
         end
     end

@@ -7,6 +7,7 @@ module quote_price
     input logic                         i_clk,
     input logic [FP_WORD_SIZE - 1 : 0]  i_ref_price,
     input logic [FP_WORD_SIZE - 1 : 0]  i_spread,
+    input logic                         i_reset_n,
     input logic                         i_buffer_full,
     input logic [DATA_WIDTH - 1 : 0]    i_best_ask,
     input logic [DATA_WIDTH - 1 : 0]    i_best_bid,
@@ -19,6 +20,13 @@ module quote_price
     logic [FP_WORD_SIZE - 1 : 0]        reg_buy_price;
     logic [FP_WORD_SIZE - 1 : 0]        reg_ask_price;
     // logic tmp;
+
+    always_ff @(posedge i_clk) begin
+        if(!i_reset_n) begin
+            reg_ask_price <= 0;
+            reg_buy_price <= 0;
+        end
+    end
 
     always_ff @(posedge i_clk) begin
         if(i_data_valid) begin
@@ -48,8 +56,8 @@ module quote_price
             end
         end
         else begin 
-            reg_ask_price <= 0;
-            reg_buy_price <= 0;
+            // reg_ask_price <= 0;
+            // reg_buy_price <= 0;
             o_data_valid <= 0;
         end 
     end
