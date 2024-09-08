@@ -114,8 +114,8 @@ module parser
 
     always_ff @(posedge i_clk) begin
         if(!i_reset_n) begin
-            o_tracking_number <= 0;
-            o_locate_code <= 0;
+            // o_tracking_number <= 0;
+            // o_locate_code <= 0;
         end
     end
 
@@ -174,8 +174,8 @@ module parser
             // o_quantity <= 0;
             // o_trade_type <= 0;
             // o_curr_time <= 48'b0;
-            o_tracking_number <= 0;
-            o_locate_code <= 0;
+            // o_tracking_number <= 0;
+            // o_locate_code <= 0;
             // o_stock_symbol <= 0;
         end
     end
@@ -186,6 +186,7 @@ module parser
             64'h414d5a4e20202020 : stock_id = AMZN;
             64'h474f4f474c202020 : stock_id = GOOGL;
             64'h4d53465420202020 : stock_id = MSFT;
+            default : stock_id = AAPL;
         endcase
     end
 

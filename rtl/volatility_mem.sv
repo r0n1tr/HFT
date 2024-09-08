@@ -104,8 +104,18 @@ module volatility_mem
     end
 
     always_comb begin
-        if(i_valid) remove_reg[i_stock_id] = buffer[i_write_address];
-        else remove_reg[i_stock_id] = 0;
+        if (i_valid) begin
+            remove_reg[0] = buffer[i_write_address];
+            remove_reg[1] = buffer[i_write_address];
+            remove_reg[2] = buffer[i_write_address];
+            remove_reg[3] = buffer[i_write_address];
+        end
+        else begin
+            remove_reg[0] = 0;
+            remove_reg[1] = 0;
+            remove_reg[2] = 0;
+            remove_reg[3] = 0;
+        end
     end
 
 

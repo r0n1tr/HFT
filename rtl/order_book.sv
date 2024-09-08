@@ -471,15 +471,34 @@ module order_book
     always_comb begin 
         if(!i_trade_type) begin
             /* verilator lint_off WIDTH */
-            write_pointer_array_bid[i_stock_id] = ((i_stock_id * BOOK_DEPTH) + ((num_trades_bid[i_stock_id])))*3;
+            write_pointer_array_bid[0] = ((0 * BOOK_DEPTH) + ((num_trades_bid[0])))*3;
+            write_pointer_array_ask[0] = ((0 * BOOK_DEPTH) + ((num_trades_ask[0])))*3 ;
+            
+            write_pointer_array_bid[1] = ((1 * BOOK_DEPTH) + ((num_trades_bid[1])))*3;
+            write_pointer_array_ask[1] = ((1 * BOOK_DEPTH) + ((num_trades_ask[1])))*3 ;
+
+            write_pointer_array_bid[2] = ((2 * BOOK_DEPTH) + ((num_trades_bid[2])))*3;
+            write_pointer_array_ask[2] = ((2 * BOOK_DEPTH) + ((num_trades_ask[2])))*3 ;
+
+            write_pointer_array_bid[3] = ((3 * BOOK_DEPTH) + ((num_trades_bid[3])))*3;
+            write_pointer_array_ask[3] = ((3 * BOOK_DEPTH) + ((num_trades_ask[3])))*3 ;
             /* verilator lint_on WIDTH */
-            write_pointer_array_ask[i_stock_id] = ((i_stock_id * BOOK_DEPTH) + ((num_trades_ask[i_stock_id])))*3 ;
         end
         else begin
             /* verilator lint_off WIDTH */
-            write_pointer_array_ask[i_stock_id] = ((i_stock_id * BOOK_DEPTH) + ((num_trades_ask[i_stock_id])))*3 ;
+            write_pointer_array_ask[0] = ((0 * BOOK_DEPTH) + ((num_trades_ask[0])))*3;
+            write_pointer_array_bid[0] = ((0 * BOOK_DEPTH) + ((num_trades_bid[0])))*3;
+
+            write_pointer_array_ask[1] = ((1 * BOOK_DEPTH) + ((num_trades_ask[1])))*3;
+            write_pointer_array_bid[1] = ((1 * BOOK_DEPTH) + ((num_trades_bid[1])))*3;
+
+            write_pointer_array_ask[2] = ((2 * BOOK_DEPTH) + ((num_trades_ask[2])))*3;
+            write_pointer_array_bid[2] = ((2 * BOOK_DEPTH) + ((num_trades_bid[2])))*3;
+
+            write_pointer_array_ask[3] = ((3 * BOOK_DEPTH) + ((num_trades_ask[3])))*3;
+            write_pointer_array_bid[3] = ((3 * BOOK_DEPTH) + ((num_trades_bid[3])))*3;
+
             /* verilator lint_on WIDTH */
-            write_pointer_array_bid[i_stock_id] = ((i_stock_id * BOOK_DEPTH) + ((num_trades_bid[i_stock_id])))*3;
         end
     end
 

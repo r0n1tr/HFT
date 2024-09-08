@@ -33,10 +33,16 @@ module volatility_ctrl
 
     always_comb begin
         if(i_data_valid) begin
-            write_address_next[i_stock_id] = (i_buffer_size*i_stock_id)+((write_address[i_stock_id])%i_buffer_size); 
+            write_address_next[0] = (i_buffer_size*0)+((write_address[0])%i_buffer_size); 
+            write_address_next[1] = (i_buffer_size*1)+((write_address[1])%i_buffer_size);
+            write_address_next[2] = (i_buffer_size*2)+((write_address[2])%i_buffer_size);
+            write_address_next[3] = (i_buffer_size*3)+((write_address[3])%i_buffer_size);
         end
         else begin
-            write_address_next[i_stock_id] = write_address[i_stock_id];
+            write_address_next[0] = write_address[0];
+            write_address_next[1] = write_address[1];
+            write_address_next[2] = write_address[2];
+            write_address_next[3] = write_address[3];
         end
     end
 
